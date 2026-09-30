@@ -95,6 +95,25 @@ public actor DropKeeperEngine {
         env.store.observeFiles(in: states)
     }
 
+    /// `observeFiles(in:)` as a standard-library stream, for clients that do not link GRDB themselves
+    /// (the app target: GRDB is linked into this package's framework and its generic symbols are not exported).
+    public nonisolated func fileUpdates(in states: [FileState]) -> AsyncThrowingStream<[TrackedFile], any Error> {
+        let observation = observeFiles(in: states)
+        return AsyncThrowingStream { continuation in
+            let task = Task {
+                do {
+                    for try await files in observation {
+                        continuation.yield(files)
+                    }
+                    continuation.finish()
+                } catch {
+                    continuation.finish(throwing: error)
+                }
+            }
+            continuation.onTermination = { _ in task.cancel() }
+        }
+    }
+
     // MARK: Lifecycle
 
     public func start() throws {
