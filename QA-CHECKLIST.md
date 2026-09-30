@@ -4,16 +4,22 @@ Run before every release. Record the macOS version and Mac model.
 
 ## Safe test run (development builds)
 
-Debug builds accept launch arguments that keep testing away from your real data: `-dbPath <file>` uses a separate database, `-noLoginItem YES` leaves login items alone, and `-watch <folder>` watches a test folder instead of the real Downloads. Nothing in your real database, defaults or login items is touched.
+Debug builds accept launch arguments that keep testing away from your real data: `-dbPath <file>` uses a separate database and a separate defaults suite, `-noLoginItem YES` leaves login items alone, and `-watch <folder>` (only together with `-dbPath`) watches a test folder. With both, onboarding offers the test folder (already watched) instead of the real Downloads, so a first-launch run never asks for or watches Downloads. Nothing in your real database, defaults or login items is touched. A new `-dbPath` file starts like a first launch.
 
+Build the debug app into `build/dd`, then run it:
+
+    xcodegen generate && xcodebuild build -project DropKeeper.xcodeproj -scheme DropKeeper -destination 'platform=macOS,arch=arm64' -derivedDataPath build/dd -quiet
     mkdir -p /tmp/dk-watch
     build/dd/Build/Products/Debug/DropKeeper.app/Contents/MacOS/DropKeeper \
       -dbPath /tmp/dk-test.sqlite -noLoginItem YES -watch /tmp/dk-watch
+
+Quit it from the menu bar item (or Ctrl-C in the terminal) when done.
 
 Release builds ignore these arguments.
 
 ## Presentation
 - [ ] Notched MacBook, lid open, no external display: the prompt grows out of the notch and the closed notch shows the mark + count while files are scheduled.
+- [ ] File name fully visible below the notch (prompt, notice, hover list and error: nothing sits behind the cutout).
 - [ ] Hovering the closed notch opens the list; moving away closes it after a moment.
 - [ ] Hover while the panel resizes (closed notch → list) does not flicker.
 - [ ] Lid closed with an external display: the prompt appears under the menu bar icon.
@@ -27,7 +33,9 @@ Release builds ignore these arguments.
 - [ ] Browser download (Safari, Chrome, Firefox): exactly one prompt per finished file, none for partial files.
 - [ ] Three files at once: one stack, "Apply to all" applies to all three.
 - [ ] Esc: the prompt closes; the file gets the default choice after the grace period.
-- [ ] Quiet mode: no prompt opens by itself; a dot appears on the menu bar icon; clicking a waiting file in the list opens the prompt.
+- [ ] Quiet mode: no prompt opens by itself; a dot appears on the menu bar icon; clicking a waiting file in the list opens the prompt for that file.
+- [ ] Close a prompt with Esc, then click that file ("Waiting") in the list: its prompt opens again. In Quiet mode the next download still doesn't open by itself.
+- [ ] A file expires while a prompt is open: after the prompt closes, the notice shows for 2.5 s with Undo.
 - [ ] Expiry: the file goes to the Trash, the notice shows for 2.5 s, and Undo puts it back.
 - [ ] Two expiries within 2.5 s: one merged notice; Undo restores both.
 - [ ] Permanent-delete mode: confirmation on switching; the notice says "Deleted" and has no Undo.
@@ -35,7 +43,9 @@ Release builds ignore these arguments.
 - [ ] Sleep the Mac past an expiry: after wake the file is trashed within seconds.
 - [ ] Remove Downloads access in System Settings: warning icon in the menu bar and in Settings; "Check again" clears it after granting access.
 - [ ] Launch at login toggles in System Settings → General → Login Items.
-- [ ] An error from a prompt or list action is visible to the user (currently only shown in Settings — note what happens).
+- [ ] A failed prompt, list or notice action (e.g. Undo after emptying the Trash) shows a short error in the panel (and in the open list); a failed Undo keeps the notice so Undo can be tried again.
+- [ ] Onboarding: if adding Downloads fails, an alert explains why.
+- [ ] If the engine can't start, an alert says so and DropKeeper quits (no silent menu bar item).
 
 ## Accessibility and appearance
 - [ ] VoiceOver: the timeline reads "Delete in 1 hour, at …" and can be adjusted with VoiceOver gestures.
