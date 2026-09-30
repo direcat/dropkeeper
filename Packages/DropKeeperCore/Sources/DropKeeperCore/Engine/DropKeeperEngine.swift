@@ -57,19 +57,19 @@ public actor DropKeeperEngine {
     let env: EngineEnvironment
     var settings = Settings()
     var folders: [WatchedFolder] = []
-    private var tracker = StabilityTracker()
+    var tracker = StabilityTracker()
     private var eventSource: (any FolderEventSource)?
     private var eventTask: Task<Void, Never>?
     private var timerTask: Task<Void, Never>?
     var isRunning = false
     /// Lower bound for the fallback scan: the heartbeat from the previous session.
-    private var scanBound: Date?
+    var scanBound: Date?
     /// When each folder (by id) stopped being `.ok` during this session; bounds its rescan on return.
     var unavailableSince: [Int64: Date] = [:]
 
     var store: FileStore { env.store }
     var actions: ItemActions { ItemActions(fs: env.fs) }
-    private var reconciler: Reconciler { Reconciler(fs: env.fs) }
+    var reconciler: Reconciler { Reconciler(fs: env.fs) }
     var trasher: Trasher { Trasher(fs: env.fs) }
 
     public init(environment: EngineEnvironment) {
@@ -159,7 +159,7 @@ public actor DropKeeperEngine {
         return inserted
     }
 
-    private func folder(containing path: String) -> WatchedFolder? {
+    func folder(containing path: String) -> WatchedFolder? {
         folders.first { $0.status == .ok && $0.contains(path) }
     }
 
@@ -277,93 +277,6 @@ public actor DropKeeperEngine {
         rescheduleTimer()
     }
 
-    private func process(path: String, flags: FolderEventFlags, folder: WatchedFolder, now: Date) {
-        guard let stat = env.fs.stat(path) else {
-            for var file in (try? store.files(in: [.pending, .scheduled], path: path)) ?? [] {
-                let outcome = reconciler.reconcile(&file, folders: folders, now: now)
-                persist(file, outcome: outcome)
-            }
-            return
-        }
-        if var file = trackedRecord(at: path, stat: stat) {
-            let outcome = reconciler.adopt(path: path, stat: stat, file: &file, folders: folders, now: now)
-            persist(file, outcome: outcome)
-            return
-        }
-        guard flags.contains(.created) || flags.contains(.renamed) else { return }
-        guard isNewItem(path: path, stat: stat, folder: folder, since: folder.addedAt) else { return }
-        tracker.observe(path, size: stat.size, now: now)
-    }
-
-    private func isNewItem(path: String, stat: FileStat, folder: WatchedFolder, since: Date) -> Bool {
-        guard
-            DownloadDetector.isCandidate(
-                path: path, folderPath: folder.path, ignoredExtensions: settings.ignoredExtensions)
-        else { return false }
-        guard let added = stat.addedDate ?? stat.creationDate else { return false }
-        return added >= since
-    }
-
-    /// Identity per spec §3.1: inode + volume first, the id xattr only as a fallback.
-    /// A path carrying the id of a record whose original is still in place is a duplicate
-    /// (e.g. a Finder copy) and is treated as a new item.
-    private func trackedRecord(at path: String, stat: FileStat) -> TrackedFile? {
-        if let file = try? store.file(inode: stat.inode, volumeId: stat.volumeId, excluding: [.gone, .trashed]) {
-            return file
-        }
-        guard let id = env.fs.readXattr(ItemActions.idAttribute, at: path), let file = try? store.file(id: id)
-        else { return nil }
-        if file.path != path, let original = env.fs.stat(file.path), original.inode == file.inode,
-            original.volumeId == file.volumeId
-        {
-            return nil
-        }
-        return file
-    }
-
-    private func persist(_ file: TrackedFile, outcome: ReconcileOutcome) {
-        guard outcome != .unchanged else { return }
-        if file.state == .kept { actions.clearMarks(at: file.path) }
-        do {
-            try store.update(file)
-        } catch {
-            Log.engine.error("Could not persist \(file.id): \(error.localizedDescription)")
-        }
-    }
-
-    private func scanForNewItems(in scanned: [WatchedFolder], since bound: Date, now: Date) {
-        for folder in scanned where folder.status == .ok {
-            let since = max(bound, folder.addedAt)
-            for name in (try? env.fs.contentsOfDirectory(folder.path)) ?? [] {
-                let path = folder.path + "/" + name
-                guard let stat = env.fs.stat(path), trackedRecord(at: path, stat: stat) == nil,
-                    isNewItem(path: path, stat: stat, folder: folder, since: since)
-                else { continue }
-                tracker.observe(path, size: stat.size, now: now)
-            }
-        }
-    }
-
-    private func pollTracker(now: Date) {
-        guard !tracker.isEmpty else { return }
-        for (path, stat) in tracker.poll(now: now, fs: env.fs) {
-            guard let folder = folder(containing: path),
-                DownloadDetector.isCandidate(
-                    path: path, folderPath: folder.path, ignoredExtensions: settings.ignoredExtensions),
-                trackedRecord(at: path, stat: stat) == nil
-            else { continue }
-            let file = TrackedFile.new(path: path, stat: stat, folderId: folder.id, now: now)
-            // A duplicate may carry the original's expiry xattr and tag; markPending overwrites the id.
-            actions.clearMarks(at: path)
-            actions.markPending(file)
-            do {
-                try store.insert(file)
-            } catch {
-                Log.engine.error("Could not insert record: \(error.localizedDescription)")
-            }
-        }
-    }
-
     // MARK: Scheduling
 
     func tick() {
@@ -456,7 +369,7 @@ public actor DropKeeperEngine {
 extension DropKeeperEngine {
     // MARK: Housekeeping
 
-    private func metaDate(_ key: MetaKey) -> Date? {
+    func metaDate(_ key: MetaKey) -> Date? {
         (try? store.meta(key)).flatMap(ISODate.parse)
     }
 

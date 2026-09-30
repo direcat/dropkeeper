@@ -81,7 +81,9 @@ extension DropKeeperEngine {
     }
 
     /// Deletes all history records (kept, trashed, gone, failed); active records stay.
+    /// The time is remembered so files that outlive their records are not re-detected (see `orphanBound`).
     public func clearHistory() throws -> Int {
-        try Maintenance(store: store).clearHistory()
+        try store.setMeta(.lastHistoryClearAt, ISODate.format(env.time.now()))
+        return try Maintenance(store: store).clearHistory()
     }
 }
