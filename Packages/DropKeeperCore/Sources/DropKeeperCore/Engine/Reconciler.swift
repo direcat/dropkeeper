@@ -12,9 +12,11 @@ public struct Reconciler: Sendable {
         self.fs = fs
     }
 
+    /// Reconciles active (pending/scheduled) records; inactive records are returned unchanged.
     public func reconcile(_ file: inout TrackedFile, folders: [WatchedFolder], now: Date) -> ReconcileOutcome {
+        guard file.state.isActive else { return .unchanged }
         if let stat = fs.stat(file.path) {
-            if stat.inode == file.inode && stat.volumeId == file.volumeId {
+            if stat.inode == file.inode && stat.volumeId == file.volumeId && identityMatches(file, path: file.path) {
                 return place(&file, at: file.path, folders: folders, now: now, identityChanged: false)
             }
             if fs.readXattr(ItemActions.idAttribute, at: file.path) == file.id {
@@ -27,7 +29,8 @@ public struct Reconciler: Sendable {
             folders.first { $0.id == file.folderId }?.path
             ?? (file.path as NSString).deletingLastPathComponent
         if let newPath = fs.path(forInode: file.inode, onVolumeOf: reference),
-            let stat = fs.stat(newPath), stat.volumeId == file.volumeId
+            let stat = fs.stat(newPath), stat.volumeId == file.volumeId,
+            identityMatches(file, path: newPath)
         {
             return place(&file, at: newPath, folders: folders, now: now, identityChanged: false)
         }
@@ -35,6 +38,13 @@ public struct Reconciler: Sendable {
         file.expiresAt = nil
         file.updatedAt = now
         return .gone
+    }
+
+    /// False only when the path carries a DropKeeper id xattr that belongs to another record.
+    /// A missing xattr is accepted (volumes without xattr support).
+    private func identityMatches(_ file: TrackedFile, path: String) -> Bool {
+        guard let id = fs.readXattr(ItemActions.idAttribute, at: path) else { return true }
+        return id == file.id
     }
 
     /// The item was observed at `path` (via an event) and identified as `file`.

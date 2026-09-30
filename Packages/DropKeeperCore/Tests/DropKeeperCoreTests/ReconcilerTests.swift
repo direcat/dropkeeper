@@ -107,3 +107,30 @@ private func setup() -> (FakeFileSystem, TrackedFile) {
             == .moved)
     #expect(file.path == "/fake/D/c.pdf")
 }
+
+@Test func candidateWithDifferentIdXattrIsGone() {
+    let (fs, original) = setup()
+    var file = original
+    fs.move("/fake/D/a.pdf", "/fake/D/sub/b.pdf")
+    try? fs.writeXattr(ItemActions.idAttribute, value: "other-id", at: "/fake/D/sub/b.pdf")
+    #expect(Reconciler(fs: fs).reconcile(&file, folders: [downloads], now: baseTime) == .gone)
+    #expect(file.state == .gone)
+}
+
+@Test func sameInodeWithDifferentIdXattrIsNotInPlace() {
+    let (fs, original) = setup()
+    var file = original
+    try? fs.writeXattr(ItemActions.idAttribute, value: "other-id", at: "/fake/D/a.pdf")
+    #expect(Reconciler(fs: fs).reconcile(&file, folders: [downloads], now: baseTime) == .gone)
+}
+
+@Test func inactiveRecordIsReturnedUnchanged() {
+    let (fs, original) = setup()
+    var file = original
+    file.state = .trashed
+    file.trashPath = "/fake/.Trash/a.pdf"
+    fs.delete("/fake/D/a.pdf")
+    let before = file
+    #expect(Reconciler(fs: fs).reconcile(&file, folders: [downloads], now: baseTime) == .unchanged)
+    #expect(file == before)
+}
