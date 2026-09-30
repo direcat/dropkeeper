@@ -1,0 +1,103 @@
+import CoreGraphics
+import DropKeeperCore
+import SwiftUI
+import Testing
+
+@testable import DropKeeper
+
+private let notch = CGRect(x: 656, y: 950, width: 200, height: 32)
+private let builtIn = ScreenDescriptor(
+    id: 1, frame: CGRect(x: 0, y: 0, width: 1512, height: 982),
+    visibleFrame: CGRect(x: 0, y: 0, width: 1512, height: 950),
+    isBuiltIn: true, isPrimary: true, notchRect: notch)
+private let external = ScreenDescriptor(
+    id: 2, frame: CGRect(x: 1512, y: 0, width: 2560, height: 1440),
+    visibleFrame: CGRect(x: 1512, y: 0, width: 2560, height: 1415),
+    isBuiltIn: false, isPrimary: false, notchRect: nil)
+
+private func secondary(_ screen: ScreenDescriptor) -> ScreenDescriptor {
+    ScreenDescriptor(
+        id: screen.id, frame: screen.frame, visibleFrame: screen.visibleFrame, isBuiltIn: screen.isBuiltIn,
+        isPrimary: false, notchRect: screen.notchRect)
+}
+
+private func primary(_ screen: ScreenDescriptor) -> ScreenDescriptor {
+    ScreenDescriptor(
+        id: screen.id, frame: screen.frame, visibleFrame: screen.visibleFrame, isBuiltIn: screen.isBuiltIn,
+        isPrimary: true, notchRect: screen.notchRect)
+}
+
+@Test func automaticUsesNotchOnPrimaryNotchedLaptop() {
+    #expect(PresentationResolver.resolve(.automatic, screens: [builtIn]) == .notch(builtIn))
+    #expect(PresentationResolver.resolve(.automatic, screens: [builtIn, external]) == .notch(builtIn))
+}
+
+@Test func reviewFocusClosedLidOrExternalPrimaryUsesMenuBar() {
+    #expect(PresentationResolver.resolve(.automatic, screens: [primary(external)]) == .menuBar)
+    #expect(PresentationResolver.resolve(.notch, screens: [primary(external)]) == .menuBar)
+    let externalMain = [primary(external), secondary(builtIn)]
+    #expect(PresentationResolver.resolve(.automatic, screens: externalMain) == .menuBar)
+    #expect(PresentationResolver.resolve(.notch, screens: externalMain) == .notch(secondary(builtIn)))
+}
+
+@Test func menuBarSettingAlwaysUsesMenuBar() {
+    #expect(PresentationResolver.resolve(.menuBar, screens: [builtIn]) == .menuBar)
+}
+
+@Test func notchRectFromAuxiliaryAreas() {
+    let frame = CGRect(x: 0, y: 0, width: 1512, height: 982)
+    let left = CGRect(x: 0, y: 950, width: 656, height: 32)
+    let right = CGRect(x: 856, y: 950, width: 656, height: 32)
+    #expect(NotchGeometry.notchRect(screenFrame: frame, leftArea: left, rightArea: right) == notch)
+    #expect(NotchGeometry.notchRect(screenFrame: frame, leftArea: nil, rightArea: right) == nil)
+}
+
+@Test func panelHangsFromTopCenteredOnNotch() {
+    let size = CGSize(width: 420, height: 132)
+    let frame = NotchGeometry.panelFrame(notch: notch, screenFrame: builtIn.frame, size: size)
+    #expect(frame == CGRect(x: 546, y: 850, width: 420, height: 132))
+    #expect(NotchGeometry.idleFrame(notch: notch) == CGRect(x: 600, y: 950, width: 312, height: 32))
+}
+
+@Test func menuBarPanelStaysOnScreen() {
+    let visible = CGRect(x: 0, y: 0, width: 1512, height: 950)
+    let anchor = CGRect(x: 1480, y: 950, width: 24, height: 32)
+    let frame = NotchGeometry.menuBarPanelFrame(
+        anchor: anchor, visibleFrame: visible, size: CGSize(width: 420, height: 132))
+    #expect(frame.maxX == 1504)  // 8 pt margin
+    #expect(frame.maxY == 944)  // 6 pt under the menu bar item
+}
+
+private struct DecisionCase: Sendable {
+    let prompt: Bool
+    let notice: Bool
+    let notched: Bool
+    let count: Int
+    let hovering: Bool
+    let expected: PanelContent
+}
+
+@Test(arguments: [
+    DecisionCase(prompt: true, notice: false, notched: false, count: 0, hovering: false, expected: .prompt),
+    DecisionCase(prompt: false, notice: true, notched: false, count: 0, hovering: false, expected: .notice),
+    DecisionCase(prompt: false, notice: false, notched: true, count: 3, hovering: false, expected: .idle),
+    DecisionCase(prompt: false, notice: false, notched: true, count: 3, hovering: true, expected: .idleExpanded),
+    DecisionCase(prompt: false, notice: false, notched: true, count: 0, hovering: false, expected: .hidden),
+    // menu bar target has no idle panel
+    DecisionCase(prompt: false, notice: false, notched: false, count: 3, hovering: false, expected: .hidden),
+])
+private func reviewFocusPanelDecision(_ testCase: DecisionCase) {
+    let target: PresentationTarget = testCase.notched ? .notch(builtIn) : .menuBar
+    #expect(
+        PanelDecision.content(
+            promptAvailable: testCase.prompt, noticeVisible: testCase.notice, target: target,
+            scheduledCount: testCase.count, hovering: testCase.hovering) == testCase.expected)
+}
+
+@Test func notchShapeHasSquareTopAndRoundedBottom() {
+    let rect = CGRect(x: 0, y: 0, width: 420, height: 132)
+    let path = NotchShape(bottomRadius: 20).path(in: rect)
+    #expect(path.boundingRect == rect)
+    #expect(path.contains(CGPoint(x: 0.5, y: 0.5)))  // top-left corner is square
+    #expect(!path.contains(CGPoint(x: 0.5, y: 131.5)))  // bottom-left corner is rounded away
+}
