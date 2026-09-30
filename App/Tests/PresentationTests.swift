@@ -44,12 +44,16 @@ private func primary(_ screen: ScreenDescriptor) -> ScreenDescriptor {
     #expect(PresentationResolver.resolve(.menuBar, screens: [builtIn]) == .menuBar)
 }
 
-@Test func notchRectFromAuxiliaryAreas() {
+@Test func notchRectFromWidthsAndInset() {
     let frame = CGRect(x: 0, y: 0, width: 1512, height: 982)
-    let left = CGRect(x: 0, y: 950, width: 656, height: 32)
-    let right = CGRect(x: 856, y: 950, width: 656, height: 32)
-    #expect(NotchGeometry.notchRect(screenFrame: frame, leftArea: left, rightArea: right) == notch)
-    #expect(NotchGeometry.notchRect(screenFrame: frame, leftArea: nil, rightArea: right) == nil)
+    #expect(NotchGeometry.notchRect(screenFrame: frame, leftWidth: 656, rightWidth: 656, topInset: 32) == notch)
+    let offset = CGRect(x: -1512, y: 300, width: 1512, height: 982)
+    #expect(
+        NotchGeometry.notchRect(screenFrame: offset, leftWidth: 656, rightWidth: 656, topInset: 32)
+            == CGRect(x: -856, y: 1250, width: 200, height: 32))
+    #expect(NotchGeometry.notchRect(screenFrame: frame, leftWidth: 656, rightWidth: 656, topInset: 0) == nil)
+    #expect(NotchGeometry.notchRect(screenFrame: frame, leftWidth: 0, rightWidth: 656, topInset: 32) == nil)
+    #expect(NotchGeometry.notchRect(screenFrame: frame, leftWidth: 656, rightWidth: 0, topInset: 32) == nil)
 }
 
 @Test func panelHangsFromTopCenteredOnNotch() {

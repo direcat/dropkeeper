@@ -16,22 +16,16 @@ struct ScreenDescriptor: Equatable, Sendable {
         NSScreen.screens.enumerated().map { index, screen in
             let number = screen.deviceDescription[NSDeviceDescriptionKey("NSScreenNumber")] as? NSNumber
             let id = number?.uint32Value ?? 0
-            let notch =
-                screen.safeAreaInsets.top > 0
-                ? NotchGeometry.notchRect(
-                    screenFrame: screen.frame,
-                    leftArea: screen.auxiliaryTopLeftArea.map { absolute($0, in: screen.frame) },
-                    rightArea: screen.auxiliaryTopRightArea.map { absolute($0, in: screen.frame) })
-                : nil
+            let notch = NotchGeometry.notchRect(
+                screenFrame: screen.frame,
+                leftWidth: screen.auxiliaryTopLeftArea?.width ?? 0,
+                rightWidth: screen.auxiliaryTopRightArea?.width ?? 0,
+                topInset: screen.safeAreaInsets.top)
             return ScreenDescriptor(
-                id: id, frame: screen.frame, visibleFrame: screen.visibleFrame, isBuiltIn: CGDisplayIsBuiltin(id) != 0,
+                id: id, frame: screen.frame, visibleFrame: screen.visibleFrame,
+                isBuiltIn: number != nil && CGDisplayIsBuiltin(id) != 0,
                 isPrimary: index == 0, notchRect: notch)
         }
-    }
-
-    /// Auxiliary areas may be reported relative to the screen; make them global.
-    private static func absolute(_ rect: CGRect, in frame: CGRect) -> CGRect {
-        frame.contains(CGPoint(x: rect.midX, y: rect.midY)) ? rect : rect.offsetBy(dx: frame.minX, dy: frame.minY)
     }
 }
 
@@ -58,10 +52,15 @@ enum NotchGeometry {
     /// Width of the black area either side of the notch in the closed state.
     static let sideWidth: CGFloat = 56
 
-    static func notchRect(screenFrame: CGRect, leftArea: CGRect?, rightArea: CGRect?) -> CGRect? {
-        guard let left = leftArea, let right = rightArea, right.minX > left.maxX else { return nil }
-        let height = screenFrame.maxY - min(left.minY, right.minY)
-        return CGRect(x: left.maxX, y: screenFrame.maxY - height, width: right.minX - left.maxX, height: height)
+    /// Derived from widths and the safe-area inset only, so it is independent of the coordinate space of the
+    /// auxiliary areas.
+    static func notchRect(screenFrame: CGRect, leftWidth: CGFloat, rightWidth: CGFloat, topInset: CGFloat) -> CGRect? {
+        guard topInset > 0, leftWidth > 0, rightWidth > 0, leftWidth + rightWidth < screenFrame.width else {
+            return nil
+        }
+        return CGRect(
+            x: screenFrame.minX + leftWidth, y: screenFrame.maxY - topInset,
+            width: screenFrame.width - leftWidth - rightWidth, height: topInset)
     }
 
     /// Open panel: hangs from the top edge, centered on the notch, kept inside the screen.
