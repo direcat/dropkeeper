@@ -1,0 +1,14 @@
+# Local working notes (not part of the repository)
+docs/
+.remember/
+
+# macOS
+.DS_Store
+
+# Xcode / SwiftPM
+xcuserdata/
+DerivedData/
+.build/
+.swiftpm/
+*.xcuserstate
+build/
