@@ -7,6 +7,7 @@ extension DropKeeperEngine {
         guard let stat = env.fs.stat(path) else {
             for var file in (try? store.files(in: [.pending, .scheduled], path: path)) ?? [] {
                 let outcome = reconciler.reconcile(&file, folders: folders, now: now)
+                if outcome == .gone, !confirmFolderAvailable(for: file) { continue }
                 persist(file, outcome: outcome)
             }
             return

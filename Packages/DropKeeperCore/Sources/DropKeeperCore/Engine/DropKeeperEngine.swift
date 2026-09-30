@@ -131,99 +131,6 @@ public actor DropKeeperEngine {
         rescheduleTimer()
     }
 
-    // MARK: Folders
-
-    public func addFolder(path: String) throws -> WatchedFolder {
-        let canonical = env.fs.canonicalPath(path)
-        if let existing = folders.first(where: { $0.path == canonical }) { return existing }
-        guard env.fs.stat(canonical)?.isDirectory == true else { throw EngineError.notADirectory(canonical) }
-        if folders.contains(where: { $0.contains(canonical) || WatchedFolder.contains(parent: canonical, $0.path) }) {
-            throw EngineError.overlapsExistingFolder(canonical)
-        }
-        let folder = try insertFolder(path: canonical)
-        if try store.meta(.lastEventId) == nil {
-            try store.setMeta(.lastEventId, String(folder.baselineEventId))
-        }
-        refreshFolderStatuses()
-        notify.yield(.foldersChanged)
-        if isRunning { restartWatcher() }
-        return folders.first { $0.id == folder.id } ?? folder
-    }
-
-    private func insertFolder(path: String) throws -> WatchedFolder {
-        let folder = WatchedFolder(
-            id: nil, path: path, bookmark: env.fs.bookmark(for: path), volumeId: env.fs.stat(path)?.volumeId ?? "",
-            addedAt: env.time.now(), baselineEventId: env.currentEventId(), status: .ok)
-        let inserted = try store.insertFolder(folder)
-        folders = try store.folders()
-        return inserted
-    }
-
-    func folder(containing path: String) -> WatchedFolder? {
-        folders.first { $0.status == .ok && $0.contains(path) }
-    }
-
-    private func isFolderAvailable(_ id: Int64?) -> Bool {
-        guard let id else { return true }
-        return folders.first { $0.id == id }?.status == .ok
-    }
-
-    private func refreshFolderStatuses() {
-        var anyChanged = false
-        var recovered: [WatchedFolder] = []
-        for var folder in folders {
-            var changed = false
-            if env.fs.stat(folder.path)?.isDirectory != true, let bookmark = folder.bookmark,
-                let resolved = env.fs.resolveBookmark(bookmark).map(env.fs.canonicalPath),
-                resolved != folder.path, env.fs.stat(resolved)?.isDirectory == true
-            {
-                folder.path = resolved
-                changed = true
-            }
-            let status = probeStatus(of: folder.path)
-            if status != folder.status {
-                if status == .ok {
-                    recovered.append(folder)
-                } else if folder.status == .ok, let id = folder.id {
-                    unavailableSince[id] = env.time.now()
-                }
-                folder.status = status
-                changed = true
-            }
-            if changed {
-                try? store.updateFolder(folder)
-                anyChanged = true
-            }
-        }
-        guard anyChanged else { return }
-        folders = (try? store.folders()) ?? folders
-        notify.yield(.foldersChanged)
-        if isRunning { restartWatcher() }
-        rescanRecovered(recovered)
-    }
-
-    private func probeStatus(of path: String) -> FolderStatus {
-        guard env.fs.stat(path)?.isDirectory == true else { return .unavailable }
-        do {
-            _ = try env.fs.contentsOfDirectory(path)
-            return .ok
-        } catch FileSystemError.noPermission {
-            return .noAccess
-        } catch {
-            return .unavailable
-        }
-    }
-
-    /// Items that arrived while a folder was unavailable produced no usable events: scan for them.
-    private func rescanRecovered(_ recovered: [WatchedFolder]) {
-        let now = env.time.now()
-        for old in recovered {
-            guard let id = old.id, let folder = folders.first(where: { $0.id == id }) else { continue }
-            let since = unavailableSince.removeValue(forKey: id) ?? scanBound ?? folder.addedAt
-            scanForNewItems(in: [folder], since: since, now: now)
-        }
-    }
-
     // MARK: Watcher
 
     func restartWatcher() {
@@ -281,6 +188,7 @@ public actor DropKeeperEngine {
 
     func tick() {
         guard isRunning else { return }
+        reprobeUnavailableFolders()
         let now = env.time.now()
         pollTracker(now: now)
         runDue()
@@ -293,6 +201,7 @@ public actor DropKeeperEngine {
         let now = env.time.now()
         for var file in (try? store.files(in: [.pending, .scheduled])) ?? [] where isFolderAvailable(file.folderId) {
             let outcome = reconciler.reconcile(&file, folders: folders, now: now)
+            if outcome == .gone, !confirmFolderAvailable(for: file) { continue }
             persist(file, outcome: outcome)
         }
     }
@@ -301,10 +210,8 @@ public actor DropKeeperEngine {
         let now = env.time.now()
         guard let active = try? store.files(in: [.pending, .scheduled]) else { return }
         var trashed: [TrackedFile] = []
-        for var file in active {
-            guard let deadline = Scheduler.deadline(for: file, settings: settings), deadline <= now,
-                isFolderAvailable(file.folderId)
-            else { continue }
+        var confirmedFolders: Set<Int64> = []
+        for var file in active where isDue(file, now: now, confirmedFolders: &confirmedFolders) {
             let outcome = reconciler.reconcile(&file, folders: folders, now: now)
             if outcome == .kept || outcome == .gone {
                 persist(file, outcome: outcome)
@@ -325,6 +232,19 @@ public actor DropKeeperEngine {
             }
         }
         if !trashed.isEmpty { notify.yield(.trashed(trashed)) }
+    }
+
+    /// True when `file`'s deadline passed and its folder is reachable. Each owning folder is re-probed once
+    /// per pass: a lost folder pauses its items instead of letting them be reconciled as gone (unmount) or
+    /// trashed while access is revoked.
+    private func isDue(_ file: TrackedFile, now: Date, confirmedFolders: inout Set<Int64>) -> Bool {
+        guard let deadline = Scheduler.deadline(for: file, settings: settings), deadline <= now,
+            isFolderAvailable(file.folderId)
+        else { return false }
+        guard let folderId = file.folderId, !confirmedFolders.contains(folderId) else { return true }
+        guard confirmFolderAvailable(for: file) else { return false }
+        confirmedFolders.insert(folderId)
+        return true
     }
 
     /// One disposal attempt for an expired scheduled record; collects successes into `trashed`.

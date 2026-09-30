@@ -98,4 +98,57 @@ import Testing
         #expect(files.first?.id != id)
         #expect(harness.fs.exists(path))
     }
+
+    // MARK: Finding 2: folder lost between status refreshes
+
+    @Test func unmountBetweenRefreshesPausesExpiryAndRemountResumesIt() async throws {
+        let harness = try EngineHarness()
+        try await harness.startWithDownloads()
+        let path = await harness.drop("a.pdf")
+        let id = try harness.files()[0].id
+        try await harness.engine.schedule(ids: [id], duration: 60)
+        let offline = "/fake/offline-Downloads"
+        harness.fs.move(EngineHarness.downloads, offline)  // volume unmounted, no wake, no event
+        await harness.advance(120)
+        #expect(try harness.store.file(id: id)?.state == .scheduled)
+        #expect(await harness.engine.watchedFolders[0].status != .ok)
+        harness.fs.move(offline, EngineHarness.downloads)
+        await harness.advance(1)
+        #expect(await harness.engine.watchedFolders[0].status == .ok)
+        #expect(!harness.fs.exists(path))
+        #expect(try harness.store.file(id: id)?.state == .trashed)
+    }
+
+    @Test func accessRevokedBetweenRefreshesPausesExpiryAndRegrantResumesIt() async throws {
+        let harness = try EngineHarness()
+        try await harness.startWithDownloads()
+        let path = await harness.drop("a.pdf")
+        let id = try harness.files()[0].id
+        try await harness.engine.schedule(ids: [id], duration: 60)
+        harness.fs.deniedDirectories = [EngineHarness.downloads]
+        await harness.advance(120)
+        #expect(harness.fs.exists(path))
+        #expect(try harness.store.file(id: id)?.state == .scheduled)
+        #expect(await harness.engine.watchedFolders[0].status == .noAccess)
+        harness.fs.deniedDirectories = []
+        await harness.advance(1)
+        #expect(!harness.fs.exists(path))
+        #expect(try harness.store.file(id: id)?.state == .trashed)
+    }
+
+    @Test func deletionEventWhileFolderIsUnmountedDoesNotMarkGone() async throws {
+        let harness = try EngineHarness()
+        try await harness.startWithDownloads()
+        let path = await harness.drop("a.pdf")
+        let id = try harness.files()[0].id
+        try await harness.engine.schedule(ids: [id], duration: 600)
+        let offline = "/fake/offline-Downloads"
+        harness.fs.move(EngineHarness.downloads, offline)
+        await harness.event(path, [.removed, .isFile])
+        #expect(try harness.store.file(id: id)?.state == .scheduled)
+        harness.fs.move(offline, EngineHarness.downloads)
+        await harness.advance(600)
+        #expect(!harness.fs.exists(path))
+        #expect(try harness.store.file(id: id)?.state == .trashed)
+    }
 }
