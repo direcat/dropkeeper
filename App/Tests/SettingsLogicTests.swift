@@ -35,3 +35,21 @@ import Testing
         #expect(input.normalized().normalized() == input.normalized())
     }
 }
+
+@Test func stopPickerOffersOnlyUnusedPresets() {
+    let stops: [TimeInterval] = [1800, 3600, 86_400]
+    let options = StopPresets.options(for: 1, in: stops)
+    #expect(options.contains(3600))
+    #expect(!options.contains(1800))
+    #expect(!options.contains(86_400))
+    #expect(options == options.sorted())
+    #expect(options.count == StopPresets.all.count - 2)
+    // An out-of-range index offers every preset not used by the stops.
+    #expect(StopPresets.options(for: 9, in: stops).count == StopPresets.all.count - 3)
+}
+
+@Test func stopToAddPrefersLargerThenFillsGaps() {
+    #expect(StopPresets.stopToAdd(to: [1800, 3600]) == 10_800)
+    #expect(StopPresets.stopToAdd(to: [1800, 7_776_000]) == 2_592_000)
+    #expect(StopPresets.stopToAdd(to: StopPresets.all) == nil)
+}

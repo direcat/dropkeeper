@@ -11,6 +11,18 @@ enum StopPresets {
     static func next(after stops: [TimeInterval]) -> TimeInterval? {
         all.first { $0 > (stops.max() ?? 0) }
     }
+
+    /// The stop "Add stop" appends: the smallest preset after the last stop, else the largest unused one below it.
+    static func stopToAdd(to stops: [TimeInterval]) -> TimeInterval? {
+        next(after: stops) ?? all.last { !stops.contains($0) }
+    }
+
+    /// Presets a stop's picker offers: its own value plus every preset no other stop uses, so picking one never
+    /// creates a duplicate that normalization would silently drop.
+    static func options(for index: Int, in stops: [TimeInterval]) -> [TimeInterval] {
+        let others = stops.enumerated().filter { $0.offset != index }.map(\.element)
+        return all.filter { !others.contains($0) }
+    }
 }
 
 enum DefaultChoiceTag {
@@ -128,7 +140,9 @@ struct SettingsView: View {
             ForEach(draft.timelineStops.indices, id: \.self) { index in
                 HStack {
                     Picker("Stop \(index + 1)", selection: stopBinding(index)) {
-                        ForEach(StopPresets.all, id: \.self) { Text(DurationLabel.short($0)).tag($0) }
+                        ForEach(StopPresets.options(for: index, in: draft.timelineStops), id: \.self) {
+                            Text(DurationLabel.short($0)).tag($0)
+                        }
                     }
                     Button {
                         draft.timelineStops.remove(at: index)
@@ -141,10 +155,10 @@ struct SettingsView: View {
                 }
             }
             Button("Add stop") {
-                if let next = StopPresets.next(after: draft.timelineStops) { draft.timelineStops.append(next) }
+                if let stop = StopPresets.stopToAdd(to: draft.timelineStops) { draft.timelineStops.append(stop) }
             }
-            .disabled(draft.timelineStops.count >= 5 || StopPresets.next(after: draft.timelineStops) == nil)
-            Picker("Ask again after", selection: $draft.gracePeriod) {
+            .disabled(draft.timelineStops.count >= 5 || StopPresets.stopToAdd(to: draft.timelineStops) == nil)
+            Picker("Apply default after", selection: $draft.gracePeriod) {
                 ForEach(Settings.gracePeriodOptions, id: \.self) { Text(DurationLabel.long($0)).tag($0) }
             }
             Picker(
@@ -192,7 +206,7 @@ struct SettingsView: View {
                 TextField("Extension, e.g. dmg", text: $newExtension)
                     .onSubmit(addExtension)
                 Button("Add", action: addExtension)
-                    .disabled(newExtension.trimmingCharacters(in: .whitespaces).isEmpty)
+                    .disabled(Self.trimmedExtension(newExtension).isEmpty)
             }
         }
     }
@@ -238,15 +252,25 @@ struct SettingsView: View {
         if draft == edit { draft = model.settings }
     }
 
-    /// Bounds-checked binding: removing a stop re-renders rows whose index may no longer exist.
+    /// Bounds-checked binding: removing a stop re-renders rows whose index may no longer exist. It ignores a value
+    /// another stop already uses.
     private func stopBinding(_ index: Int) -> Binding<TimeInterval> {
         Binding(
             get: { draft.timelineStops.indices.contains(index) ? draft.timelineStops[index] : draft.timelineStops[0] },
-            set: { if draft.timelineStops.indices.contains(index) { draft.timelineStops[index] = $0 } })
+            set: { value in
+                guard draft.timelineStops.indices.contains(index),
+                    StopPresets.options(for: index, in: draft.timelineStops).contains(value)
+                else { return }
+                draft.timelineStops[index] = value
+            })
+    }
+
+    private static func trimmedExtension(_ text: String) -> String {
+        text.trimmingCharacters(in: CharacterSet(charactersIn: ". ")).lowercased()
     }
 
     private func addExtension() {
-        let ext = newExtension.trimmingCharacters(in: CharacterSet(charactersIn: ". ")).lowercased()
+        let ext = Self.trimmedExtension(newExtension)
         guard !ext.isEmpty, !draft.ignoredExtensions.contains(ext) else { return }
         draft.ignoredExtensions.append(ext)
         newExtension = ""

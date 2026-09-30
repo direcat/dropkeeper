@@ -304,7 +304,7 @@
       "comment" : "Settings button that adds a timeline stop",
       "localizations" : { "cs" : { "stringUnit" : { "state" : "translated", "value" : "Přidat bod" } } }
     },
-    "Ask again after" : {
+    "Apply default after" : {
       "comment" : "Settings picker: grace period before the default choice applies",
       "localizations" : { "cs" : { "stringUnit" : { "state" : "translated", "value" : "Výchozí volba po" } } }
     },

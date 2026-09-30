@@ -11,6 +11,10 @@ final class SettingsWindowController {
     }
 
     func show() {
+        if let window, !window.isVisible {
+            // A fresh view per opening, so a reopened window shows no leftover state (e.g. the cleared-records count).
+            window.contentViewController = NSHostingController(rootView: SettingsView(model: model))
+        }
         if window == nil {
             let window = NSWindow(contentViewController: NSHostingController(rootView: SettingsView(model: model)))
             window.title = String(localized: "DropKeeper Settings")
@@ -19,8 +23,12 @@ final class SettingsWindowController {
             window.center()
             self.window = window
         }
+        // An error from elsewhere (e.g. the prompt) would otherwise pop up out of context in Settings.
+        model.clearError()
+        // Becoming active refreshes the folders (AppDelegate); only an already active app needs it here.
+        let wasActive = NSApp.isActive
         NSApp.activate()
         window?.makeKeyAndOrderFront(nil)
-        Task { await model.refreshFolders() }
+        if wasActive { Task { await model.refreshFolders() } }
     }
 }
