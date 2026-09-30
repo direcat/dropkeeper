@@ -113,3 +113,11 @@ private func reviewFocusPanelDecision(_ testCase: DecisionCase) {
         #expect(!PanelDecision.keepsHover(showing: content))
     }
 }
+
+@Test func showNeverSkipsWhileTheHideFadeIsRunning() {
+    #expect(PanelDecision.showStep(isOnScreen: false, isFadingOut: false, frameChanged: false) == .fadeIn)
+    #expect(PanelDecision.showStep(isOnScreen: true, isFadingOut: true, frameChanged: false) == .restore)
+    #expect(PanelDecision.showStep(isOnScreen: true, isFadingOut: true, frameChanged: true) == .restore)
+    #expect(PanelDecision.showStep(isOnScreen: true, isFadingOut: false, frameChanged: true) == .restore)
+    #expect(PanelDecision.showStep(isOnScreen: true, isFadingOut: false, frameChanged: false) == .none)
+}

@@ -10,8 +10,9 @@ final class PanelCoordinator {
     private let panel = FloatingPanel()
     private var hosting: NSHostingView<PanelRootView>?
     private var hovering = false
-    /// False from the moment a hide starts; a show during the fade-out sets it again and keeps the panel.
-    private var wantsVisible = false
+    /// True from the start of a hide's fade until the panel is ordered out; a show in between clears it and keeps
+    /// the panel.
+    private var isFadingOut = false
     private var collapseTask: Task<Void, Never>?
     private var screenObserver: NSObjectProtocol?
 
@@ -103,9 +104,13 @@ final class PanelCoordinator {
 
     private func show(frame: CGRect) {
         let reduceMotion = NSWorkspace.shared.accessibilityDisplayShouldReduceMotion
-        wantsVisible = true
-        if panel.isVisible {
-            guard frame != panel.frame || panel.alphaValue < 1 else { return }
+        let step = PanelDecision.showStep(
+            isOnScreen: panel.isVisible, isFadingOut: isFadingOut, frameChanged: frame != panel.frame)
+        isFadingOut = false
+        switch step {
+        case .none:
+            return
+        case .restore:
             NSAnimationContext.runAnimationGroup { context in
                 context.duration = reduceMotion ? 0 : 0.3
                 context.allowsImplicitAnimation = true
@@ -113,7 +118,7 @@ final class PanelCoordinator {
                 // Undoes a fade-out that is still running.
                 panel.animator().alphaValue = 1
             }
-        } else {
+        case .fadeIn:
             panel.setFrame(frame, display: true)
             panel.alphaValue = 0
             panel.orderFrontRegardless()
@@ -126,8 +131,8 @@ final class PanelCoordinator {
 
     private func hide() {
         resetHover()
-        guard panel.isVisible, wantsVisible else { return }
-        wantsVisible = false
+        guard panel.isVisible, !isFadingOut else { return }
+        isFadingOut = true
         NSAnimationContext.runAnimationGroup { context in
             context.duration = 0.22
             panel.animator().alphaValue = 0
@@ -138,7 +143,8 @@ final class PanelCoordinator {
 
     private func finishHide() {
         // A new render may have started showing the panel again during the fade.
-        guard !wantsVisible else { return }
+        guard isFadingOut else { return }
+        isFadingOut = false
         panel.orderOut(nil)
     }
 
