@@ -10,6 +10,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     let model = AppDelegate.makeModel()
     private var systemEvents: SystemEvents?
     private var panels: PanelCoordinator?
+    private var statusItem: StatusItemController?
     private lazy var actions = AppActions(
         openSettings: { [weak self] in self?.openSettings() },
         quit: { NSApp.terminate(nil) },
@@ -49,9 +50,12 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         didLaunch()
     }
 
-    /// Task 9 adds the status item here, Tasks 10 and 11 the windows.
+    /// Tasks 10 and 11 add the windows here.
     private func didLaunch() {
-        let panels = PanelCoordinator(model: model, actions: actions, statusAnchor: { nil })
+        let status = StatusItemController(model: model, actions: actions)
+        statusItem = status
+        let panels = PanelCoordinator(
+            model: model, actions: actions, statusAnchor: { [weak status] in status?.anchorFrame })
         panels.start()
         self.panels = panels
     }

@@ -24,9 +24,10 @@ struct PanelRootView: View {
                 NoticeView(
                     files: model.notice.files, canUndo: model.settings.deleteMode == .trash,
                     onUndo: { Task { await model.undoNotice() } })
-            case .idle, .idleExpanded:
-                // Task 9 replaces `.idleExpanded` with the pending list.
+            case .idle:
                 NotchIdleView(count: model.scheduled.count, urgentSeconds: model.urgentSeconds, notchWidth: notchWidth)
+            case .idleExpanded:
+                PendingListView(model: model, actions: actions, showsFooter: false)
             case .hidden:
                 EmptyView()
             }
