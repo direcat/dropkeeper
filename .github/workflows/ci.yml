@@ -34,5 +34,7 @@ jobs:
         run: xcodegen generate
       - name: swift-format
         run: swift format lint --strict --recursive App/Sources App/Tests
+      - name: Localizations
+        run: python3 scripts/check-localizations.py
       - name: Test app
         run: xcodebuild test -project DropKeeper.xcodeproj -scheme DropKeeper -destination 'platform=macOS,arch=arm64' -quiet

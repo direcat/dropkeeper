@@ -21,6 +21,28 @@ public struct TrackedFile: Codable, Sendable, Equatable, Identifiable, Fetchable
     public var failureCount: Int
     public var updatedAt: Date
 
+    /// Public memberwise initializer (declared explicitly so it is visible outside the module).
+    public init(
+        id: FileID, folderId: Int64?, path: String, inode: Int64, volumeId: String, displayName: String,
+        kind: FileKind, sizeBytes: Int64?, state: FileState, firstSeen: Date, expiresAt: Date?,
+        trashPath: String?, failureCount: Int, updatedAt: Date
+    ) {
+        self.id = id
+        self.folderId = folderId
+        self.path = path
+        self.inode = inode
+        self.volumeId = volumeId
+        self.displayName = displayName
+        self.kind = kind
+        self.sizeBytes = sizeBytes
+        self.state = state
+        self.firstSeen = firstSeen
+        self.expiresAt = expiresAt
+        self.trashPath = trashPath
+        self.failureCount = failureCount
+        self.updatedAt = updatedAt
+    }
+
     public enum CodingKeys: String, CodingKey, ColumnExpression {
         case id
         case folderId = "folder_id"

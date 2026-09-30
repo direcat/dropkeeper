@@ -1,0 +1,60 @@
+{
+  "sourceLanguage" : "en",
+  "strings" : {
+    "%lld days" : {
+      "comment" : "Timeline stop in days, e.g. 1 day, 10 days",
+      "localizations" : {
+        "en" : { "variations" : { "plural" : {
+          "one" : { "stringUnit" : { "state" : "translated", "value" : "%lld day" } },
+          "other" : { "stringUnit" : { "state" : "translated", "value" : "%lld days" } } } } },
+        "cs" : { "variations" : { "plural" : {
+          "one" : { "stringUnit" : { "state" : "translated", "value" : "%lld den" } },
+          "few" : { "stringUnit" : { "state" : "translated", "value" : "%lld dny" } },
+          "many" : { "stringUnit" : { "state" : "translated", "value" : "%lld dne" } },
+          "other" : { "stringUnit" : { "state" : "translated", "value" : "%lld dní" } } } } }
+      }
+    },
+    "%lld h" : {
+      "comment" : "Timeline stop in hours, e.g. 1 h",
+      "localizations" : { "cs" : { "stringUnit" : { "state" : "translated", "value" : "%lld h" } } }
+    },
+    "%lld min" : {
+      "comment" : "Timeline stop in minutes, e.g. 30 min",
+      "localizations" : { "cs" : { "stringUnit" : { "state" : "translated", "value" : "%lld min" } } }
+    },
+    "Today %@" : {
+      "comment" : "Deletion time today, e.g. Today 16:40",
+      "localizations" : { "cs" : { "stringUnit" : { "state" : "translated", "value" : "Dnes %@" } } }
+    },
+    "Tomorrow %@" : {
+      "comment" : "Deletion time tomorrow, e.g. Tomorrow 09:15",
+      "localizations" : { "cs" : { "stringUnit" : { "state" : "translated", "value" : "Zítra %@" } } }
+    },
+    "in <1 min" : {
+      "comment" : "Less than a minute left",
+      "localizations" : { "cs" : { "stringUnit" : { "state" : "translated", "value" : "za <1 min" } } }
+    },
+    "in %lld min" : {
+      "comment" : "Minutes left, e.g. in 42 min",
+      "localizations" : { "cs" : { "stringUnit" : { "state" : "translated", "value" : "za %lld min" } } }
+    },
+    "in %lld h" : {
+      "comment" : "Hours left, e.g. in 3 h",
+      "localizations" : { "cs" : { "stringUnit" : { "state" : "translated", "value" : "za %lld h" } } }
+    },
+    "in %lld days" : {
+      "comment" : "Days left, e.g. in 2 days",
+      "localizations" : {
+        "en" : { "variations" : { "plural" : {
+          "one" : { "stringUnit" : { "state" : "translated", "value" : "in %lld day" } },
+          "other" : { "stringUnit" : { "state" : "translated", "value" : "in %lld days" } } } } },
+        "cs" : { "variations" : { "plural" : {
+          "one" : { "stringUnit" : { "state" : "translated", "value" : "za %lld den" } },
+          "few" : { "stringUnit" : { "state" : "translated", "value" : "za %lld dny" } },
+          "many" : { "stringUnit" : { "state" : "translated", "value" : "za %lld dne" } },
+          "other" : { "stringUnit" : { "state" : "translated", "value" : "za %lld dní" } } } } }
+      }
+    }
+  },
+  "version" : "1.0"
+}
