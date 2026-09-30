@@ -40,3 +40,16 @@ public struct TrackedFile: Codable, Sendable, Equatable, Identifiable, Fetchable
 
 extension FileKind: DatabaseValueConvertible {}
 extension FileState: DatabaseValueConvertible {}
+
+extension TrackedFile {
+    /// A freshly detected item in state `pending`.
+    public static func new(path: String, stat: FileStat, folderId: Int64?, now: Date) -> TrackedFile {
+        let name = (path as NSString).lastPathComponent
+        return TrackedFile(
+            id: UUID().uuidString, folderId: folderId, path: path, inode: stat.inode, volumeId: stat.volumeId,
+            displayName: name, kind: FileKind.classify(pathExtension: (name as NSString).pathExtension),
+            sizeBytes: stat.size, state: .pending, firstSeen: now, expiresAt: nil, trashPath: nil,
+            failureCount: 0, updatedAt: now
+        )
+    }
+}
