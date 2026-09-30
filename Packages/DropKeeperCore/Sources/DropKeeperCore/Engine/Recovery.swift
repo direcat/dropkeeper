@@ -15,7 +15,21 @@ public struct Recovery: Sendable {
         for folder in folders {
             walk(folder.path, depth: 0, folder: folder, now: now, into: &found)
         }
-        return found
+        return resolvingDuplicates(found)
+    }
+
+    /// An id on more than one path (a copy made outside DropKeeper) cannot tell which path the user
+    /// scheduled: every such path is recovered as `kept` under a fresh id, never as `scheduled`.
+    private func resolvingDuplicates(_ found: [TrackedFile]) -> [TrackedFile] {
+        let counts = Dictionary(grouping: found, by: \.id).mapValues(\.count)
+        return found.map { file in
+            guard counts[file.id, default: 0] > 1 else { return file }
+            var copy = file
+            copy.id = UUID().uuidString
+            copy.state = .kept
+            copy.expiresAt = nil
+            return copy
+        }
     }
 
     private func walk(

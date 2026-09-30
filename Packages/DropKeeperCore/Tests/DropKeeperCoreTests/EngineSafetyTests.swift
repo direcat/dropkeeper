@@ -172,4 +172,73 @@ import Testing
         #expect(try harness.store.file(id: ids[1])?.state == .kept)
         #expect(try harness.store.file(id: ids[0])?.state == .trashed)
     }
+
+    // MARK: Minor findings
+
+    @Test func recoveryKeepsEveryPathSharingAnIdAndNeverTrashesThem() async throws {
+        let original = EngineHarness.downloads + "/original.pdf"
+        let copy = EngineHarness.downloads + "/copy.pdf"
+        let expiry = ISODate.format(TestTimeSource.base.addingTimeInterval(60))
+        let harness = try EngineHarness(needsRecovery: true, hints: [EngineHarness.downloads]) { fs in
+            for path in [original, copy] {
+                fs.createFile(path, added: TestTimeSource.base)
+                try? fs.writeXattr(ItemActions.idAttribute, value: "DUP", at: path)
+                try? fs.writeXattr(ItemActions.expiryAttribute, value: expiry, at: path)
+            }
+        }
+        try await harness.engine.start()
+        let files = try harness.files()
+        #expect(Set(files.map(\.path)) == [original, copy])
+        #expect(files.allSatisfy { $0.state == .kept })
+        for file in files {
+            #expect(harness.fs.xattr(ItemActions.idAttribute, at: file.path) == file.id)
+            #expect(harness.fs.xattr(ItemActions.expiryAttribute, at: file.path) == nil)
+        }
+        await harness.advance(120)
+        #expect(harness.fs.exists(original))
+        #expect(harness.fs.exists(copy))
+    }
+
+    @Test func downloadStabilizingAtQuitIsPromptedAfterStart() async throws {
+        let store = try FileStore.inMemory()
+        let first = try EngineHarness(store: store)
+        try await first.startWithDownloads()
+        await first.engine.stop()  // heartbeat = base
+
+        let path = EngineHarness.downloads + "/late.pdf"
+        let second = try EngineHarness(store: store) { fs in
+            fs.createFile(path, added: TestTimeSource.base.addingTimeInterval(1))
+        }
+        second.time.advance(by: 30)
+        try await second.engine.start()
+        await second.advance(1)
+        let files = try store.files(in: FileState.allCases)
+        #expect(files.map(\.path) == [path])
+        #expect(files.first?.state == .pending)
+    }
+
+    @Test func rootFolderIsRejected() async throws {
+        let harness = try EngineHarness()
+        harness.fs.mkdir("/")
+        try await harness.engine.start()
+        await #expect(throws: EngineError.invalidFolder("/")) {
+            try await harness.engine.addFolder(path: "/")
+        }
+        #expect(await harness.engine.watchedFolders.isEmpty)
+    }
+
+    @Test func refreshFoldersPicksUpGrantedAccessAndProcessesOverdueItems() async throws {
+        let harness = try EngineHarness()
+        try await harness.startWithDownloads()
+        let path = await harness.drop("a.pdf")
+        try await harness.engine.schedule(ids: [try harness.files()[0].id], duration: 60)
+        harness.fs.deniedDirectories = [EngineHarness.downloads]
+        await harness.engine.refreshFolders()
+        #expect(await harness.engine.watchedFolders[0].status == .noAccess)
+        harness.time.advance(by: 120)
+        harness.fs.deniedDirectories = []
+        await harness.engine.refreshFolders()
+        #expect(await harness.engine.watchedFolders[0].status == .ok)
+        #expect(!harness.fs.exists(path))
+    }
 }

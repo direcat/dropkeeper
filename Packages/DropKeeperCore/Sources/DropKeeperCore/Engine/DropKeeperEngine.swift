@@ -7,6 +7,9 @@ public struct EngineEnvironment: Sendable {
     public var time: any TimeSource
     public var makeEventSource: @Sendable ([String], UInt64?) throws -> any FolderEventSource
     public var currentEventId: @Sendable () -> UInt64
+    /// True only when the database was lost or corrupt (e.g. `StoreOpenResult.recoveredFromCorruption`,
+    /// or a new database while the app knows it ran before). Must be false on a genuine first launch,
+    /// where existing folder contents are never recorded.
     public var needsRecovery: Bool
     public var recoveryFolderHints: [String]
     public var automaticTimer: Bool
@@ -44,6 +47,8 @@ public enum EngineNotification: Sendable, Equatable {
 
 public enum EngineError: Error, Equatable {
     case notADirectory(String)
+    /// The path cannot be watched (e.g. the filesystem root).
+    case invalidFolder(String)
     case overlapsExistingFolder(String)
     /// A batch action processed every item but these failed.
     case partialFailure(failedIds: [FileID])
@@ -54,6 +59,8 @@ public actor DropKeeperEngine {
     public static let maintenanceInterval: TimeInterval = 86_400
     public static let pollInterval: TimeInterval = 0.5
 
+    /// Engine events for the UI. Single consumer: `AsyncStream` delivers each element to one iterator only,
+    /// so the app must iterate it from exactly one place and fan out from there.
     public nonisolated let notifications: AsyncStream<EngineNotification>
     let notify: AsyncStream<EngineNotification>.Continuation
     let env: EngineEnvironment
@@ -100,6 +107,11 @@ public actor DropKeeperEngine {
             try store.setMeta(.lastEventId, String(env.currentEventId()))
         }
         refreshFolderStatuses()
+        // Downloads still stabilizing at quit (or missed by the replay) are found by the fallback scan,
+        // bounded by the previous heartbeat. Without a previous heartbeat nothing is admitted.
+        if let scanBound {
+            scanForNewItems(in: folders.filter { $0.status == .ok }, since: scanBound, now: env.time.now())
+        }
         reconcileActive()
         runDue()
         runMaintenanceIfDue()
@@ -120,6 +132,12 @@ public actor DropKeeperEngine {
     }
 
     public func handleWake() {
+        refreshFolders()
+    }
+
+    /// Re-checks every watched folder now (e.g. after the user granted access in System Settings):
+    /// statuses are refreshed, folders that came back are rescanned, and overdue items are processed.
+    public func refreshFolders() {
         guard isRunning else { return }
         refreshFolderStatuses()
         reconcileActive()
@@ -322,6 +340,9 @@ extension DropKeeperEngine {
         let now = env.time.now()
         for file in Recovery(fs: env.fs).scan(folders: folders, now: now) where (try? store.file(id: file.id)) == nil {
             try store.insert(file)
+            // Duplicated ids were reissued by Recovery; kept items must not keep an expiry mark.
+            actions.markPending(file)
+            if file.state == .kept { actions.clearMarks(at: file.path) }
         }
     }
 }

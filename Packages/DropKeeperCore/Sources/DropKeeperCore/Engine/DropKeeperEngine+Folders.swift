@@ -5,6 +5,8 @@ extension DropKeeperEngine {
 
     public func addFolder(path: String) throws -> WatchedFolder {
         let canonical = env.fs.canonicalPath(path)
+        // Watching the root would sweep every new top-level item on the volume.
+        guard canonical != "/" else { throw EngineError.invalidFolder(canonical) }
         if let existing = folders.first(where: { $0.path == canonical }) { return existing }
         guard env.fs.stat(canonical)?.isDirectory == true else { throw EngineError.notADirectory(canonical) }
         if folders.contains(where: { $0.contains(canonical) || WatchedFolder.contains(parent: canonical, $0.path) }) {
