@@ -36,6 +36,20 @@ func shortDurations(seconds: TimeInterval, expected: String) {
     #expect(later.hasSuffix("09:00"))
 }
 
+@Test func deletionLabelsFollowTwelveHourClock() {
+    var calendar = prague
+    calendar.locale = Locale(identifier: "en_US")
+    let text = TimeLabels.deletion(at: base.addingTimeInterval(7 * 3600 + 40 * 60), now: base, calendar: calendar)
+        .replacingOccurrences(of: "\u{202F}", with: " ").replacingOccurrences(of: "\u{00A0}", with: " ")
+    #expect(text == "Today 4:40 PM")
+}
+
+@Test func remainingLabelsAroundTheHour() {
+    #expect(TimeLabels.remaining(until: base.addingTimeInterval(3540), now: base) == "in 59 min")
+    #expect(TimeLabels.remaining(until: base.addingTimeInterval(3570), now: base) == "in 1 h")
+    #expect(TimeLabels.remaining(until: base.addingTimeInterval(3600), now: base) == "in 1 h")
+}
+
 @Test func remainingLabels() {
     #expect(TimeLabels.remaining(until: base.addingTimeInterval(30), now: base) == "in <1 min")
     #expect(TimeLabels.remaining(until: base.addingTimeInterval(42 * 60), now: base) == "in 42 min")
