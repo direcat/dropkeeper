@@ -3,12 +3,23 @@
 set -euo pipefail
 cd "$(dirname "$0")/.."
 
-PATTERN='URLSession|URLRequest|NSURLConnection|import Network|NWConnection|NWBrowser|NWListener|CFNetwork|CFSocket|CFStream|[^a-zA-Z_]socket\(|WKWebView'
+# Networking APIs, plus APIs that can fetch a URL or run a networking tool
+# (Data/String(contentsOf:) accept remote URLs; Process/NSTask can run curl).
+PATTERN='URLSession|URLRequest|NSURLConnection|import Network|NWConnection|NWBrowser|NWListener|CFNetwork|CFSocket|CFStream|(^|[^a-zA-Z_])socket\(|WKWebView|Data\(contentsOf:|String\(contentsOf:|Process\(|NSTask'
 DIRS=()
-for d in Packages/DropKeeperCore/Sources App; do [ -d "$d" ] && DIRS+=("$d"); done
+for d in Packages/DropKeeperCore/Sources Packages/DropKeeperCore/Tests App; do [ -d "$d" ] && DIRS+=("$d"); done
+INCLUDES=(--include='*.swift' --include='*.m' --include='*.h')
 
-if grep -rnE "$PATTERN" --include='*.swift' --include='*.m' --include='*.h' "${DIRS[@]}"; then
+if grep -rnE "$PATTERN" "${INCLUDES[@]}" "${DIRS[@]}"; then
   echo "offline-guard: networking API found (see above). DropKeeper must stay 100% offline." >&2
+  exit 1
+fi
+
+# URL literals in code. Lines that are only a comment (doc links) are allowed.
+URLS=$(grep -rnE 'https?://' "${INCLUDES[@]}" "${DIRS[@]}" | grep -vE '^[^:]+:[0-9]+:[[:space:]]*(//|/\*|\*)' || true)
+if [ -n "$URLS" ]; then
+  echo "$URLS" >&2
+  echo "offline-guard: URL literal found in code (see above). DropKeeper must stay 100% offline." >&2
   exit 1
 fi
 
