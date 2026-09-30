@@ -12,3 +12,5 @@ DerivedData/
 .swiftpm/
 *.xcuserstate
 build/
+# XcodeGen output
+DropKeeper.xcodeproj/

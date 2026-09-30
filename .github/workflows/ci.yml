@@ -22,3 +22,17 @@ jobs:
           swiftlint lint --strict
       - name: Test core
         run: swift test --package-path Packages/DropKeeperCore
+  app:
+    runs-on: macos-26
+    steps:
+      - uses: actions/checkout@v7
+      - name: Toolchain
+        run: xcodebuild -version
+      - name: Install XcodeGen
+        run: brew install xcodegen
+      - name: Generate project
+        run: xcodegen generate
+      - name: swift-format
+        run: swift format lint --strict --recursive App/Sources App/Tests
+      - name: Test app
+        run: xcodebuild test -project DropKeeper.xcodeproj -scheme DropKeeper -destination 'platform=macOS,arch=arm64' -quiet

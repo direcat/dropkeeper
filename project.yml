@@ -1,0 +1,78 @@
+name: DropKeeper
+options:
+  bundleIdPrefix: net.direcat
+  deploymentTarget:
+    macOS: "15.0"
+  createIntermediateGroups: true
+settings:
+  base:
+    SWIFT_VERSION: "6.0"
+    SWIFT_STRICT_CONCURRENCY: complete
+    ARCHS: arm64
+    ONLY_ACTIVE_ARCH: NO
+    MACOSX_DEPLOYMENT_TARGET: "15.0"
+    CODE_SIGN_IDENTITY: "-"
+    CODE_SIGN_STYLE: Manual
+    DEVELOPMENT_TEAM: ""
+    ENABLE_HARDENED_RUNTIME: NO
+    LOCALIZATION_PREFERS_STRING_CATALOGS: YES
+    SWIFT_EMIT_LOC_STRINGS: YES
+    DEAD_CODE_STRIPPING: YES
+packages:
+  DropKeeperCore:
+    path: Packages/DropKeeperCore
+targets:
+  DropKeeper:
+    type: application
+    platform: macOS
+    sources:
+      - path: App/Sources
+      - path: App/Resources
+        excludes:
+          - "AppIcon.icon"
+          - "AppIcon.icon/**"
+    info:
+      path: App/Info.plist
+      properties:
+        CFBundleDisplayName: DropKeeper
+        CFBundleShortVersionString: "0.1.0"
+        CFBundleVersion: "1"
+        CFBundleDevelopmentRegion: en
+        CFBundleLocalizations: [en, cs]
+        LSUIElement: true
+        LSApplicationCategoryType: public.app-category.utilities
+        NSHumanReadableCopyright: "© 2026 DropKeeper contributors. MIT License."
+        NSDownloadsFolderUsageDescription: "DropKeeper watches this folder for new downloads so it can move expired ones to the Trash."
+        NSDesktopFolderUsageDescription: "DropKeeper watches this folder for new files so it can move expired ones to the Trash."
+        NSDocumentsFolderUsageDescription: "DropKeeper watches this folder for new files so it can move expired ones to the Trash."
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: net.direcat.dropkeeper
+        PRODUCT_NAME: DropKeeper
+        ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME: AccentColor
+        GENERATE_INFOPLIST_FILE: NO
+    dependencies:
+      - package: DropKeeperCore
+  DropKeeperTests:
+    type: bundle.unit-test
+    platform: macOS
+    sources:
+      - path: App/Tests
+    dependencies:
+      - target: DropKeeper
+      - package: DropKeeperCore
+    settings:
+      base:
+        GENERATE_INFOPLIST_FILE: YES
+        BUNDLE_LOADER: "$(TEST_HOST)"
+        TEST_HOST: "$(BUILT_PRODUCTS_DIR)/DropKeeper.app/Contents/MacOS/DropKeeper"
+schemes:
+  DropKeeper:
+    build:
+      targets:
+        DropKeeper: all
+        DropKeeperTests: [test]
+    test:
+      targets: [DropKeeperTests]
+      language: en
+      region: US

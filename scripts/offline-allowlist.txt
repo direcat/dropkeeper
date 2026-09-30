@@ -1,0 +1,2 @@
+# URL literals allowed in app code (opened in the user's browser, never fetched by the app)
+https://github.com/direcat/dropkeeper

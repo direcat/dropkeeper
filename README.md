@@ -13,3 +13,13 @@ Work in progress.
 DropKeeper is a functional open-source clone of [TempCat](https://voprexlabs.com/tempcat/) by Voprex Labs, and fully inspired by it. In the age of AI agents, selling small (if useful) utilities for money no longer feels like a viable model, so this one is free and open.
 
 DropKeeper is AI-coded. That is what makes it possible for it to exist at all, for free and as open source. If that is a problem for you, that is completely fine — you don't have to use it.
+
+## Build from source
+
+Requirements: Apple Silicon Mac, macOS 15+, Xcode 26 or newer, [XcodeGen](https://github.com/yonaskolb/XcodeGen).
+
+    brew install xcodegen
+    xcodegen generate
+    open DropKeeper.xcodeproj
+
+Core engine tests: `swift test --package-path Packages/DropKeeperCore`
