@@ -183,6 +183,10 @@
           "many" : { "stringUnit" : { "state" : "translated", "value" : "%lld souboru naplánováno" } },
           "other" : { "stringUnit" : { "state" : "translated", "value" : "%lld souborů naplánováno" } } } } }
       }
+    },
+    "Deleting in %@" : {
+      "comment" : "VoiceOver value of the closed notch during the last-seconds countdown, e.g. Deleting in 0:07",
+      "localizations" : { "cs" : { "stringUnit" : { "state" : "translated", "value" : "Smazání za %@" } } }
     }
   },
   "version" : "1.0"

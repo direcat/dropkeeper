@@ -7,23 +7,32 @@ struct TimelineView: View {
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
     private let keepGap: CGFloat = TK.Space.m
-    private let rowHeight: CGFloat = 20
+    /// Horizontal inset of the first and last dot inside the track.
+    private let trackInset: CGFloat = 20
+    /// Vertical centers of the three rows: deletion time, dots, stop labels.
+    private let labelRowY: CGFloat = 8
+    private let dotRowY: CGFloat = 28
+    private let stopLabelRowY: CGFloat = 48
+    private let labelRowHeight: CGFloat = 16
+    private let dotHitSize: CGFloat = 28
+    private let totalHeight: CGFloat = 58
 
     var body: some View {
         GeometryReader { geometry in
             let stopX = positions(width: geometry.size.width)
             ZStack(alignment: .topLeading) {
-                selectedLabel
-                    .position(x: clampedLabelX(stopX[model.selectedIndex], width: geometry.size.width), y: 8)
+                ClampedCenterLayout(centerX: stopX[model.selectedIndex]) { selectedLabel }
+                    .frame(width: geometry.size.width, height: labelRowHeight)
+                    .position(x: geometry.size.width / 2, y: labelRowY)
                 lines(stopX)
                 ForEach(model.stops.indices, id: \.self) { index in
-                    dot(index).position(x: stopX[index], y: 28)
+                    dot(index).position(x: stopX[index], y: dotRowY)
                     Text(label(for: model.stops[index]))
                         .font(.system(size: 11, weight: .medium))
                         .monospacedDigit()
                         .foregroundStyle(index == model.selectedIndex ? TK.Notch.textPrimary : TK.Notch.textSecondary)
                         .fixedSize()
-                        .position(x: stopX[index], y: 48)
+                        .position(x: stopX[index], y: stopLabelRowY)
                 }
             }
             .contentShape(Rectangle())
@@ -34,7 +43,7 @@ struct TimelineView: View {
                     select(nearest)
                 })
         }
-        .frame(height: 58)
+        .frame(height: totalHeight)
         .accessibilityElement(children: .ignore)
         .accessibilityLabel(Text("Delete after"))
         .accessibilityValue(Text(accessibilityValue))
@@ -48,31 +57,26 @@ struct TimelineView: View {
     }
 
     private func positions(width: CGFloat) -> [CGFloat] {
-        let inset: CGFloat = 20
         let count = model.stops.count
         guard count > 1 else { return [width / 2] }
-        let step = (width - 2 * inset - keepGap) / CGFloat(count - 1)
+        let step = (width - 2 * trackInset - keepGap) / CGFloat(count - 1)
         return (0..<count).map { index in
-            inset + CGFloat(index) * step + (index == count - 1 ? keepGap : 0)
+            trackInset + CGFloat(index) * step + (index == count - 1 ? keepGap : 0)
         }
-    }
-
-    private func clampedLabelX(_ centerX: CGFloat, width: CGFloat) -> CGFloat {
-        min(max(centerX, 50), width - 50)
     }
 
     @ViewBuilder
     private func lines(_ stopX: [CGFloat]) -> some View {
         let lastDuration = max(0, model.stops.count - 2)
         Path { path in
-            path.move(to: CGPoint(x: stopX[0], y: 28))
-            path.addLine(to: CGPoint(x: stopX[lastDuration], y: 28))
+            path.move(to: CGPoint(x: stopX[0], y: dotRowY))
+            path.addLine(to: CGPoint(x: stopX[lastDuration], y: dotRowY))
         }
         .stroke(TK.Notch.hairline, lineWidth: 1)
         if case .duration = model.selected {
             Path { path in
-                path.move(to: CGPoint(x: stopX[0], y: 28))
-                path.addLine(to: CGPoint(x: stopX[model.selectedIndex], y: 28))
+                path.move(to: CGPoint(x: stopX[0], y: dotRowY))
+                path.addLine(to: CGPoint(x: stopX[model.selectedIndex], y: dotRowY))
             }
             .stroke(TK.Notch.accent, lineWidth: 1)
         }
@@ -84,7 +88,7 @@ struct TimelineView: View {
         return Circle()
             .fill(model.isHighlighted(index) ? TK.Notch.accent : TK.Notch.hairline)
             .frame(width: size, height: size)
-            .frame(width: 28, height: 28)
+            .frame(width: dotHitSize, height: dotHitSize)
             .contentShape(Rectangle())
             .onTapGesture { select(index) }
     }
@@ -121,9 +125,43 @@ struct TimelineView: View {
     }
 
     private func select(_ index: Int) {
-        withAnimation(reduceMotion ? TK.Motion.reduced : TK.Motion.select) {
+        withAnimation(Self.selectionAnimation(reduceMotion: reduceMotion)) {
             model.select(index)
         }
+    }
+
+    /// Animation for moving the selected stop (tap, drag, arrows, VoiceOver); a plain fade under Reduce Motion.
+    static func selectionAnimation(reduceMotion: Bool) -> Animation {
+        reduceMotion ? TK.Motion.reduced : TK.Motion.select
+    }
+}
+
+/// Places its single subview centered on `centerX`, shifted inward only as far as needed to stay inside the bounds.
+struct ClampedCenterLayout: Layout {
+    var centerX: CGFloat
+
+    var animatableData: CGFloat {
+        get { centerX }
+        set { centerX = newValue }
+    }
+
+    nonisolated static func clampedCenter(_ centerX: CGFloat, labelWidth: CGFloat, width: CGFloat) -> CGFloat {
+        let half = labelWidth / 2
+        guard labelWidth < width else { return width / 2 }
+        return min(max(centerX, half), width - half)
+    }
+
+    func sizeThatFits(proposal: ProposedViewSize, subviews: Subviews, cache: inout ()) -> CGSize {
+        let size = subviews.first?.sizeThatFits(.unspecified) ?? .zero
+        return CGSize(width: proposal.width ?? size.width, height: proposal.height ?? size.height)
+    }
+
+    func placeSubviews(in bounds: CGRect, proposal: ProposedViewSize, subviews: Subviews, cache: inout ()) {
+        guard let subview = subviews.first else { return }
+        let size = subview.sizeThatFits(.unspecified)
+        let labelX = Self.clampedCenter(centerX, labelWidth: size.width, width: bounds.width)
+        subview.place(
+            at: CGPoint(x: bounds.minX + labelX, y: bounds.midY), anchor: .center, proposal: ProposedViewSize(size))
     }
 }
 

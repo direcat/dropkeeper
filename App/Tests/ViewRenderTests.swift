@@ -43,3 +43,18 @@ private func render(_ view: some View) -> CGImage? {
     model.select(3)
     #expect((0..<4).map(model.isHighlighted) == [false, false, false, true])
 }
+
+@Test func timelineLabelCentersOverDotUnlessItWouldOverflow() {
+    // Short label near the right edge stays centered over the dot.
+    #expect(ClampedCenterLayout.clampedCenter(368, labelWidth: 30, width: 388) == 368)
+    // Wide label is shifted inward just enough to fit.
+    #expect(ClampedCenterLayout.clampedCenter(368, labelWidth: 130, width: 388) == 323)
+    #expect(ClampedCenterLayout.clampedCenter(20, labelWidth: 100, width: 388) == 50)
+    // Wider than the track: centered in it.
+    #expect(ClampedCenterLayout.clampedCenter(20, labelWidth: 400, width: 388) == 194)
+}
+
+@Test func idleAccessibilityValueAnnouncesCountdown() {
+    #expect(NotchIdleView.accessibilityValue(urgentSeconds: 7) == "Deleting in 0:07")
+    #expect(NotchIdleView.accessibilityValue(urgentSeconds: nil) == nil)
+}

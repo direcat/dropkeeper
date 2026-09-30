@@ -12,6 +12,7 @@ struct PromptView: View {
     let onKeep: () -> Void
     let onClose: () -> Void
     @FocusState private var focused: Bool
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
     var body: some View {
         VStack(alignment: .leading, spacing: TK.Space.l) {
@@ -23,30 +24,34 @@ struct PromptView: View {
                         .foregroundStyle(TK.Notch.textSecondary)
                 }
                 .toggleStyle(.checkbox)
+                .focusEffectDisabled(false)
             }
             TimelineView(model: $timeline, now: now)
             HStack {
                 Button("Keep it", action: onKeep)
                     .buttonStyle(PromptButtonStyle(primary: false))
+                    .focusEffectDisabled(false)
                 Spacer()
                 Button("Done", action: onDone)
                     .buttonStyle(PromptButtonStyle(primary: true))
                     .keyboardShortcut(.defaultAction)
+                    .focusEffectDisabled(false)
             }
         }
         .padding(TK.Space.l)
         .frame(width: TK.Size.notchPanelWidth)
         .focusable()
+        // The container only receives the arrow keys; its own ring is hidden, controls keep the system ring (§9).
         .focusEffectDisabled()
         .focused($focused)
         .defaultFocus($focused, true)
         .onAppear { focused = true }
         .onKeyPress(.leftArrow) {
-            timeline.moveLeft()
+            withAnimation(TimelineView.selectionAnimation(reduceMotion: reduceMotion)) { timeline.moveLeft() }
             return .handled
         }
         .onKeyPress(.rightArrow) {
-            timeline.moveRight()
+            withAnimation(TimelineView.selectionAnimation(reduceMotion: reduceMotion)) { timeline.moveRight() }
             return .handled
         }
     }
@@ -72,6 +77,7 @@ struct PromptView: View {
             }
             .buttonStyle(.plain)
             .keyboardShortcut(.cancelAction)
+            .focusEffectDisabled(false)
             .foregroundStyle(TK.Notch.textSecondary)
             .accessibilityLabel(Text("Close"))
         }

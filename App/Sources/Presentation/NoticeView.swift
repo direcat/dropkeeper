@@ -27,10 +27,17 @@ struct NoticeView: View {
             }
             Spacer()
             if canUndo {
-                Button("Undo", action: onUndo)
-                    .buttonStyle(.plain)
-                    .font(.system(size: 13, weight: .medium))
-                    .foregroundStyle(TK.Notch.accentText)
+                Button(action: onUndo) {
+                    Text("Undo")
+                        .padding(.horizontal, TK.Space.s)
+                        .padding(.vertical, TK.Space.xs)
+                        .contentShape(Rectangle())
+                }
+                .buttonStyle(.plain)
+                .font(.system(size: 13, weight: .medium))
+                .foregroundStyle(TK.Notch.accentText)
+                // Keep the visible text aligned with the panel padding despite the larger hit area.
+                .padding(.trailing, -TK.Space.s)
             }
         }
         .padding(TK.Space.l)
