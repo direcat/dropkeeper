@@ -21,7 +21,11 @@ struct PromptQueue: Equatable {
 
     /// Closes the prompt for the current file (or the whole stack) without deciding.
     mutating func dismiss(applyToAll: Bool) {
-        let ids = targets(applyToAll: applyToAll)
+        dismiss(ids: targets(applyToAll: applyToAll))
+    }
+
+    /// Hides these files until they leave the pending list (e.g. right after a successful decision).
+    mutating func dismiss(ids: [FileID]) {
         dismissed.formUnion(ids)
         items.removeAll { ids.contains($0.id) }
     }

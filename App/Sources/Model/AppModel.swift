@@ -31,6 +31,7 @@ final class AppModel {
     @ObservationIgnored private let log = Logger(subsystem: "net.direcat.dropkeeper", category: "app")
 
     static let onboardingCompletedKey = "onboardingCompleted"
+    static let loginItemInitializedKey = "loginItemInitialized"
 
     /// `applyLoginItem` is injectable so tests never register the test host as a login item.
     init(defaults: UserDefaults = .standard, applyLoginItem: @escaping @MainActor (Bool) -> Void = LoginItem.apply) {
@@ -58,7 +59,11 @@ final class AppModel {
             bootstrap.isFirstLaunch || (folders.isEmpty && !defaults.bool(forKey: Self.onboardingCompletedKey))
         observeFiles(bootstrap.engine)
         observeNotifications(bootstrap.engine)
-        applyLoginItem(settings.launchAtLogin)
+        // Only once: later launches must not undo a change the user made in System Settings.
+        if !defaults.bool(forKey: Self.loginItemInitializedKey) {
+            applyLoginItem(settings.launchAtLogin)
+            defaults.set(true, forKey: Self.loginItemInitializedKey)
+        }
     }
 
     func stop() async {
@@ -176,10 +181,12 @@ final class AppModel {
         isDeciding = true
         defer { isDeciding = false }
         let ids = queue.targets(applyToAll: applyToAll)
+        let succeeded: Bool
         switch timeline.selected {
-        case .keep: await keep(ids)
-        case .duration(let duration): await schedule(ids, duration: duration)
+        case .keep: succeeded = await perform { try await $0.keep(ids: ids) }
+        case .duration(let duration): succeeded = await perform { try await $0.schedule(ids: ids, duration: duration) }
         }
+        if succeeded { finishDecision(ids) }
     }
 
     func keepPrompted() async {
@@ -187,7 +194,14 @@ final class AppModel {
         isDeciding = true
         defer { isDeciding = false }
         let ids = queue.targets(applyToAll: applyToAll)
-        await keep(ids)
+        if await perform({ try await $0.keep(ids: ids) }) { finishDecision(ids) }
+    }
+
+    /// Moves the prompt on right away instead of waiting for the file observation to catch up.
+    private func finishDecision(_ ids: [FileID]) {
+        queue.dismiss(ids: ids)
+        if queue.current == nil { promptRequested = false }
+        resetPromptState()
     }
 
     func dismissPrompt() {
@@ -226,7 +240,10 @@ final class AppModel {
     }
 
     func removeFolder(id: Int64) async {
-        await perform { try await $0.removeFolder(id: id) }
+        let path = folders.first { $0.id == id }?.path
+        if await perform({ try await $0.removeFolder(id: id) }), let path {
+            EngineBootstrap.forgetFolder(path: path, defaults: defaults)
+        }
         await refreshState()
     }
 
@@ -251,12 +268,16 @@ final class AppModel {
 
     // MARK: Helpers
 
-    private func perform(_ action: (DropKeeperEngine) async throws -> Void) async {
-        guard let engine else { return }
+    /// Runs an engine action and reports its error; returns whether it succeeded.
+    @discardableResult
+    private func perform(_ action: (DropKeeperEngine) async throws -> Void) async -> Bool {
+        guard let engine else { return false }
         do {
             try await action(engine)
+            return true
         } catch {
             report(error)
+            return false
         }
     }
 

@@ -52,3 +52,12 @@ private func pending(_ id: String, seen offset: TimeInterval = 0) -> TrackedFile
     queue.update(pending: [pending("b", seen: 1)])
     #expect(queue.current?.id == "b")
 }
+
+@Test func dismissingDecidedIdsMovesToTheNextFile() {
+    var queue = PromptQueue()
+    queue.update(pending: [pending("a"), pending("b", seen: 1)])
+    queue.dismiss(ids: ["a"])
+    #expect(queue.current?.id == "b")
+    queue.update(pending: [pending("b", seen: 1)])
+    #expect(queue.items.map(\.id) == ["b"])
+}

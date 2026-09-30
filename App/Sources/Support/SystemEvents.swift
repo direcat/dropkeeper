@@ -1,6 +1,6 @@
 import AppKit
 
-/// Forwards wake-from-sleep and system clock changes.
+/// Forwards wake-from-sleep and system clock changes. Lives for the whole process, so it never removes its observers.
 @MainActor
 final class SystemEvents {
     private var tokens: [NSObjectProtocol] = []
@@ -14,10 +14,5 @@ final class SystemEvents {
             NotificationCenter.default.addObserver(
                 forName: .NSSystemClockDidChange, object: nil, queue: .main
             ) { _ in MainActor.assumeIsolated { onClockChange() } })
-    }
-
-    isolated deinit {
-        tokens.forEach(NSWorkspace.shared.notificationCenter.removeObserver)
-        tokens.forEach(NotificationCenter.default.removeObserver)
     }
 }

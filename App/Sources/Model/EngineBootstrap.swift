@@ -37,7 +37,17 @@ enum EngineBootstrap {
         return Result(engine: DropKeeperEngine(environment: environment), isFirstLaunch: decision.isFirstLaunch)
     }
 
+    /// Adds the current folders to the hints. Never drops a hint: a folder missing at launch (e.g. on an
+    /// unmounted volume) is not recovered, and its hint is needed to recover it on a later launch.
     static func rememberFolders(_ folders: [WatchedFolder], defaults: UserDefaults) {
-        defaults.set(folders.map(\.path), forKey: folderHintsKey)
+        let hints = defaults.stringArray(forKey: folderHintsKey) ?? []
+        let added = folders.map(\.path).filter { !hints.contains($0) }
+        defaults.set(hints + added, forKey: folderHintsKey)
+    }
+
+    /// Removes a folder's hint; only for an explicit user removal.
+    static func forgetFolder(path: String, defaults: UserDefaults) {
+        let hints = defaults.stringArray(forKey: folderHintsKey) ?? []
+        defaults.set(hints.filter { $0 != path }, forKey: folderHintsKey)
     }
 }

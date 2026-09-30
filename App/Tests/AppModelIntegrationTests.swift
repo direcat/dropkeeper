@@ -4,6 +4,13 @@ import Testing
 
 @testable import DropKeeper
 
+/// Records launch-at-login requests instead of touching the real login item.
+@MainActor
+private final class LoginItemRecorder {
+    var calls: [Bool] = []
+    func apply(_ enabled: Bool) { calls.append(enabled) }
+}
+
 /// Real engine, real FSEvents, temp database and temp watched folder.
 @MainActor
 @Suite(.serialized) struct AppModelIntegrationTests {
@@ -45,9 +52,43 @@ import Testing
         #expect(model.isPromptAvailable)
 
         await model.keepPrompted()
-        try await waitUntil { model.queue.current == nil }
+        #expect(model.queue.current == nil)  // the prompt moves on as soon as the decision succeeded
+        try await waitUntil { model.pending.isEmpty }
         #expect(model.pending.isEmpty)
+
+        await model.removeFolder(id: try #require(model.folders.first?.id))
+        #expect(model.folders.isEmpty)
+        #expect(defaults.stringArray(forKey: EngineBootstrap.folderHintsKey) == [])
         await model.stop()
+    }
+
+    @Test func loginItemIsAppliedOnFirstLaunchAndOnChangeOnly() async throws {
+        let root = try tempDir()
+        defer { try? FileManager.default.removeItem(at: root) }
+        let suite = "DropKeeperAppTests.\(UUID().uuidString)"
+        let defaults = try #require(UserDefaults(suiteName: suite))
+        defer { defaults.removePersistentDomain(forName: suite) }
+
+        let first = LoginItemRecorder()
+        let firstModel = AppModel(defaults: defaults, applyLoginItem: first.apply)
+        await firstModel.start(
+            with: try EngineBootstrap.make(
+                databaseURL: root.appendingPathComponent("one/db.sqlite"), defaults: defaults))
+        await firstModel.stop()
+        #expect(first.calls == [true])
+
+        // A later launch must not re-register: the user may have turned it off in System Settings.
+        let second = LoginItemRecorder()
+        let secondModel = AppModel(defaults: defaults, applyLoginItem: second.apply)
+        await secondModel.start(
+            with: try EngineBootstrap.make(
+                databaseURL: root.appendingPathComponent("two/db.sqlite"), defaults: defaults))
+        #expect(second.calls.isEmpty)
+        var settings = secondModel.settings
+        settings.launchAtLogin = false
+        await secondModel.update(settings)
+        #expect(second.calls == [false])
+        await secondModel.stop()
     }
 
     /// A second prompt action while the first is still running must be ignored, not applied to the same files.
