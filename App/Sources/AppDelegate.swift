@@ -7,8 +7,13 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         ProcessInfo.processInfo.environment["XCTestConfigurationFilePath"] != nil
     }
 
-    let model = AppModel()
+    let model = AppDelegate.makeModel()
     private var systemEvents: SystemEvents?
+    private var panels: PanelCoordinator?
+    private lazy var actions = AppActions(
+        openSettings: { [weak self] in self?.openSettings() },
+        quit: { NSApp.terminate(nil) },
+        review: { [weak self] in self?.model.promptRequested = true })
     private let log = Logger(subsystem: "net.direcat.dropkeeper", category: "app")
 
     func applicationDidFinishLaunching(_ notification: Notification) {
@@ -19,7 +24,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     private func launch() async {
         let bootstrap: EngineBootstrap.Result
         do {
-            bootstrap = try EngineBootstrap.make(databaseURL: try EngineBootstrap.databaseURL(), defaults: .standard)
+            bootstrap = try EngineBootstrap.make(databaseURL: try Self.databaseURL(), defaults: Self.appDefaults)
         } catch {
             presentFatal(error)
             return
@@ -37,8 +42,57 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         didLaunch()
     }
 
-    /// Later tasks create the status item, panels and windows here.
-    private func didLaunch() {}
+    /// Task 9 adds the status item here, Tasks 10 and 11 the windows.
+    private func didLaunch() {
+        let panels = PanelCoordinator(model: model, actions: actions, statusAnchor: { nil })
+        panels.start()
+        self.panels = panels
+    }
+
+    /// Replaced in Task 10.
+    private func openSettings() {}
+
+    private static func makeModel() -> AppModel {
+        #if DEBUG
+            // Development only: `-noLoginItem YES` never registers this build as a login item.
+            if UserDefaults.standard.bool(forKey: "noLoginItem") {
+                return AppModel(defaults: appDefaults, applyLoginItem: { _ in })
+            }
+        #endif
+        return AppModel(defaults: appDefaults)
+    }
+
+    /// Where the app keeps its own state (folder hints, first-launch markers).
+    private static let appDefaults: UserDefaults = {
+        #if DEBUG
+            // A `-dbPath` run keeps that state in a separate suite, so it never marks the real app as launched
+            // or leaves folder hints that would turn its next real launch into a recovery. A new database starts
+            // with empty state, like a first launch.
+            if let path = UserDefaults.standard.string(forKey: "dbPath"),
+                let suite = UserDefaults(suiteName: debugSuiteName)
+            {
+                if !FileManager.default.fileExists(atPath: path) {
+                    suite.removePersistentDomain(forName: debugSuiteName)
+                }
+                return suite
+            }
+        #endif
+        return .standard
+    }()
+
+    #if DEBUG
+        private static let debugSuiteName = "net.direcat.dropkeeper.debug"
+    #endif
+
+    private static func databaseURL() throws -> URL {
+        #if DEBUG
+            // Development only: `-dbPath /path/to/db.sqlite` uses a throwaway database.
+            if let path = UserDefaults.standard.string(forKey: "dbPath") {
+                return URL(fileURLWithPath: path)
+            }
+        #endif
+        return try EngineBootstrap.databaseURL()
+    }
 
     func applicationShouldTerminate(_ sender: NSApplication) -> NSApplication.TerminateReply {
         guard !Self.isRunningTests else { return .terminateNow }
