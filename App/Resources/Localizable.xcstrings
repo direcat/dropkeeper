@@ -91,6 +91,98 @@
     "Quit DropKeeper and try again. Your files have not been touched." : {
       "comment" : "Fatal alert message at launch",
       "localizations" : { "cs" : { "stringUnit" : { "state" : "translated", "value" : "Ukončete DropKeeper a zkuste to znovu. Vašich souborů se nic nedotklo." } } }
+    },
+    "Delete after" : {
+      "comment" : "VoiceOver label of the timeline",
+      "localizations" : { "cs" : { "stringUnit" : { "state" : "translated", "value" : "Smazat po" } } }
+    },
+    "Kept" : {
+      "comment" : "Shown above the Keep stop on the timeline",
+      "localizations" : { "cs" : { "stringUnit" : { "state" : "translated", "value" : "Ponecháno" } } }
+    },
+    "Keep" : {
+      "comment" : "Last timeline stop: keep the file",
+      "localizations" : { "cs" : { "stringUnit" : { "state" : "translated", "value" : "Ponechat" } } }
+    },
+    "Keep it" : {
+      "comment" : "Prompt button and VoiceOver value: keep the file",
+      "localizations" : { "cs" : { "stringUnit" : { "state" : "translated", "value" : "Ponechat" } } }
+    },
+    "Delete in %@, at %@" : {
+      "comment" : "VoiceOver value of the timeline, e.g. Delete in 1 hour, at Today 16:40",
+      "localizations" : { "cs" : { "stringUnit" : { "state" : "translated", "value" : "Smazat za %@, v %@" } } }
+    },
+    "Apply to all %lld new files" : {
+      "comment" : "Prompt checkbox when several new files are stacked",
+      "localizations" : {
+        "en" : { "variations" : { "plural" : {
+          "one" : { "stringUnit" : { "state" : "translated", "value" : "Apply to %lld new file" } },
+          "other" : { "stringUnit" : { "state" : "translated", "value" : "Apply to all %lld new files" } } } } },
+        "cs" : { "variations" : { "plural" : {
+          "one" : { "stringUnit" : { "state" : "translated", "value" : "Použít pro %lld nový soubor" } },
+          "few" : { "stringUnit" : { "state" : "translated", "value" : "Použít pro všechny %lld nové soubory" } },
+          "many" : { "stringUnit" : { "state" : "translated", "value" : "Použít pro všech %lld nového souboru" } },
+          "other" : { "stringUnit" : { "state" : "translated", "value" : "Použít pro všech %lld nových souborů" } } } } }
+      }
+    },
+    "%lld new files" : {
+      "comment" : "Prompt metadata: number of stacked new files",
+      "localizations" : {
+        "en" : { "variations" : { "plural" : {
+          "one" : { "stringUnit" : { "state" : "translated", "value" : "%lld new file" } },
+          "other" : { "stringUnit" : { "state" : "translated", "value" : "%lld new files" } } } } },
+        "cs" : { "variations" : { "plural" : {
+          "one" : { "stringUnit" : { "state" : "translated", "value" : "%lld nový soubor" } },
+          "few" : { "stringUnit" : { "state" : "translated", "value" : "%lld nové soubory" } },
+          "many" : { "stringUnit" : { "state" : "translated", "value" : "%lld nového souboru" } },
+          "other" : { "stringUnit" : { "state" : "translated", "value" : "%lld nových souborů" } } } } }
+      }
+    },
+    "Done" : {
+      "comment" : "Prompt primary button",
+      "localizations" : { "cs" : { "stringUnit" : { "state" : "translated", "value" : "Hotovo" } } }
+    },
+    "Close" : {
+      "comment" : "Prompt close button (VoiceOver)",
+      "localizations" : { "cs" : { "stringUnit" : { "state" : "translated", "value" : "Zavřít" } } }
+    },
+    "%lld files" : {
+      "comment" : "Notice title when several files were deleted at once",
+      "localizations" : {
+        "en" : { "variations" : { "plural" : {
+          "one" : { "stringUnit" : { "state" : "translated", "value" : "%lld file" } },
+          "other" : { "stringUnit" : { "state" : "translated", "value" : "%lld files" } } } } },
+        "cs" : { "variations" : { "plural" : {
+          "one" : { "stringUnit" : { "state" : "translated", "value" : "%lld soubor" } },
+          "few" : { "stringUnit" : { "state" : "translated", "value" : "%lld soubory" } },
+          "many" : { "stringUnit" : { "state" : "translated", "value" : "%lld souboru" } },
+          "other" : { "stringUnit" : { "state" : "translated", "value" : "%lld souborů" } } } } }
+      }
+    },
+    "Moved to Trash" : {
+      "comment" : "Notice subtitle after a file was moved to the Trash",
+      "localizations" : { "cs" : { "stringUnit" : { "state" : "translated", "value" : "Přesunuto do Koše" } } }
+    },
+    "Deleted" : {
+      "comment" : "Notice subtitle after a file was deleted permanently",
+      "localizations" : { "cs" : { "stringUnit" : { "state" : "translated", "value" : "Smazáno" } } }
+    },
+    "Undo" : {
+      "comment" : "Notice button: restore the file from the Trash",
+      "localizations" : { "cs" : { "stringUnit" : { "state" : "translated", "value" : "Vrátit" } } }
+    },
+    "%lld files scheduled" : {
+      "comment" : "VoiceOver label of the closed notch",
+      "localizations" : {
+        "en" : { "variations" : { "plural" : {
+          "one" : { "stringUnit" : { "state" : "translated", "value" : "%lld file scheduled" } },
+          "other" : { "stringUnit" : { "state" : "translated", "value" : "%lld files scheduled" } } } } },
+        "cs" : { "variations" : { "plural" : {
+          "one" : { "stringUnit" : { "state" : "translated", "value" : "%lld soubor naplánován" } },
+          "few" : { "stringUnit" : { "state" : "translated", "value" : "%lld soubory naplánovány" } },
+          "many" : { "stringUnit" : { "state" : "translated", "value" : "%lld souboru naplánováno" } },
+          "other" : { "stringUnit" : { "state" : "translated", "value" : "%lld souborů naplánováno" } } } } }
+      }
     }
   },
   "version" : "1.0"
