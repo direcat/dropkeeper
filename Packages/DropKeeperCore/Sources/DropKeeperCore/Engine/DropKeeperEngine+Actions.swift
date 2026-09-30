@@ -3,31 +3,34 @@ import Foundation
 extension DropKeeperEngine {
     // MARK: User actions
 
+    /// Schedules active items. Every id is processed; failures are reported together afterwards.
     public func schedule(ids: [FileID], duration: TimeInterval) throws {
         let now = env.time.now()
-        for id in ids {
-            guard var file = try store.file(id: id), file.state.isActive else { continue }
+        defer { rescheduleTimer() }
+        try forEach(ids) { id in
+            guard var file = try store.file(id: id), file.state.isActive else { return }
             actions.schedule(&file, duration: duration, now: now, tagEnabled: settings.finderTagEnabled)
             try store.update(file)
         }
-        rescheduleTimer()
     }
 
+    /// Keeps active and failed items. Every id is processed; failures are reported together afterwards.
     public func keep(ids: [FileID]) throws {
         let now = env.time.now()
-        for id in ids {
-            guard var file = try store.file(id: id), file.state.isActive || file.state == .failed else { continue }
+        defer { rescheduleTimer() }
+        try forEach(ids) { id in
+            guard var file = try store.file(id: id), file.state.isActive || file.state == .failed else { return }
             actions.keep(&file, now: now)
             try store.update(file)
         }
-        rescheduleTimer()
     }
 
     /// Moves trashed items back to their original location (a unique name if it is taken); they become `kept`.
+    /// Every id is processed; the ones that could not be restored are reported in `partialFailure`.
     public func undoTrash(ids: [FileID]) throws {
         let now = env.time.now()
-        for id in ids {
-            guard var file = try store.file(id: id), file.state == .trashed, file.trashPath != nil else { continue }
+        try forEach(ids) { id in
+            guard var file = try store.file(id: id), file.state == .trashed, file.trashPath != nil else { return }
             try trasher.undo(&file, now: now)
             // The restored file still carries the expiry xattr and Finder tag from before disposal.
             actions.clearMarks(at: file.path)
@@ -40,27 +43,38 @@ extension DropKeeperEngine {
         }
     }
 
-    /// Re-attempts disposal of `failed` items immediately.
+    /// Re-attempts disposal of `failed` items immediately. Every id is processed; failures are reported
+    /// together afterwards.
     public func retry(ids: [FileID]) throws {
         let now = env.time.now()
-        for id in ids {
-            guard var file = try store.file(id: id), file.state == .failed else { continue }
+        defer {
+            runDue()
+            rescheduleTimer()
+        }
+        try forEach(ids) { id in
+            guard var file = try store.file(id: id), file.state == .failed else { return }
             file.state = .scheduled
             file.expiresAt = now
             file.failureCount = 0
             file.updatedAt = now
             try store.update(file)
         }
-        runDue()
-        rescheduleTimer()
     }
 
     /// Stops watching a folder. Its active and failed items become `kept`; nothing is trashed.
+    /// The folder is removed even when some items could not be updated: once it is not watched, reconciling
+    /// such an item finds it outside all watched folders and keeps it. Those ids are reported afterwards.
     public func removeFolder(id: Int64) throws {
         let now = env.time.now()
+        var failed: [FileID] = []
         for var file in try store.files(in: [.pending, .scheduled, .failed], folderId: id) {
             actions.keep(&file, now: now)
-            try store.update(file)
+            do {
+                try store.update(file)
+            } catch {
+                Log.engine.error("Could not keep \(file.id): \(error.localizedDescription)")
+                failed.append(file.id)
+            }
         }
         try store.deleteFolder(id: id)
         unavailableSince[id] = nil
@@ -68,6 +82,21 @@ extension DropKeeperEngine {
         notify.yield(.foldersChanged)
         if isRunning { restartWatcher() }
         rescheduleTimer()
+        if !failed.isEmpty { throw EngineError.partialFailure(failedIds: failed) }
+    }
+
+    /// Runs `body` for every id, then throws `partialFailure` listing the ids whose body threw.
+    private func forEach(_ ids: [FileID], _ body: (FileID) throws -> Void) throws {
+        var failed: [FileID] = []
+        for id in ids {
+            do {
+                try body(id)
+            } catch {
+                Log.engine.error("Action failed for \(id): \(error.localizedDescription)")
+                failed.append(id)
+            }
+        }
+        if !failed.isEmpty { throw EngineError.partialFailure(failedIds: failed) }
     }
 
     public func updateSettings(_ new: Settings) throws {

@@ -45,6 +45,8 @@ public enum EngineNotification: Sendable, Equatable {
 public enum EngineError: Error, Equatable {
     case notADirectory(String)
     case overlapsExistingFolder(String)
+    /// A batch action processed every item but these failed.
+    case partialFailure(failedIds: [FileID])
 }
 
 public actor DropKeeperEngine {

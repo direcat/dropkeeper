@@ -151,4 +151,25 @@ import Testing
         #expect(!harness.fs.exists(path))
         #expect(try harness.store.file(id: id)?.state == .trashed)
     }
+
+    // MARK: Finding 3: batch actions do not stop at the first error
+
+    @Test func undoOfSeveralItemsRestoresTheRestWhenOneFails() async throws {
+        let harness = try EngineHarness()
+        try await harness.startWithDownloads()
+        let first = await harness.drop("a.pdf")
+        let second = await harness.drop("b.pdf")
+        let ids = try harness.files().map(\.id)
+        try await harness.engine.schedule(ids: ids, duration: 60)
+        await harness.advance(60)
+        #expect(!harness.fs.exists(first))
+        #expect(!harness.fs.exists(second))
+        harness.fs.delete(FakeFileSystem.trashDir + "/a.pdf")  // emptied from the Trash meanwhile
+        await #expect(throws: EngineError.partialFailure(failedIds: [ids[0]])) {
+            try await harness.engine.undoTrash(ids: ids)
+        }
+        #expect(harness.fs.exists(second))
+        #expect(try harness.store.file(id: ids[1])?.state == .kept)
+        #expect(try harness.store.file(id: ids[0])?.state == .trashed)
+    }
 }
