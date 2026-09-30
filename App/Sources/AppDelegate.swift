@@ -31,9 +31,16 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         }
         await model.start(with: bootstrap)
         #if DEBUG
-            // Development only: `-watch /path/to/folder` (scheme argument) watches a folder before Settings exists.
+            // Development only: `-watch /path/to/folder` watches a folder before Settings exists. It needs `-dbPath`
+            // (and should be run with `-noLoginItem YES`), so a debug run never writes folders or hints into the
+            // real database or defaults. Example:
+            // DropKeeper -dbPath /tmp/dk/db.sqlite -noLoginItem YES -watch /tmp/dk/Downloads
             if let path = UserDefaults.standard.string(forKey: "watch") {
-                await model.addFolder(URL(fileURLWithPath: path))
+                if UserDefaults.standard.string(forKey: "dbPath") != nil {
+                    await model.addFolder(URL(fileURLWithPath: path))
+                } else {
+                    log.error("Ignoring -watch without -dbPath")
+                }
             }
         #endif
         systemEvents = SystemEvents(

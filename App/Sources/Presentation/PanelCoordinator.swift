@@ -31,13 +31,15 @@ final class PanelCoordinator {
         render()
     }
 
-    /// Everything that changes which content is shown, or the panel size.
+    /// Everything that changes which content is shown, or the panel size. The countdown is not here: the hosted
+    /// view observes it itself, and it never changes the frame.
     private func readState() {
         _ = model.isPromptAvailable
         _ = model.queue.items.count
+        _ = model.queue.current?.id
         _ = model.notice.isVisible
+        _ = model.notice.files.count
         _ = model.scheduled.count
-        _ = model.urgentSeconds
         _ = model.settings.promptPresentation
         _ = model.settings.quietMode
     }
@@ -48,6 +50,7 @@ final class PanelCoordinator {
         let content = PanelDecision.content(
             promptAvailable: model.isPromptAvailable, noticeVisible: model.notice.isVisible, target: target,
             scheduledCount: model.scheduled.count, hovering: hovering)
+        if !PanelDecision.keepsHover(showing: content) { resetHover() }
         guard content != .hidden else {
             hide()
             return
@@ -102,6 +105,7 @@ final class PanelCoordinator {
         let reduceMotion = NSWorkspace.shared.accessibilityDisplayShouldReduceMotion
         wantsVisible = true
         if panel.isVisible {
+            guard frame != panel.frame || panel.alphaValue < 1 else { return }
             NSAnimationContext.runAnimationGroup { context in
                 context.duration = reduceMotion ? 0 : 0.3
                 context.allowsImplicitAnimation = true
@@ -121,6 +125,7 @@ final class PanelCoordinator {
     }
 
     private func hide() {
+        resetHover()
         guard panel.isVisible, wantsVisible else { return }
         wantsVisible = false
         NSAnimationContext.runAnimationGroup { context in
@@ -135,6 +140,12 @@ final class PanelCoordinator {
         // A new render may have started showing the panel again during the fade.
         guard !wantsVisible else { return }
         panel.orderOut(nil)
+    }
+
+    private func resetHover() {
+        collapseTask?.cancel()
+        collapseTask = nil
+        hovering = false
     }
 
     private func setHovering(_ inside: Bool) {

@@ -105,3 +105,11 @@ private func reviewFocusPanelDecision(_ testCase: DecisionCase) {
     #expect(path.contains(CGPoint(x: 0.5, y: 0.5)))  // top-left corner is square
     #expect(!path.contains(CGPoint(x: 0.5, y: 131.5)))  // bottom-left corner is rounded away
 }
+
+@Test func hoverSurvivesOnlyWhileTheClosedNotchIsShown() {
+    #expect(PanelDecision.keepsHover(showing: .idle))
+    #expect(PanelDecision.keepsHover(showing: .idleExpanded))
+    for content in [PanelContent.hidden, .prompt, .notice] {
+        #expect(!PanelDecision.keepsHover(showing: content))
+    }
+}
