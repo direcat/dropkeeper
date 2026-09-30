@@ -53,24 +53,24 @@ public actor DropKeeperEngine {
     public static let pollInterval: TimeInterval = 0.5
 
     public nonisolated let notifications: AsyncStream<EngineNotification>
-    private let notify: AsyncStream<EngineNotification>.Continuation
-    private let env: EngineEnvironment
-    private var settings = Settings()
-    private var folders: [WatchedFolder] = []
+    let notify: AsyncStream<EngineNotification>.Continuation
+    let env: EngineEnvironment
+    var settings = Settings()
+    var folders: [WatchedFolder] = []
     private var tracker = StabilityTracker()
     private var eventSource: (any FolderEventSource)?
     private var eventTask: Task<Void, Never>?
     private var timerTask: Task<Void, Never>?
-    private var isRunning = false
+    var isRunning = false
     /// Lower bound for the fallback scan: the heartbeat from the previous session.
     private var scanBound: Date?
     /// When each folder (by id) stopped being `.ok` during this session; bounds its rescan on return.
-    private var unavailableSince: [Int64: Date] = [:]
+    var unavailableSince: [Int64: Date] = [:]
 
-    private var store: FileStore { env.store }
-    private var actions: ItemActions { ItemActions(fs: env.fs) }
+    var store: FileStore { env.store }
+    var actions: ItemActions { ItemActions(fs: env.fs) }
     private var reconciler: Reconciler { Reconciler(fs: env.fs) }
-    private var trasher: Trasher { Trasher(fs: env.fs) }
+    var trasher: Trasher { Trasher(fs: env.fs) }
 
     public init(environment: EngineEnvironment) {
         env = environment
@@ -118,6 +118,7 @@ public actor DropKeeperEngine {
     }
 
     public func handleWake() {
+        guard isRunning else { return }
         refreshFolderStatuses()
         reconcileActive()
         runDue()
@@ -125,6 +126,7 @@ public actor DropKeeperEngine {
     }
 
     public func handleClockChange() {
+        guard isRunning else { return }
         runDue()
         rescheduleTimer()
     }
@@ -224,7 +226,7 @@ public actor DropKeeperEngine {
 
     // MARK: Watcher
 
-    private func restartWatcher() {
+    func restartWatcher() {
         eventTask?.cancel()
         eventSource?.stop()
         eventSource = nil
@@ -382,7 +384,7 @@ public actor DropKeeperEngine {
         }
     }
 
-    private func runDue() {
+    func runDue() {
         let now = env.time.now()
         guard let active = try? store.files(in: [.pending, .scheduled]) else { return }
         var trashed: [TrackedFile] = []
@@ -430,7 +432,7 @@ public actor DropKeeperEngine {
         }
     }
 
-    private func rescheduleTimer() {
+    func rescheduleTimer() {
         timerTask?.cancel()
         timerTask = nil
         guard env.automaticTimer, isRunning else { return }
@@ -448,28 +450,6 @@ public actor DropKeeperEngine {
             guard !Task.isCancelled else { return }
             await self?.tick()
         }
-    }
-
-    // MARK: User actions
-
-    public func schedule(ids: [FileID], duration: TimeInterval) throws {
-        let now = env.time.now()
-        for id in ids {
-            guard var file = try store.file(id: id), file.state.isActive else { continue }
-            actions.schedule(&file, duration: duration, now: now, tagEnabled: settings.finderTagEnabled)
-            try store.update(file)
-        }
-        rescheduleTimer()
-    }
-
-    public func keep(ids: [FileID]) throws {
-        let now = env.time.now()
-        for id in ids {
-            guard var file = try store.file(id: id), file.state.isActive || file.state == .failed else { continue }
-            actions.keep(&file, now: now)
-            try store.update(file)
-        }
-        rescheduleTimer()
     }
 }
 
