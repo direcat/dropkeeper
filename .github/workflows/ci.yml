@@ -1,0 +1,24 @@
+name: CI
+
+on:
+  push:
+    branches: [master]
+  pull_request:
+
+jobs:
+  core:
+    runs-on: macos-26
+    steps:
+      - uses: actions/checkout@v7
+      - name: Toolchain
+        run: swift --version
+      - name: Offline guard
+        run: scripts/offline-guard.sh
+      - name: swift-format
+        run: swift format lint --strict --recursive Packages/DropKeeperCore/Sources Packages/DropKeeperCore/Tests
+      - name: SwiftLint
+        run: |
+          brew install swiftlint
+          swiftlint lint --strict
+      - name: Test core
+        run: swift test --package-path Packages/DropKeeperCore
