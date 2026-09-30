@@ -110,7 +110,7 @@
     },
     "Delete in %@, at %@" : {
       "comment" : "VoiceOver value of the timeline, e.g. Delete in 1 hour, at Today 16:40",
-      "localizations" : { "cs" : { "stringUnit" : { "state" : "translated", "value" : "Smazat za %@, v %@" } } }
+      "localizations" : { "cs" : { "stringUnit" : { "state" : "translated", "value" : "Smazat za %@, %@" } } }
     },
     "Apply to all %lld new files" : {
       "comment" : "Prompt checkbox when several new files are stacked",
@@ -142,13 +142,13 @@
       "localizations" : { "cs" : { "stringUnit" : { "state" : "translated", "value" : "Vítá vás DropKeeper" } } }
     },
     "Every new download gets an expiry. Pick 30 minutes, a day, or keep it. When time is up, DropKeeper moves the file to the Trash." : {
-      "localizations" : { "cs" : { "stringUnit" : { "state" : "translated", "value" : "Každé nové stažení dostane dobu platnosti. Vyberte 30 minut, den, nebo si ho nechte. Až čas vyprší, DropKeeper soubor přesune do Koše." } } }
+      "localizations" : { "cs" : { "stringUnit" : { "state" : "translated", "value" : "Každé nové stažení dostane dobu platnosti. Vyberte 30 minut, den, nebo ho ponechte. Až čas vyprší, DropKeeper soubor přesune do Koše." } } }
     },
     "100 % offline — no analytics, no tracking, nothing leaves your Mac." : {
       "localizations" : { "cs" : { "stringUnit" : { "state" : "translated", "value" : "100% offline – žádná analytika, žádné sledování, nic neopustí váš Mac." } } }
     },
     "Allow access to Downloads" : {
-      "localizations" : { "cs" : { "stringUnit" : { "state" : "translated", "value" : "Povolit přístup ke Stažené" } } }
+      "localizations" : { "cs" : { "stringUnit" : { "state" : "translated", "value" : "Povolit přístup ke složce Stažené" } } }
     },
     "Downloads is watched" : {
       "localizations" : { "cs" : { "stringUnit" : { "state" : "translated", "value" : "Složka Stažené je sledovaná" } } }
@@ -267,7 +267,7 @@
     },
     "In the notch" : {
       "comment" : "Settings option: show the prompt in the screen notch",
-      "localizations" : { "cs" : { "stringUnit" : { "state" : "translated", "value" : "Ve výřezu (notch)" } } }
+      "localizations" : { "cs" : { "stringUnit" : { "state" : "translated", "value" : "Ve výřezu" } } }
     },
     "Quiet mode" : {
       "comment" : "Settings toggle",
@@ -476,7 +476,7 @@
     },
     "Redo" : {
       "comment" : "Main menu: Edit > Redo",
-      "localizations" : { "cs" : { "stringUnit" : { "state" : "translated", "value" : "Znovu" } } }
+      "localizations" : { "cs" : { "stringUnit" : { "state" : "translated", "value" : "Opakovat" } } }
     },
     "Cut" : {
       "comment" : "Main menu: Edit > Cut",

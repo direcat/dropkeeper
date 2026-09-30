@@ -6,6 +6,10 @@ Downloads that clean up after themselves. Every new download gets an expiry — 
 - Free and open source (MIT)
 - Apple Silicon, macOS 15 or later
 
+## How it works
+
+A new file lands in a watched folder, a small prompt opens (from the notch, or under the menu bar icon), and you pick when it should go: 30 minutes, an hour, a day, ten days — or keep it. When the time is up, DropKeeper moves the file to the Trash. Rename it or move it into a subfolder and it is still tracked; move it out of the watched folders and it is kept.
+
 Work in progress.
 
 ## Credits and transparency
