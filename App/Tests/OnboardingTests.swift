@@ -16,3 +16,13 @@ private func folder(_ status: FolderStatus) -> WatchedFolder {
     #expect(OnboardingStep.state(folders: [folder(.ok)], downloads: downloads) == .granted)
     #expect(OnboardingStep.state(folders: [folder(.noAccess)], downloads: downloads) == .denied)
 }
+
+@Test func safeDebugRunOnboardsTheTestFolder() {
+    let real = URL(fileURLWithPath: "/Users/me/Downloads")
+    #expect(
+        OnboardingFolder.target(downloads: real, dbPath: "/tmp/dk.sqlite", watch: "/tmp/dk-watch").path
+            == "/tmp/dk-watch")
+    #expect(OnboardingFolder.target(downloads: real, dbPath: nil, watch: "/tmp/dk-watch") == real)
+    #expect(OnboardingFolder.target(downloads: real, dbPath: "/tmp/dk.sqlite", watch: nil) == real)
+    #expect(OnboardingFolder.target(downloads: real, dbPath: nil, watch: nil) == real)
+}

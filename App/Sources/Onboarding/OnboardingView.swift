@@ -20,6 +20,8 @@ struct OnboardingView: View {
     let downloads: URL
     let onDone: () -> Void
     @State private var launchAtLogin = true
+    /// Why adding the folder failed; shown once, then gone.
+    @State private var accessError: String?
 
     private static let filesAndFoldersSettings = URL(
         string: "x-apple.systempreferences:com.apple.preference.security?Privacy_FilesAndFolders")!
@@ -42,10 +44,10 @@ struct OnboardingView: View {
                 .foregroundStyle(.secondary)
             switch step {
             case .needsAccess:
-                Button("Allow access to Downloads") { Task { await model.addFolder(downloads) } }
+                Button("Allow access to Downloads") { Task { await allowAccess() } }
                     .buttonStyle(.borderedProminent)
             case .granted:
-                Label("Downloads is watched", systemImage: "checkmark.circle").foregroundStyle(Color.accentColor)
+                Label("Downloads is watched", systemImage: "checkmark.circle").foregroundStyle(Color.green)
             case .denied:
                 VStack(spacing: TK.Space.s) {
                     Image("Permission").resizable().scaledToFit().frame(width: 64, height: 64)
@@ -80,5 +82,19 @@ struct OnboardingView: View {
         .padding(TK.Space.xl)
         .frame(width: 480)
         .onAppear { launchAtLogin = model.settings.launchAtLogin }
+        .alert(
+            "Couldn't watch Downloads",
+            isPresented: Binding(get: { accessError != nil }, set: { if !$0 { accessError = nil } })
+        ) {
+            Button("OK") {}
+        } message: {
+            Text(accessError ?? "")
+        }
+    }
+
+    private func allowAccess() async {
+        guard !(await model.addFolder(downloads)) else { return }
+        accessError = model.lastError ?? String(localized: "Something went wrong. Please try again.")
+        model.clearError()
     }
 }

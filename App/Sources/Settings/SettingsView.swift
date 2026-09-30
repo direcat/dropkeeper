@@ -108,7 +108,7 @@ struct SettingsView: View {
             ForEach(model.folders) { folder in
                 HStack {
                     Image(systemName: folder.status == .ok ? "folder" : "exclamationmark.triangle")
-                        .foregroundStyle(folder.status == .ok ? Color.secondary : TK.Notch.urgent)
+                        .foregroundStyle(folder.status == .ok ? Color.secondary : Color.orange)
                     VStack(alignment: .leading) {
                         Text(verbatim: (folder.path as NSString).abbreviatingWithTildeInPath)
                         if folder.status == .noAccess {
