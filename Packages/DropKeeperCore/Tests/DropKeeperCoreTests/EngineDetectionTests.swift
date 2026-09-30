@@ -206,4 +206,80 @@ import Testing
         await harness.engine.handleWake()
         #expect(!harness.fs.exists(path))
     }
+
+    @Test func reviewFocusFinderDuplicateIsNewItemAndOriginalKeepsItsSchedule() async throws {
+        let harness = try EngineHarness()
+        try await harness.startWithDownloads()
+        let original = await harness.drop("a.pdf")
+        let id = try harness.files()[0].id
+        try await harness.engine.schedule(ids: [id], duration: 1800)
+        let copy = EngineHarness.downloads + "/a copy.pdf"
+        harness.fs.createFile(copy, added: harness.time.now())
+        try harness.fs.writeXattr(ItemActions.idAttribute, value: id, at: copy)
+        let expiry = try #require(harness.fs.xattr(ItemActions.expiryAttribute, at: original))
+        try harness.fs.writeXattr(ItemActions.expiryAttribute, value: expiry, at: copy)
+        await harness.event(copy, [.created, .isFile])
+        await harness.advance(1)
+
+        let originalRecord = try #require(try harness.store.file(id: id))
+        #expect(originalRecord.path == original)
+        #expect(originalRecord.state == .scheduled)
+        let others = try harness.files().filter { $0.id != id }
+        #expect(others.map(\.path) == [copy])
+        #expect(others.first?.state == .pending)
+        #expect(harness.fs.xattr(ItemActions.idAttribute, at: copy) == others.first?.id)
+        #expect(harness.fs.xattr(ItemActions.expiryAttribute, at: copy) == nil)
+
+        await harness.advance(1799)
+        #expect(harness.fs.trashedPaths == [original])
+        #expect(harness.fs.exists(copy))
+    }
+
+    @Test func reviewFocusPutBackFromTrashBecomesKeptWithoutMarks() async throws {
+        let store = try FileStore.inMemory()
+        var settings = Settings()
+        settings.finderTagEnabled = true
+        try store.saveSettings(settings)
+        let harness = try EngineHarness(store: store)
+        try await harness.startWithDownloads()
+        let path = await harness.drop("a.pdf")
+        let id = try harness.files()[0].id
+        try await harness.engine.schedule(ids: [id], duration: 60)
+        #expect(harness.fs.tags(at: path) == [ItemActions.finderTag])
+        await harness.advance(60)
+        #expect(try harness.store.file(id: id)?.state == .trashed)
+
+        let trashed = FakeFileSystem.trashDir + "/a.pdf"
+        harness.fs.move(trashed, path)
+        await harness.event(path, [.renamed, .isFile])
+        #expect(try harness.store.file(id: id)?.state == .kept)
+        #expect(harness.fs.xattr(ItemActions.expiryAttribute, at: path) == nil)
+        #expect(harness.fs.tags(at: path).isEmpty)
+    }
+
+    @Test func reviewFocusDownloadWhileFolderUnavailableIsFoundWhenItReturns() async throws {
+        let harness = try EngineHarness()
+        try await harness.startWithDownloads()
+        harness.fs.deniedDirectories = [EngineHarness.downloads]
+        await harness.engine.handleWake()
+        #expect(await harness.engine.watchedFolders[0].status == .noAccess)
+        let path = EngineHarness.downloads + "/arrived.pdf"
+        harness.fs.createFile(path, added: harness.time.now())
+        await harness.advance(5)
+        #expect(try harness.files().isEmpty)
+        harness.fs.deniedDirectories = []
+        await harness.engine.handleWake()
+        await harness.advance(1)
+        let files = try harness.files()
+        #expect(files.map(\.path) == [path])
+        #expect(files.first?.state == .pending)
+    }
+
+    @Test func eventsAndTicksAfterStopDoNothing() async throws {
+        let harness = try EngineHarness()
+        try await harness.startWithDownloads()
+        await harness.engine.stop()
+        await harness.drop("late.pdf")
+        #expect(try harness.files().isEmpty)
+    }
 }

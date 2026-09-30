@@ -64,6 +64,8 @@ public actor DropKeeperEngine {
     private var isRunning = false
     /// Lower bound for the fallback scan: the heartbeat from the previous session.
     private var scanBound: Date?
+    /// When each folder (by id) stopped being `.ok` during this session; bounds its rescan on return.
+    private var unavailableSince: [Int64: Date] = [:]
 
     private var store: FileStore { env.store }
     private var actions: ItemActions { ItemActions(fs: env.fs) }
@@ -166,6 +168,7 @@ public actor DropKeeperEngine {
 
     private func refreshFolderStatuses() {
         var anyChanged = false
+        var recovered: [WatchedFolder] = []
         for var folder in folders {
             var changed = false
             if env.fs.stat(folder.path)?.isDirectory != true, let bookmark = folder.bookmark,
@@ -175,20 +178,13 @@ public actor DropKeeperEngine {
                 folder.path = resolved
                 changed = true
             }
-            let status: FolderStatus
-            if env.fs.stat(folder.path)?.isDirectory != true {
-                status = .unavailable
-            } else {
-                do {
-                    _ = try env.fs.contentsOfDirectory(folder.path)
-                    status = .ok
-                } catch FileSystemError.noPermission {
-                    status = .noAccess
-                } catch {
-                    status = .unavailable
-                }
-            }
+            let status = probeStatus(of: folder.path)
             if status != folder.status {
+                if status == .ok {
+                    recovered.append(folder)
+                } else if folder.status == .ok, let id = folder.id {
+                    unavailableSince[id] = env.time.now()
+                }
                 folder.status = status
                 changed = true
             }
@@ -201,6 +197,29 @@ public actor DropKeeperEngine {
         folders = (try? store.folders()) ?? folders
         notify.yield(.foldersChanged)
         if isRunning { restartWatcher() }
+        rescanRecovered(recovered)
+    }
+
+    private func probeStatus(of path: String) -> FolderStatus {
+        guard env.fs.stat(path)?.isDirectory == true else { return .unavailable }
+        do {
+            _ = try env.fs.contentsOfDirectory(path)
+            return .ok
+        } catch FileSystemError.noPermission {
+            return .noAccess
+        } catch {
+            return .unavailable
+        }
+    }
+
+    /// Items that arrived while a folder was unavailable produced no usable events: scan for them.
+    private func rescanRecovered(_ recovered: [WatchedFolder]) {
+        let now = env.time.now()
+        for old in recovered {
+            guard let id = old.id, let folder = folders.first(where: { $0.id == id }) else { continue }
+            let since = unavailableSince.removeValue(forKey: id) ?? scanBound ?? folder.addedAt
+            scanForNewItems(in: [folder], since: since, now: now)
+        }
     }
 
     // MARK: Watcher
@@ -226,6 +245,7 @@ public actor DropKeeperEngine {
     }
 
     func handle(events: [FolderEvent]) {
+        guard isRunning else { return }
         let now = env.time.now()
         var needsRescan = false
         var maxId: UInt64 = 0
@@ -247,7 +267,9 @@ public actor DropKeeperEngine {
             let stored = (try? store.meta(.lastEventId)).flatMap { UInt64($0) } ?? 0
             if maxId > stored { try? store.setMeta(.lastEventId, String(maxId)) }
         }
-        if needsRescan { scanForNewItems(now: now) }
+        if needsRescan {
+            scanForNewItems(in: folders.filter { $0.status == .ok }, since: scanBound ?? now, now: now)
+        }
         pollTracker(now: now)
         runDue()
         rescheduleTimer()
@@ -280,16 +302,26 @@ public actor DropKeeperEngine {
         return added >= since
     }
 
+    /// Identity per spec §3.1: inode + volume first, the id xattr only as a fallback.
+    /// A path carrying the id of a record whose original is still in place is a duplicate
+    /// (e.g. a Finder copy) and is treated as a new item.
     private func trackedRecord(at path: String, stat: FileStat) -> TrackedFile? {
-        if let id = env.fs.readXattr(ItemActions.idAttribute, at: path), let file = try? store.file(id: id) {
+        if let file = try? store.file(inode: stat.inode, volumeId: stat.volumeId, excluding: [.gone, .trashed]) {
             return file
         }
-        return try? store.file(inode: stat.inode, volumeId: stat.volumeId, excluding: [.gone, .trashed])
+        guard let id = env.fs.readXattr(ItemActions.idAttribute, at: path), let file = try? store.file(id: id)
+        else { return nil }
+        if file.path != path, let original = env.fs.stat(file.path), original.inode == file.inode,
+            original.volumeId == file.volumeId
+        {
+            return nil
+        }
+        return file
     }
 
     private func persist(_ file: TrackedFile, outcome: ReconcileOutcome) {
         guard outcome != .unchanged else { return }
-        if outcome == .kept { actions.clearMarks(at: file.path) }
+        if file.state == .kept { actions.clearMarks(at: file.path) }
         do {
             try store.update(file)
         } catch {
@@ -297,9 +329,9 @@ public actor DropKeeperEngine {
         }
     }
 
-    private func scanForNewItems(now: Date) {
-        for folder in folders where folder.status == .ok {
-            let since = max(scanBound ?? now, folder.addedAt)
+    private func scanForNewItems(in scanned: [WatchedFolder], since bound: Date, now: Date) {
+        for folder in scanned where folder.status == .ok {
+            let since = max(bound, folder.addedAt)
             for name in (try? env.fs.contentsOfDirectory(folder.path)) ?? [] {
                 let path = folder.path + "/" + name
                 guard let stat = env.fs.stat(path), trackedRecord(at: path, stat: stat) == nil,
@@ -319,6 +351,8 @@ public actor DropKeeperEngine {
                 trackedRecord(at: path, stat: stat) == nil
             else { continue }
             let file = TrackedFile.new(path: path, stat: stat, folderId: folder.id, now: now)
+            // A duplicate may carry the original's expiry xattr and tag; markPending overwrites the id.
+            actions.clearMarks(at: path)
             actions.markPending(file)
             do {
                 try store.insert(file)
@@ -331,6 +365,7 @@ public actor DropKeeperEngine {
     // MARK: Scheduling
 
     func tick() {
+        guard isRunning else { return }
         let now = env.time.now()
         pollTracker(now: now)
         runDue()
@@ -415,6 +450,30 @@ public actor DropKeeperEngine {
         }
     }
 
+    // MARK: User actions
+
+    public func schedule(ids: [FileID], duration: TimeInterval) throws {
+        let now = env.time.now()
+        for id in ids {
+            guard var file = try store.file(id: id), file.state.isActive else { continue }
+            actions.schedule(&file, duration: duration, now: now, tagEnabled: settings.finderTagEnabled)
+            try store.update(file)
+        }
+        rescheduleTimer()
+    }
+
+    public func keep(ids: [FileID]) throws {
+        let now = env.time.now()
+        for id in ids {
+            guard var file = try store.file(id: id), file.state.isActive || file.state == .failed else { continue }
+            actions.keep(&file, now: now)
+            try store.update(file)
+        }
+        rescheduleTimer()
+    }
+}
+
+extension DropKeeperEngine {
     // MARK: Housekeeping
 
     private func metaDate(_ key: MetaKey) -> Date? {
@@ -449,28 +508,6 @@ public actor DropKeeperEngine {
         for file in Recovery(fs: env.fs).scan(folders: folders, now: now) where (try? store.file(id: file.id)) == nil {
             try store.insert(file)
         }
-    }
-
-    // MARK: User actions
-
-    public func schedule(ids: [FileID], duration: TimeInterval) throws {
-        let now = env.time.now()
-        for id in ids {
-            guard var file = try store.file(id: id), file.state.isActive else { continue }
-            actions.schedule(&file, duration: duration, now: now, tagEnabled: settings.finderTagEnabled)
-            try store.update(file)
-        }
-        rescheduleTimer()
-    }
-
-    public func keep(ids: [FileID]) throws {
-        let now = env.time.now()
-        for id in ids {
-            guard var file = try store.file(id: id), file.state.isActive || file.state == .failed else { continue }
-            actions.keep(&file, now: now)
-            try store.update(file)
-        }
-        rescheduleTimer()
     }
 }
 
