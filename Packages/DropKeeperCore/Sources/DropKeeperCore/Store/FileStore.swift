@@ -104,6 +104,8 @@ public final class FileStore: Sendable {
             try db.create(index: "tracked_file_state_expires", on: "tracked_file", columns: ["state", "expires_at"])
             try db.create(index: "tracked_file_identity", on: "tracked_file", columns: ["inode", "volume_id"])
             try db.create(index: "tracked_file_state_updated", on: "tracked_file", columns: ["state", "updated_at"])
+            try db.create(index: "tracked_file_folder", on: "tracked_file", columns: ["folder_id"])
+            try db.create(index: "tracked_file_path", on: "tracked_file", columns: ["path"])
             try db.create(table: "setting") { table in
                 table.primaryKey("key", .text)
                 table.column("value", .text).notNull()

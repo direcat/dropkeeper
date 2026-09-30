@@ -4,6 +4,7 @@ import Synchronization
 
 public enum FolderWatcherError: Error {
     case couldNotCreateStream
+    case couldNotStartStream
 }
 
 /// One FSEvents stream over the given folders, file-level events, delivered as batches.
@@ -46,7 +47,11 @@ public final class FolderWatcher: FolderEventSource {
                     kCFAllocatorDefault, Self.callback, &context, paths as CFArray, sinceId, latency, flags)
             else { throw FolderWatcherError.couldNotCreateStream }
             FSEventStreamSetDispatchQueue(created, queue)
-            FSEventStreamStart(created)
+            guard FSEventStreamStart(created) else {
+                FSEventStreamInvalidate(created)
+                FSEventStreamRelease(created)
+                throw FolderWatcherError.couldNotStartStream
+            }
             value = created
         }
     }
