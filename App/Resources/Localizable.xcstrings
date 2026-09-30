@@ -224,6 +224,259 @@
       "comment" : "Pending list action that reveals a file in Finder",
       "localizations" : { "cs" : { "stringUnit" : { "state" : "translated", "value" : "Zobrazit ve Finderu" } } }
     },
+    "General" : {
+      "comment" : "Settings section title",
+      "localizations" : { "cs" : { "stringUnit" : { "state" : "translated", "value" : "Obecné" } } }
+    },
+    "Launch at login" : {
+      "comment" : "Settings toggle",
+      "localizations" : { "cs" : { "stringUnit" : { "state" : "translated", "value" : "Spouštět po přihlášení" } } }
+    },
+    "Show new downloads" : {
+      "comment" : "Settings picker: where the prompt for new downloads appears",
+      "localizations" : { "cs" : { "stringUnit" : { "state" : "translated", "value" : "Zobrazovat nová stažení" } } }
+    },
+    "Automatically" : {
+      "comment" : "Settings option: pick the prompt location automatically",
+      "localizations" : { "cs" : { "stringUnit" : { "state" : "translated", "value" : "Automaticky" } } }
+    },
+    "Under the menu bar icon" : {
+      "comment" : "Settings option: show the prompt under the menu bar icon",
+      "localizations" : { "cs" : { "stringUnit" : { "state" : "translated", "value" : "Pod ikonou v menu baru" } } }
+    },
+    "In the notch" : {
+      "comment" : "Settings option: show the prompt in the screen notch",
+      "localizations" : { "cs" : { "stringUnit" : { "state" : "translated", "value" : "Ve výřezu (notch)" } } }
+    },
+    "Quiet mode" : {
+      "comment" : "Settings toggle",
+      "localizations" : { "cs" : { "stringUnit" : { "state" : "translated", "value" : "Tichý režim" } } }
+    },
+    "Don't open the prompt by itself. A dot on the menu bar icon shows waiting files." : {
+      "comment" : "Settings: Quiet mode explanation",
+      "localizations" : { "cs" : { "stringUnit" : { "state" : "translated", "value" : "Výzva se neotevře sama. Čekající soubory ukáže tečka na ikoně v menu baru." } } }
+    },
+    "Folders" : {
+      "comment" : "Settings section title",
+      "localizations" : { "cs" : { "stringUnit" : { "state" : "translated", "value" : "Složky" } } }
+    },
+    "DropKeeper has no access to this folder." : {
+      "comment" : "Settings: watched folder without file access",
+      "localizations" : { "cs" : { "stringUnit" : { "state" : "translated", "value" : "DropKeeper nemá k této složce přístup." } } }
+    },
+    "This folder is not available." : {
+      "comment" : "Settings: watched folder that is missing or on an unmounted disk",
+      "localizations" : { "cs" : { "stringUnit" : { "state" : "translated", "value" : "Tato složka není dostupná." } } }
+    },
+    "Grant access" : {
+      "comment" : "Settings button that opens Files and Folders privacy settings",
+      "localizations" : { "cs" : { "stringUnit" : { "state" : "translated", "value" : "Povolit přístup" } } }
+    },
+    "Check again" : {
+      "comment" : "Settings button that re-checks folder access",
+      "localizations" : { "cs" : { "stringUnit" : { "state" : "translated", "value" : "Zkontrolovat znovu" } } }
+    },
+    "Remove folder" : {
+      "comment" : "VoiceOver label of the button that stops watching a folder",
+      "localizations" : { "cs" : { "stringUnit" : { "state" : "translated", "value" : "Odebrat složku" } } }
+    },
+    "Add folder…" : {
+      "comment" : "Settings button that adds a watched folder",
+      "localizations" : { "cs" : { "stringUnit" : { "state" : "translated", "value" : "Přidat složku…" } } }
+    },
+    "Watch folder" : {
+      "comment" : "Open panel confirm button when adding a watched folder",
+      "localizations" : { "cs" : { "stringUnit" : { "state" : "translated", "value" : "Sledovat složku" } } }
+    },
+    "Behavior" : {
+      "comment" : "Settings section title",
+      "localizations" : { "cs" : { "stringUnit" : { "state" : "translated", "value" : "Chování" } } }
+    },
+    "Stop %lld" : {
+      "comment" : "Settings picker label of a timeline stop, e.g. Stop 1",
+      "localizations" : { "cs" : { "stringUnit" : { "state" : "translated", "value" : "Bod %lld" } } }
+    },
+    "Remove stop" : {
+      "comment" : "VoiceOver label of the button that removes a timeline stop",
+      "localizations" : { "cs" : { "stringUnit" : { "state" : "translated", "value" : "Odebrat bod" } } }
+    },
+    "Add stop" : {
+      "comment" : "Settings button that adds a timeline stop",
+      "localizations" : { "cs" : { "stringUnit" : { "state" : "translated", "value" : "Přidat bod" } } }
+    },
+    "Ask again after" : {
+      "comment" : "Settings picker: grace period before the default choice applies",
+      "localizations" : { "cs" : { "stringUnit" : { "state" : "translated", "value" : "Výchozí volba po" } } }
+    },
+    "If you don't choose" : {
+      "comment" : "Settings picker: what happens when the user makes no choice",
+      "localizations" : { "cs" : { "stringUnit" : { "state" : "translated", "value" : "Když nevyberete" } } }
+    },
+    "Delete after %@" : {
+      "comment" : "Settings option: default choice, e.g. Delete after 1 hour",
+      "localizations" : { "cs" : { "stringUnit" : { "state" : "translated", "value" : "Smazat po %@" } } }
+    },
+    "Expired files" : {
+      "comment" : "Settings picker: what happens to expired files",
+      "localizations" : { "cs" : { "stringUnit" : { "state" : "translated", "value" : "Soubory po vypršení" } } }
+    },
+    "Move to Trash" : {
+      "comment" : "Settings option: expired files go to the Trash",
+      "localizations" : { "cs" : { "stringUnit" : { "state" : "translated", "value" : "Přesunout do Koše" } } }
+    },
+    "Delete permanently" : {
+      "comment" : "Settings option and confirm button: expired files are deleted permanently",
+      "localizations" : { "cs" : { "stringUnit" : { "state" : "translated", "value" : "Trvale smazat" } } }
+    },
+    "Mark scheduled files with the “Temporary” Finder tag" : {
+      "comment" : "Settings toggle",
+      "localizations" : { "cs" : { "stringUnit" : { "state" : "translated", "value" : "Označit naplánované soubory štítkem Finderu „Temporary“" } } }
+    },
+    "Delete files permanently?" : {
+      "comment" : "Confirmation title before switching to permanent deletion",
+      "localizations" : { "cs" : { "stringUnit" : { "state" : "translated", "value" : "Mazat soubory trvale?" } } }
+    },
+    "Expired files will be deleted right away instead of going to the Trash. This can't be undone." : {
+      "comment" : "Confirmation message before switching to permanent deletion",
+      "localizations" : { "cs" : { "stringUnit" : { "state" : "translated", "value" : "Soubory po vypršení se smažou hned, místo aby šly do Koše. Nejde to vrátit." } } }
+    },
+    "Cancel" : {
+      "comment" : "Cancel button of a confirmation",
+      "localizations" : { "cs" : { "stringUnit" : { "state" : "translated", "value" : "Zrušit" } } }
+    },
+    "Ignored extensions" : {
+      "comment" : "Settings section title",
+      "localizations" : { "cs" : { "stringUnit" : { "state" : "translated", "value" : "Ignorované přípony" } } }
+    },
+    "Remove extension" : {
+      "comment" : "VoiceOver label of the button that removes an ignored extension",
+      "localizations" : { "cs" : { "stringUnit" : { "state" : "translated", "value" : "Odebrat příponu" } } }
+    },
+    "Extension, e.g. dmg" : {
+      "comment" : "Placeholder of the ignored extension text field",
+      "localizations" : { "cs" : { "stringUnit" : { "state" : "translated", "value" : "Přípona, např. dmg" } } }
+    },
+    "Add" : {
+      "comment" : "Button that adds an ignored extension",
+      "localizations" : { "cs" : { "stringUnit" : { "state" : "translated", "value" : "Přidat" } } }
+    },
+    "Data" : {
+      "comment" : "Settings section title",
+      "localizations" : { "cs" : { "stringUnit" : { "state" : "translated", "value" : "Data" } } }
+    },
+    "Keep history for" : {
+      "comment" : "Settings picker: history retention",
+      "localizations" : { "cs" : { "stringUnit" : { "state" : "translated", "value" : "Uchovávat historii" } } }
+    },
+    "1 month" : {
+      "comment" : "History retention option",
+      "localizations" : { "cs" : { "stringUnit" : { "state" : "translated", "value" : "1 měsíc" } } }
+    },
+    "3 months" : {
+      "comment" : "History retention option",
+      "localizations" : { "cs" : { "stringUnit" : { "state" : "translated", "value" : "3 měsíce" } } }
+    },
+    "6 months" : {
+      "comment" : "History retention option",
+      "localizations" : { "cs" : { "stringUnit" : { "state" : "translated", "value" : "6 měsíců" } } }
+    },
+    "1 year" : {
+      "comment" : "History retention option",
+      "localizations" : { "cs" : { "stringUnit" : { "state" : "translated", "value" : "1 rok" } } }
+    },
+    "2 years" : {
+      "comment" : "History retention option",
+      "localizations" : { "cs" : { "stringUnit" : { "state" : "translated", "value" : "2 roky" } } }
+    },
+    "Forever" : {
+      "comment" : "History retention option",
+      "localizations" : { "cs" : { "stringUnit" : { "state" : "translated", "value" : "Navždy" } } }
+    },
+    "Clear history now…" : {
+      "comment" : "Settings button that asks to clear the history",
+      "localizations" : { "cs" : { "stringUnit" : { "state" : "translated", "value" : "Vymazat historii…" } } }
+    },
+    "Clear history?" : {
+      "comment" : "Confirmation title before clearing the history",
+      "localizations" : { "cs" : { "stringUnit" : { "state" : "translated", "value" : "Vymazat historii?" } } }
+    },
+    "Clear history" : {
+      "comment" : "Confirm button that clears the history",
+      "localizations" : { "cs" : { "stringUnit" : { "state" : "translated", "value" : "Vymazat historii" } } }
+    },
+    "Scheduled and waiting files are not affected." : {
+      "comment" : "Confirmation message before clearing the history",
+      "localizations" : { "cs" : { "stringUnit" : { "state" : "translated", "value" : "Naplánovaných a čekajících souborů se to netýká." } } }
+    },
+    "Removed %lld records" : {
+      "comment" : "Settings: number of history records removed, e.g. Removed 12 records",
+      "localizations" : {
+        "en" : { "variations" : { "plural" : {
+          "one" : { "stringUnit" : { "state" : "translated", "value" : "Removed %lld record" } },
+          "other" : { "stringUnit" : { "state" : "translated", "value" : "Removed %lld records" } } } } },
+        "cs" : { "variations" : { "plural" : {
+          "one" : { "stringUnit" : { "state" : "translated", "value" : "Odstraněn %lld záznam" } },
+          "few" : { "stringUnit" : { "state" : "translated", "value" : "Odstraněny %lld záznamy" } },
+          "many" : { "stringUnit" : { "state" : "translated", "value" : "Odstraněno %lld záznamu" } },
+          "other" : { "stringUnit" : { "state" : "translated", "value" : "Odstraněno %lld záznamů" } } } } }
+      }
+    },
+    "About" : {
+      "comment" : "Settings section title",
+      "localizations" : { "cs" : { "stringUnit" : { "state" : "translated", "value" : "O aplikaci" } } }
+    },
+    "Version %@" : {
+      "comment" : "Settings: app version, e.g. Version 0.1.0",
+      "localizations" : { "cs" : { "stringUnit" : { "state" : "translated", "value" : "Verze %@" } } }
+    },
+    "Free and open source (MIT). 100 % offline — no analytics, no tracking, nothing leaves your Mac." : {
+      "comment" : "Settings: about text",
+      "localizations" : { "cs" : { "stringUnit" : { "state" : "translated", "value" : "Zdarma a open source (MIT). 100% offline – žádná analytika, žádné sledování, nic neopustí váš Mac." } } }
+    },
+    "Inspired by TempCat." : {
+      "comment" : "Settings: credit to the app that inspired DropKeeper",
+      "localizations" : { "cs" : { "stringUnit" : { "state" : "translated", "value" : "Inspirováno aplikací TempCat." } } }
+    },
+    "github.com/direcat/dropkeeper" : {
+      "comment" : "Settings: link to the project repository",
+      "shouldTranslate" : false
+    },
+    "OK" : {
+      "comment" : "Button that dismisses an error alert",
+      "localizations" : { "cs" : { "stringUnit" : { "state" : "translated", "value" : "OK" } } }
+    },
+    "DropKeeper Settings" : {
+      "comment" : "Settings window title",
+      "localizations" : { "cs" : { "stringUnit" : { "state" : "translated", "value" : "Nastavení DropKeeperu" } } }
+    },
+    "Edit" : {
+      "comment" : "Main menu: Edit menu",
+      "localizations" : { "cs" : { "stringUnit" : { "state" : "translated", "value" : "Úpravy" } } }
+    },
+    "Redo" : {
+      "comment" : "Main menu: Edit > Redo",
+      "localizations" : { "cs" : { "stringUnit" : { "state" : "translated", "value" : "Znovu" } } }
+    },
+    "Cut" : {
+      "comment" : "Main menu: Edit > Cut",
+      "localizations" : { "cs" : { "stringUnit" : { "state" : "translated", "value" : "Vyjmout" } } }
+    },
+    "Copy" : {
+      "comment" : "Main menu: Edit > Copy",
+      "localizations" : { "cs" : { "stringUnit" : { "state" : "translated", "value" : "Kopírovat" } } }
+    },
+    "Paste" : {
+      "comment" : "Main menu: Edit > Paste",
+      "localizations" : { "cs" : { "stringUnit" : { "state" : "translated", "value" : "Vložit" } } }
+    },
+    "Select All" : {
+      "comment" : "Main menu: Edit > Select All",
+      "localizations" : { "cs" : { "stringUnit" : { "state" : "translated", "value" : "Vybrat vše" } } }
+    },
+    "Window" : {
+      "comment" : "Main menu: Window menu",
+      "localizations" : { "cs" : { "stringUnit" : { "state" : "translated", "value" : "Okno" } } }
+    },
     "DropKeeper" : {
       "comment" : "App name, VoiceOver label of the menu bar item",
       "shouldTranslate" : false

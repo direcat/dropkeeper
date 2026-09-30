@@ -11,15 +11,29 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     private var systemEvents: SystemEvents?
     private var panels: PanelCoordinator?
     private var statusItem: StatusItemController?
+    private lazy var settingsWindow = SettingsWindowController(model: model)
     private lazy var actions = AppActions(
-        openSettings: { [weak self] in self?.openSettings() },
+        openSettings: { [weak self] in
+            self?.statusItem?.closePopover()
+            self?.openSettings()
+        },
         quit: { NSApp.terminate(nil) },
-        review: { [weak self] in self?.model.promptRequested = true })
+        review: { [weak self] in
+            self?.statusItem?.closePopover()
+            self?.model.promptRequested = true
+        })
     private let log = Logger(subsystem: "net.direcat.dropkeeper", category: "app")
 
     func applicationDidFinishLaunching(_ notification: Notification) {
         guard !Self.isRunningTests else { return }
+        installMainMenu()
         Task { await launch() }
+    }
+
+    /// Returning from System Settings (e.g. after granting folder access) updates the folder status.
+    func applicationDidBecomeActive(_ notification: Notification) {
+        guard !Self.isRunningTests else { return }
+        Task { await model.refreshFolders() }
     }
 
     private func launch() async {
@@ -50,7 +64,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         didLaunch()
     }
 
-    /// Tasks 10 and 11 add the windows here.
+    /// Task 11 adds the onboarding window here.
     private func didLaunch() {
         let status = StatusItemController(model: model, actions: actions)
         statusItem = status
@@ -60,8 +74,45 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         self.panels = panels
     }
 
-    /// Replaced in Task 10.
-    private func openSettings() {}
+    private func openSettings() { settingsWindow.show() }
+
+    /// An LSUIElement app has no menu bar, but the key equivalents of its main menu still work in its windows:
+    /// ⌘, opens Settings, ⌘W closes, ⌘Q quits, and the Edit items make copy and paste work in text fields.
+    private func installMainMenu() {
+        let main = NSMenu()
+        let appItem = NSMenuItem()
+        let appMenu = NSMenu()
+        appMenu.addItem(withTitle: String(localized: "Settings…"), action: #selector(showSettings), keyEquivalent: ",")
+        appMenu.addItem(.separator())
+        appMenu.addItem(
+            withTitle: String(localized: "Quit DropKeeper"), action: #selector(NSApplication.terminate(_:)),
+            keyEquivalent: "q")
+        appItem.submenu = appMenu
+        main.addItem(appItem)
+
+        let editItem = NSMenuItem()
+        let editMenu = NSMenu(title: String(localized: "Edit"))
+        editMenu.addItem(withTitle: String(localized: "Undo"), action: Selector(("undo:")), keyEquivalent: "z")
+        editMenu.addItem(withTitle: String(localized: "Redo"), action: Selector(("redo:")), keyEquivalent: "Z")
+        editMenu.addItem(.separator())
+        editMenu.addItem(withTitle: String(localized: "Cut"), action: #selector(NSText.cut(_:)), keyEquivalent: "x")
+        editMenu.addItem(withTitle: String(localized: "Copy"), action: #selector(NSText.copy(_:)), keyEquivalent: "c")
+        editMenu.addItem(withTitle: String(localized: "Paste"), action: #selector(NSText.paste(_:)), keyEquivalent: "v")
+        editMenu.addItem(
+            withTitle: String(localized: "Select All"), action: #selector(NSText.selectAll(_:)), keyEquivalent: "a")
+        editItem.submenu = editMenu
+        main.addItem(editItem)
+
+        let windowItem = NSMenuItem()
+        let windowMenu = NSMenu(title: String(localized: "Window"))
+        windowMenu.addItem(
+            withTitle: String(localized: "Close"), action: #selector(NSWindow.performClose(_:)), keyEquivalent: "w")
+        windowItem.submenu = windowMenu
+        main.addItem(windowItem)
+        NSApp.mainMenu = main
+    }
+
+    @objc private func showSettings() { openSettings() }
 
     private static func makeModel() -> AppModel {
         #if DEBUG

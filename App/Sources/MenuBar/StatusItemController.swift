@@ -58,6 +58,11 @@ final class StatusItemController: NSObject {
 
     var anchorFrame: CGRect? { item.button?.window?.frame }
 
+    /// Closes the pending list before another window (Settings, the prompt) takes over.
+    func closePopover() {
+        if popover.isShown { popover.performClose(nil) }
+    }
+
     private func readState() {
         _ = model.hasProblems
         _ = model.settings.quietMode
@@ -95,6 +100,8 @@ final class StatusItemController: NSObject {
         if popover.isShown {
             popover.performClose(sender)
         } else {
+            // Activating the app makes ⌘, and ⌘Q from the main menu work inside the popover.
+            NSApp.activate()
             popover.show(relativeTo: button.bounds, of: button, preferredEdge: .minY)
             popover.contentViewController?.view.window?.makeKey()
         }
