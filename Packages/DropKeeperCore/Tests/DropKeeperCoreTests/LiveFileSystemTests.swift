@@ -75,7 +75,8 @@ import Testing
     }
 
     @Test func listingMissingDirectoryThrowsNotFound() {
-        #expect(throws: FileSystemError.self) { try fs.contentsOfDirectory("/nonexistent-\(UUID())") }
+        let path = "/nonexistent-\(UUID())"
+        #expect(throws: FileSystemError.notFound(path)) { try fs.contentsOfDirectory(path) }
     }
 
     @Test func bookmarkResolvesRenamedFolder() throws {

@@ -1,34 +1,22 @@
 import Darwin
 import Foundation
-import Synchronization
 
 public final class LiveFileSystem: FileSystem {
-    private let volumeIds = Mutex<[Int32: String]>([:])
-
     public init() {}
 
     public func stat(_ path: String) -> FileStat? {
         var st = Darwin.stat()
         guard lstat(path, &st) == 0 else { return nil }
         let values = try? URL(fileURLWithPath: path)
-            .resourceValues(forKeys: [.addedToDirectoryDateKey, .creationDateKey])
+            .resourceValues(forKeys: [.addedToDirectoryDateKey, .creationDateKey, .volumeUUIDStringKey])
         return FileStat(
             inode: Int64(bitPattern: st.st_ino),
-            volumeId: volumeId(device: st.st_dev, path: path),
+            volumeId: values?.volumeUUIDString ?? "dev-\(st.st_dev)",
             size: Int64(st.st_size),
             isDirectory: (st.st_mode & S_IFMT) == S_IFDIR,
             creationDate: values?.creationDate,
             addedDate: values?.addedToDirectoryDate
         )
-    }
-
-    private func volumeId(device: Int32, path: String) -> String {
-        if let cached = volumeIds.withLock({ $0[device] }) { return cached }
-        let uuid =
-            (try? URL(fileURLWithPath: path).resourceValues(forKeys: [.volumeUUIDStringKey]))?
-            .volumeUUIDString ?? "dev-\(device)"
-        volumeIds.withLock { $0[device] = uuid }
-        return uuid
     }
 
     public func contentsOfDirectory(_ path: String) throws -> [String] {
@@ -54,14 +42,16 @@ public final class LiveFileSystem: FileSystem {
 
     public func writeXattr(_ name: String, value: String, at path: String) throws {
         let bytes = Array(value.utf8)
-        guard setxattr(path, name, bytes, bytes.count, 0, XATTR_NOFOLLOW) == 0 else {
-            throw FileSystemError.posix(errno, path)
+        if setxattr(path, name, bytes, bytes.count, 0, XATTR_NOFOLLOW) != 0 {
+            let code = errno
+            throw FileSystemError.posix(code, path)
         }
     }
 
     public func removeXattr(_ name: String, at path: String) throws {
-        guard removexattr(path, name, XATTR_NOFOLLOW) == 0 || errno == ENOATTR else {
-            throw FileSystemError.posix(errno, path)
+        if removexattr(path, name, XATTR_NOFOLLOW) != 0 {
+            let code = errno
+            guard code == ENOATTR else { throw FileSystemError.posix(code, path) }
         }
     }
 
