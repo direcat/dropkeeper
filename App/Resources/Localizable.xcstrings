@@ -138,6 +138,27 @@
           "other" : { "stringUnit" : { "state" : "translated", "value" : "%lld nových souborů" } } } } }
       }
     },
+    "Welcome to DropKeeper" : {
+      "localizations" : { "cs" : { "stringUnit" : { "state" : "translated", "value" : "Vítá vás DropKeeper" } } }
+    },
+    "Every new download gets an expiry. Pick 30 minutes, a day, or keep it. When time is up, DropKeeper moves the file to the Trash." : {
+      "localizations" : { "cs" : { "stringUnit" : { "state" : "translated", "value" : "Každé nové stažení dostane dobu platnosti. Vyberte 30 minut, den, nebo si ho nechte. Až čas vyprší, DropKeeper soubor přesune do Koše." } } }
+    },
+    "100 % offline — no analytics, no tracking, nothing leaves your Mac." : {
+      "localizations" : { "cs" : { "stringUnit" : { "state" : "translated", "value" : "100% offline – žádná analytika, žádné sledování, nic neopustí váš Mac." } } }
+    },
+    "Allow access to Downloads" : {
+      "localizations" : { "cs" : { "stringUnit" : { "state" : "translated", "value" : "Povolit přístup ke Stažené" } } }
+    },
+    "Downloads is watched" : {
+      "localizations" : { "cs" : { "stringUnit" : { "state" : "translated", "value" : "Složka Stažené je sledovaná" } } }
+    },
+    "DropKeeper has no access to Downloads. Allow it in System Settings → Privacy & Security → Files and Folders." : {
+      "localizations" : { "cs" : { "stringUnit" : { "state" : "translated", "value" : "DropKeeper nemá přístup ke složce Stažené. Povolte ho v Nastavení systému → Soukromí a zabezpečení → Soubory a složky." } } }
+    },
+    "Open System Settings" : {
+      "localizations" : { "cs" : { "stringUnit" : { "state" : "translated", "value" : "Otevřít Nastavení systému" } } }
+    },
     "Done" : {
       "comment" : "Prompt primary button",
       "localizations" : { "cs" : { "stringUnit" : { "state" : "translated", "value" : "Hotovo" } } }

@@ -11,6 +11,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     private var systemEvents: SystemEvents?
     private var panels: PanelCoordinator?
     private var statusItem: StatusItemController?
+    private lazy var onboarding = OnboardingWindowController(model: model)
     private lazy var settingsWindow = SettingsWindowController(model: model)
     private lazy var actions = AppActions(
         openSettings: { [weak self] in
@@ -64,7 +65,6 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         didLaunch()
     }
 
-    /// Task 11 adds the onboarding window here.
     private func didLaunch() {
         let status = StatusItemController(model: model, actions: actions)
         statusItem = status
@@ -72,6 +72,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             model: model, actions: actions, statusAnchor: { [weak status] in status?.anchorFrame })
         panels.start()
         self.panels = panels
+        if model.needsOnboarding { onboarding.show() }
     }
 
     private func openSettings() { settingsWindow.show() }
