@@ -97,9 +97,11 @@ public actor DropKeeperEngine {
 
     /// `observeFiles(in:)` as a standard-library stream, for clients that do not link GRDB themselves
     /// (the app target: GRDB is linked into this package's framework and its generic symbols are not exported).
+    /// Only the newest value is buffered. The observation runs until the stream is iterated to its end, or its
+    /// iterating task is cancelled, or the stream is dropped — iterate it or drop it to stop the observation.
     public nonisolated func fileUpdates(in states: [FileState]) -> AsyncThrowingStream<[TrackedFile], any Error> {
         let observation = observeFiles(in: states)
-        return AsyncThrowingStream { continuation in
+        return AsyncThrowingStream(bufferingPolicy: .bufferingNewest(1)) { continuation in
             let task = Task {
                 do {
                     for try await files in observation {
