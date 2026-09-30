@@ -1,0 +1,280 @@
+import DropKeeperCore
+import Foundation
+import Observation
+import os
+
+@MainActor
+@Observable
+final class AppModel {
+    private(set) var pending: [TrackedFile] = []
+    private(set) var scheduled: [TrackedFile] = []
+    private(set) var failed: [TrackedFile] = []
+    private(set) var settings = Settings()
+    private(set) var folders: [WatchedFolder] = []
+    private(set) var queue = PromptQueue()
+    private(set) var notice = NoticeCoalescer()
+    private(set) var now = Date()
+    private(set) var lastError: String?
+    private(set) var needsOnboarding = false
+    var timeline = TimelineModel(durations: Settings().timelineStops, defaultChoice: .keep)
+    var applyToAll = false
+    /// Set when the user asks to review pending files (e.g. from the list) while Quiet mode is on.
+    var promptRequested = false
+
+    @ObservationIgnored private var engine: DropKeeperEngine?
+    @ObservationIgnored private var tasks: [Task<Void, Never>] = []
+    @ObservationIgnored private var clockTask: Task<Void, Never>?
+    @ObservationIgnored private var noticeTask: Task<Void, Never>?
+    @ObservationIgnored private var isDeciding = false
+    @ObservationIgnored private let defaults: UserDefaults
+    @ObservationIgnored private let applyLoginItem: @MainActor (Bool) -> Void
+    @ObservationIgnored private let log = Logger(subsystem: "net.direcat.dropkeeper", category: "app")
+
+    static let onboardingCompletedKey = "onboardingCompleted"
+
+    /// `applyLoginItem` is injectable so tests never register the test host as a login item.
+    init(defaults: UserDefaults = .standard, applyLoginItem: @escaping @MainActor (Bool) -> Void = LoginItem.apply) {
+        self.defaults = defaults
+        self.applyLoginItem = applyLoginItem
+    }
+
+    var urgentSeconds: Int? { Countdown.urgentSeconds(scheduled: scheduled, now: now) }
+    var hasProblems: Bool { !failed.isEmpty || folders.contains { $0.status != .ok } }
+    var isPromptAvailable: Bool { queue.current != nil && (!settings.quietMode || promptRequested) }
+
+    // MARK: Lifecycle
+
+    func start(with bootstrap: EngineBootstrap.Result) async {
+        engine = bootstrap.engine
+        do {
+            try await bootstrap.engine.start()
+        } catch {
+            report(error)
+            return
+        }
+        await refreshState()
+        resetPromptState()
+        needsOnboarding =
+            bootstrap.isFirstLaunch || (folders.isEmpty && !defaults.bool(forKey: Self.onboardingCompletedKey))
+        observeFiles(bootstrap.engine)
+        observeNotifications(bootstrap.engine)
+        applyLoginItem(settings.launchAtLogin)
+    }
+
+    func stop() async {
+        for task in tasks { task.cancel() }
+        tasks = []
+        clockTask?.cancel()
+        noticeTask?.cancel()
+        await engine?.stop()
+    }
+
+    func handleWake() async { await engine?.handleWake() }
+    func handleClockChange() async { await engine?.handleClockChange() }
+
+    func refreshFolders() async {
+        await engine?.refreshFolders()
+        await refreshState()
+    }
+
+    func completeOnboarding() {
+        defaults.set(true, forKey: Self.onboardingCompletedKey)
+        needsOnboarding = false
+    }
+
+    func clearError() { lastError = nil }
+
+    // MARK: Engine state
+
+    private func observeFiles(_ engine: DropKeeperEngine) {
+        let updates = engine.fileUpdates(in: [.pending, .scheduled, .failed])
+        tasks.append(
+            Task { [weak self] in
+                do {
+                    for try await files in updates {
+                        self?.apply(files)
+                    }
+                } catch {
+                    self?.report(error)
+                }
+            })
+    }
+
+    private func observeNotifications(_ engine: DropKeeperEngine) {
+        let stream = engine.notifications
+        tasks.append(
+            Task { [weak self] in
+                for await note in stream {
+                    await self?.handle(note)
+                }
+            })
+    }
+
+    func apply(_ files: [TrackedFile]) {
+        let previous = queue.current?.id
+        pending = files.filter { $0.state == .pending }
+        scheduled = files.filter { $0.state == .scheduled }
+        failed = files.filter { $0.state == .failed }
+        queue.update(pending: pending)
+        if queue.current?.id != previous { resetPromptState() }
+        if queue.current == nil { promptRequested = false }
+        scheduleClock()
+    }
+
+    private func handle(_ note: EngineNotification) async {
+        switch note {
+        case .trashed(let files):
+            notice.add(files, now: Date())
+            scheduleNoticeExpiry()
+        case .failed:
+            break  // failed files arrive through the file observation
+        case .foldersChanged:
+            await refreshState()
+        }
+    }
+
+    private func refreshState() async {
+        guard let engine else { return }
+        settings = await engine.currentSettings
+        folders = await engine.watchedFolders
+        EngineBootstrap.rememberFolders(folders, defaults: defaults)
+    }
+
+    private func resetPromptState() {
+        timeline = TimelineModel(durations: settings.timelineStops, defaultChoice: settings.defaultChoice)
+        applyToAll = false
+    }
+
+    private func scheduleClock() {
+        clockTask?.cancel()
+        now = Date()
+        guard let next = Countdown.nextRefresh(scheduled: scheduled, now: now) else { return }
+        let delay = max(0.1, next.timeIntervalSince(now))
+        clockTask = Task { [weak self] in
+            try? await Task.sleep(for: .seconds(delay))
+            guard !Task.isCancelled else { return }
+            self?.scheduleClock()
+        }
+    }
+
+    private func scheduleNoticeExpiry() {
+        noticeTask?.cancel()
+        guard let expiresAt = notice.expiresAt else { return }
+        let delay = max(0, expiresAt.timeIntervalSinceNow)
+        noticeTask = Task { [weak self] in
+            try? await Task.sleep(for: .seconds(delay))
+            guard !Task.isCancelled else { return }
+            self?.notice.expireIfDue(now: Date())
+        }
+    }
+
+    // MARK: Prompt actions
+
+    /// Ignored while a previous decision is still running, so a double click never acts on the same files twice.
+    func decide() async {
+        guard !isDeciding else { return }
+        isDeciding = true
+        defer { isDeciding = false }
+        let ids = queue.targets(applyToAll: applyToAll)
+        switch timeline.selected {
+        case .keep: await keep(ids)
+        case .duration(let duration): await schedule(ids, duration: duration)
+        }
+    }
+
+    func keepPrompted() async {
+        guard !isDeciding else { return }
+        isDeciding = true
+        defer { isDeciding = false }
+        let ids = queue.targets(applyToAll: applyToAll)
+        await keep(ids)
+    }
+
+    func dismissPrompt() {
+        queue.dismiss(applyToAll: applyToAll)
+        if queue.current == nil { promptRequested = false }
+        resetPromptState()
+    }
+
+    // MARK: File actions
+
+    func keep(_ ids: [FileID]) async { await perform { try await $0.keep(ids: ids) } }
+
+    func schedule(_ ids: [FileID], duration: TimeInterval) async {
+        await perform { try await $0.schedule(ids: ids, duration: duration) }
+    }
+
+    func undoNotice() async {
+        let ids = notice.files.map(\.id)
+        notice.clear()
+        await perform { try await $0.undoTrash(ids: ids) }
+    }
+
+    func retry(_ ids: [FileID]) async { await perform { try await $0.retry(ids: ids) } }
+
+    // MARK: Folders & settings
+
+    @discardableResult
+    func addFolder(_ url: URL) async -> Bool {
+        var added = false
+        await perform { engine in
+            _ = try await engine.addFolder(path: url.path)
+            added = true
+        }
+        await refreshState()
+        return added
+    }
+
+    func removeFolder(id: Int64) async {
+        await perform { try await $0.removeFolder(id: id) }
+        await refreshState()
+    }
+
+    func update(_ newSettings: Settings) async {
+        let loginChanged = newSettings.launchAtLogin != settings.launchAtLogin
+        await perform { try await $0.updateSettings(newSettings) }
+        await refreshState()
+        if loginChanged { applyLoginItem(settings.launchAtLogin) }
+        let fresh = TimelineModel(durations: settings.timelineStops, defaultChoice: settings.defaultChoice)
+        if timeline.stops != fresh.stops { resetPromptState() }
+    }
+
+    func clearHistory() async -> Int? {
+        guard let engine else { return nil }
+        do {
+            return try await engine.clearHistory()
+        } catch {
+            report(error)
+            return nil
+        }
+    }
+
+    // MARK: Helpers
+
+    private func perform(_ action: (DropKeeperEngine) async throws -> Void) async {
+        guard let engine else { return }
+        do {
+            try await action(engine)
+        } catch {
+            report(error)
+        }
+    }
+
+    private func report(_ error: any Error) {
+        log.error("Engine action failed: \(String(describing: error), privacy: .private)")
+        lastError = ErrorText.message(for: error)
+    }
+}
+
+enum ErrorText {
+    static func message(for error: any Error) -> String {
+        switch error as? EngineError {
+        case .notADirectory: String(localized: "That item is not a folder.")
+        case .invalidFolder: String(localized: "That folder can't be watched.")
+        case .overlapsExistingFolder:
+            String(localized: "That folder is inside, or contains, a folder that is already watched.")
+        case .partialFailure(let ids): String(localized: "\(ids.count) files could not be updated.")
+        case nil: String(localized: "Something went wrong. Please try again.")
+        }
+    }
+}
