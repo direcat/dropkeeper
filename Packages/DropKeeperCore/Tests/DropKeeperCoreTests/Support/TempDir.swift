@@ -13,10 +13,12 @@ struct TempDir {
         path = LiveFileSystem().canonicalPath(url.path)
     }
 
+    /// Writes the file in place (not atomically), so FSEvents reports a genuine create
+    /// on this path rather than a temp-file rename, like a browser writing a download.
     @discardableResult
     func createFile(_ name: String, contents: String = "x") -> String {
         let filePath = path + "/" + name
-        FileManager.default.createFile(atPath: filePath, contents: Data(contents.utf8))
+        try? Data(contents.utf8).write(to: URL(fileURLWithPath: filePath))
         return filePath
     }
 
