@@ -1,0 +1,19 @@
+{
+  "fill" : {
+    "solid" : "srgb:0.01176,0.27451,0.28627,1.00000"
+  },
+  "groups" : [
+    {
+      "layers" : [
+        { "image-name" : "hand.svg", "name" : "hand" },
+        { "image-name" : "clock.svg", "name" : "clock" },
+        { "image-name" : "tray.svg", "name" : "tray" }
+      ],
+      "shadow" : { "kind" : "neutral", "opacity" : 0.5 },
+      "translucency" : { "enabled" : false, "value" : 0.5 }
+    }
+  ],
+  "supported-platforms" : {
+    "squares" : [ "macOS" ]
+  }
+}
