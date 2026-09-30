@@ -21,6 +21,18 @@ import Testing
                 currentEventId: { FolderWatcher.currentEventId() },
                 needsRecovery: false, recoveryFolderHints: [], automaticTimer: false))
         try await engine.start()
+        do {
+            try await exercise(engine: engine, store: opened.store, downloads: downloads, time: time)
+        } catch {
+            await engine.stop()
+            throw error
+        }
+        await engine.stop()
+    }
+
+    private func exercise(engine: DropKeeperEngine, store: FileStore, downloads: String, time: TestTimeSource)
+        async throws
+    {
         _ = try await engine.addFolder(path: downloads)
         var settings = await engine.currentSettings
         settings.deleteMode = .permanent  // keep the user's Trash clean
@@ -36,16 +48,16 @@ import Testing
             try await Task.sleep(for: .milliseconds(200))
             time.advance(by: 1)
             await engine.tick()
-            pending = try opened.store.files(in: [.pending])
+            pending = try store.files(in: [.pending])
         }
         #expect(pending.map(\.displayName) == ["file.pdf"])
-        #expect(LiveFileSystem().readXattr(ItemActions.idAttribute, at: downloads + "/file.pdf") == pending[0].id)
+        let file = try #require(pending.first)
+        #expect(LiveFileSystem().readXattr(ItemActions.idAttribute, at: downloads + "/file.pdf") == file.id)
 
-        try await engine.schedule(ids: [pending[0].id], duration: 1800)
+        try await engine.schedule(ids: [file.id], duration: 1800)
         time.advance(by: 1800)
         await engine.tick()
         #expect(!FileManager.default.fileExists(atPath: downloads + "/file.pdf"))
-        #expect(try opened.store.file(id: pending[0].id)?.state == .trashed)
-        await engine.stop()
+        #expect(try store.file(id: file.id)?.state == .trashed)
     }
 }
