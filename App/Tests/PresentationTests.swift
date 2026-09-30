@@ -78,6 +78,7 @@ private struct DecisionCase: Sendable {
     let notched: Bool
     let count: Int
     let hovering: Bool
+    var error = false
     let expected: PanelContent
 }
 
@@ -89,12 +90,22 @@ private struct DecisionCase: Sendable {
     DecisionCase(prompt: false, notice: false, notched: true, count: 0, hovering: false, expected: .hidden),
     // menu bar target has no idle panel
     DecisionCase(prompt: false, notice: false, notched: false, count: 3, hovering: false, expected: .hidden),
+    // an error never hides the file the user is deciding about, the notice or the open list
+    DecisionCase(prompt: true, notice: true, notched: true, count: 3, hovering: false, error: true, expected: .prompt),
+    DecisionCase(
+        prompt: false, notice: true, notched: false, count: 0, hovering: false, error: true, expected: .notice),
+    DecisionCase(
+        prompt: false, notice: false, notched: true, count: 3, hovering: true, error: true, expected: .idleExpanded),
+    DecisionCase(prompt: false, notice: false, notched: true, count: 3, hovering: false, error: true, expected: .error),
+    DecisionCase(
+        prompt: false, notice: false, notched: false, count: 0, hovering: false, error: true, expected: .error),
 ])
 private func reviewFocusPanelDecision(_ testCase: DecisionCase) {
     let target: PresentationTarget = testCase.notched ? .notch(builtIn) : .menuBar
     #expect(
         PanelDecision.content(
-            promptAvailable: testCase.prompt, noticeVisible: testCase.notice, target: target,
+            promptAvailable: testCase.prompt, noticeVisible: testCase.notice, errorVisible: testCase.error,
+            target: target,
             scheduledCount: testCase.count, hovering: testCase.hovering) == testCase.expected)
 }
 
@@ -120,4 +131,14 @@ private func reviewFocusPanelDecision(_ testCase: DecisionCase) {
     #expect(PanelDecision.showStep(isOnScreen: true, isFadingOut: true, frameChanged: true) == .restore)
     #expect(PanelDecision.showStep(isOnScreen: true, isFadingOut: false, frameChanged: true) == .restore)
     #expect(PanelDecision.showStep(isOnScreen: true, isFadingOut: false, frameChanged: false) == .none)
+}
+
+@Test func openNotchContentStartsBelowTheHardwareNotch() {
+    for content in [PanelContent.prompt, .notice, .idleExpanded, .error] {
+        #expect(PanelDecision.topInset(for: content, notchHeight: 32) == 32)
+        #expect(PanelDecision.topInset(for: content, notchHeight: nil) == 0)  // menu bar panel
+    }
+    // The closed notch lays itself out around the cutout.
+    #expect(PanelDecision.topInset(for: .idle, notchHeight: 32) == 0)
+    #expect(PanelDecision.topInset(for: .hidden, notchHeight: 32) == 0)
 }

@@ -18,6 +18,10 @@ struct PendingListView: View {
     var body: some View {
         let rows = PendingRows.ordered(pending: model.pending, scheduled: model.scheduled, failed: model.failed)
         VStack(spacing: 0) {
+            if let message = model.panelError.message {
+                PanelErrorBanner(message: message)
+                    .padding(.bottom, TK.Space.s)
+            }
             if rows.isEmpty {
                 Text("No files scheduled")
                     .font(.system(size: 13))
@@ -78,7 +82,7 @@ private struct PendingRow: View {
         .background(hovering ? TK.Notch.surfaceRaised : .clear)
         .contentShape(Rectangle())
         .onHover { hovering = $0 }
-        .onTapGesture { if file.state == .pending { actions.review() } }
+        .onTapGesture { if file.state == .pending { actions.review(file.id) } }
         .contextMenu { menuItems }
     }
 

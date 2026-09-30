@@ -84,6 +84,26 @@
       "comment" : "Generic error message",
       "localizations" : { "cs" : { "stringUnit" : { "state" : "translated", "value" : "Něco se pokazilo. Zkuste to prosím znovu." } } }
     },
+    "DropKeeper can't start" : {
+      "comment" : "Fatal alert title when the engine fails to start",
+      "localizations" : { "cs" : { "stringUnit" : { "state" : "translated", "value" : "DropKeeper se nepodařilo spustit" } } }
+    },
+    "Couldn't update the file. Please try again." : {
+      "comment" : "Panel error after a failed prompt or list action",
+      "localizations" : { "cs" : { "stringUnit" : { "state" : "translated", "value" : "Soubor se nepodařilo upravit. Zkuste to prosím znovu." } } }
+    },
+    "Couldn't put the file back from the Trash." : {
+      "comment" : "Panel error after a failed Undo",
+      "localizations" : { "cs" : { "stringUnit" : { "state" : "translated", "value" : "Soubor se nepodařilo vrátit z Koše." } } }
+    },
+    "Couldn't move the file to the Trash. Please try again later." : {
+      "comment" : "Panel error after a failed Retry",
+      "localizations" : { "cs" : { "stringUnit" : { "state" : "translated", "value" : "Soubor se nepodařilo přesunout do Koše. Zkuste to prosím později." } } }
+    },
+    "Couldn't watch Downloads" : {
+      "comment" : "Onboarding alert title when adding Downloads fails",
+      "localizations" : { "cs" : { "stringUnit" : { "state" : "translated", "value" : "Složku Stažené nelze sledovat" } } }
+    },
     "DropKeeper can't open its database" : {
       "comment" : "Fatal alert title at launch",
       "localizations" : { "cs" : { "stringUnit" : { "state" : "translated", "value" : "DropKeeper nemůže otevřít svou databázi" } } }

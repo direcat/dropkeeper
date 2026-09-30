@@ -19,9 +19,9 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             self?.openSettings()
         },
         quit: { NSApp.terminate(nil) },
-        review: { [weak self] in
+        review: { [weak self] id in
             self?.statusItem?.closePopover()
-            self?.model.promptRequested = true
+            self?.model.review(id)
         })
     private let log = Logger(subsystem: "net.direcat.dropkeeper", category: "app")
 
@@ -42,10 +42,16 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         do {
             bootstrap = try EngineBootstrap.make(databaseURL: try Self.databaseURL(), defaults: Self.appDefaults)
         } catch {
-            presentFatal(error)
+            log.fault("Cannot open database: \(String(describing: error), privacy: .private)")
+            presentFatal(String(localized: "DropKeeper can't open its database"))
             return
         }
-        await model.start(with: bootstrap)
+        // A failed start must not look like a working app: nothing would be watched or trashed.
+        guard await model.start(with: bootstrap) else {
+            log.fault("Engine failed to start")
+            presentFatal(String(localized: "DropKeeper can't start"))
+            return
+        }
         #if DEBUG
             // Development only: `-watch /path/to/folder` watches a folder before Settings exists. It needs `-dbPath`
             // (and should be run with `-noLoginItem YES`), so a debug run never writes folders or hints into the
@@ -69,7 +75,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         let status = StatusItemController(model: model, actions: actions)
         statusItem = status
         let panels = PanelCoordinator(
-            model: model, actions: actions, statusAnchor: { [weak status] in status?.anchorFrame })
+            model: model, actions: actions, statusAnchor: { [weak status] in status?.anchorFrame },
+            isPopoverShown: { [weak status] in status?.isPopoverShown ?? false })
         panels.start()
         self.panels = panels
         if model.needsOnboarding { onboarding.show() }
@@ -166,10 +173,9 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         return .terminateLater
     }
 
-    private func presentFatal(_ error: any Error) {
-        log.fault("Cannot open database: \(String(describing: error), privacy: .private)")
+    private func presentFatal(_ message: String) {
         let alert = NSAlert()
-        alert.messageText = String(localized: "DropKeeper can't open its database")
+        alert.messageText = message
         alert.informativeText = String(localized: "Quit DropKeeper and try again. Your files have not been touched.")
         alert.alertStyle = .critical
         NSApp.activate()

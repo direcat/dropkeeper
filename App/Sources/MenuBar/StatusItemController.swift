@@ -57,6 +57,7 @@ final class StatusItemController: NSObject {
     }
 
     var anchorFrame: CGRect? { item.button?.window?.frame }
+    var isPopoverShown: Bool { popover.isShown }
 
     /// Closes the pending list before another window (Settings, the prompt) takes over.
     func closePopover() {

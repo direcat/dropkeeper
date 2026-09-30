@@ -35,7 +35,7 @@ import Testing
     let defaults = UserDefaults(suiteName: suiteName)!
     defer { defaults.removePersistentDomain(forName: suiteName) }
     let model = AppModel(defaults: defaults, applyLoginItem: { _ in })
-    let actions = AppActions(openSettings: {}, quit: {}, review: {})
+    let actions = AppActions(openSettings: {}, quit: {}, review: { _ in })
     #expect(ImageRenderer(content: PendingListView(model: model, actions: actions)).cgImage != nil)
     var failedFile = scheduledFile(expiresIn: 0, id: "failed")
     failedFile.state = .failed

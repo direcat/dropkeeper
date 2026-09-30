@@ -7,6 +7,8 @@ final class PanelCoordinator {
     private let model: AppModel
     private let actions: AppActions
     private let statusAnchor: @MainActor () -> CGRect?
+    /// The open popover shows errors in its list; the panel then doesn't show them a second time.
+    private let isPopoverShown: @MainActor () -> Bool
     private let panel = FloatingPanel()
     private var hosting: NSHostingView<PanelRootView>?
     private var hovering = false
@@ -16,10 +18,14 @@ final class PanelCoordinator {
     private var collapseTask: Task<Void, Never>?
     private var screenObserver: NSObjectProtocol?
 
-    init(model: AppModel, actions: AppActions, statusAnchor: @escaping @MainActor () -> CGRect?) {
+    init(
+        model: AppModel, actions: AppActions, statusAnchor: @escaping @MainActor () -> CGRect?,
+        isPopoverShown: @escaping @MainActor () -> Bool
+    ) {
         self.model = model
         self.actions = actions
         self.statusAnchor = statusAnchor
+        self.isPopoverShown = isPopoverShown
     }
 
     func start() {
@@ -40,6 +46,7 @@ final class PanelCoordinator {
         _ = model.queue.current?.id
         _ = model.notice.isVisible
         _ = model.notice.files.count
+        _ = model.panelError.message
         _ = model.scheduled.count
         _ = model.settings.promptPresentation
         _ = model.settings.quietMode
@@ -49,7 +56,8 @@ final class PanelCoordinator {
         let target = PresentationResolver.resolve(
             model.settings.promptPresentation, screens: ScreenDescriptor.current())
         let content = PanelDecision.content(
-            promptAvailable: model.isPromptAvailable, noticeVisible: model.notice.isVisible, target: target,
+            promptAvailable: model.isPromptAvailable, noticeVisible: model.notice.isVisible,
+            errorVisible: model.panelError.isVisible && !isPopoverShown(), target: target,
             scheduledCount: model.scheduled.count, hovering: hovering)
         if !PanelDecision.keepsHover(showing: content) { resetHover() }
         guard content != .hidden else {
@@ -58,12 +66,15 @@ final class PanelCoordinator {
         }
         var isNotch = false
         var notchWidth: CGFloat = 0
+        var notchHeight: CGFloat?
         if case .notch(let screen) = target, let notch = screen.notchRect {
             isNotch = true
             notchWidth = notch.width
+            notchHeight = notch.height
         }
         let root = PanelRootView(
-            model: model, content: content, isNotch: isNotch, notchWidth: notchWidth, actions: actions,
+            model: model, content: content, isNotch: isNotch, notchWidth: notchWidth,
+            topInset: PanelDecision.topInset(for: content, notchHeight: notchHeight), actions: actions,
             onHover: { [weak self] inside in self?.setHovering(inside) })
         let hostingView: NSHostingView<PanelRootView>
         if let hosting {

@@ -15,6 +15,7 @@ final class AppModel {
     private(set) var notice = NoticeCoalescer()
     private(set) var now = Date()
     private(set) var lastError: String?
+    private(set) var panelError = PanelError()
     private(set) var needsOnboarding = false
     var timeline = TimelineModel(durations: Settings().timelineStops, defaultChoice: .keep)
     var applyToAll = false
@@ -22,9 +23,14 @@ final class AppModel {
     var promptRequested = false
 
     @ObservationIgnored private var engine: DropKeeperEngine?
+    /// Only a started engine is stopped: stopping writes a heartbeat, which would narrow the next launch's scan.
+    @ObservationIgnored private var isStarted = false
     @ObservationIgnored private var tasks: [Task<Void, Never>] = []
     @ObservationIgnored private var clockTask: Task<Void, Never>?
     @ObservationIgnored private var noticeTask: Task<Void, Never>?
+    @ObservationIgnored private var panelErrorTask: Task<Void, Never>?
+    /// Whether the prompt was shown at the last check, to notice it closing (see `promptVisibilityChanged`).
+    @ObservationIgnored private var promptWasAvailable = false
     @ObservationIgnored private var isDeciding = false
     @ObservationIgnored private let defaults: UserDefaults
     @ObservationIgnored private let applyLoginItem: @MainActor (Bool) -> Void
@@ -45,16 +51,19 @@ final class AppModel {
 
     // MARK: Lifecycle
 
-    func start(with bootstrap: EngineBootstrap.Result) async {
+    @discardableResult
+    func start(with bootstrap: EngineBootstrap.Result) async -> Bool {
         engine = bootstrap.engine
         do {
             try await bootstrap.engine.start()
         } catch {
             report(error)
-            return
+            return false
         }
+        isStarted = true
         await refreshState()
         resetPromptState()
+        promptVisibilityChanged()
         needsOnboarding =
             bootstrap.isFirstLaunch || (folders.isEmpty && !defaults.bool(forKey: Self.onboardingCompletedKey))
         observeFiles(bootstrap.engine)
@@ -64,6 +73,7 @@ final class AppModel {
             applyLoginItem(settings.launchAtLogin)
             defaults.set(true, forKey: Self.loginItemInitializedKey)
         }
+        return true
     }
 
     func stop() async {
@@ -71,6 +81,9 @@ final class AppModel {
         tasks = []
         clockTask?.cancel()
         noticeTask?.cancel()
+        panelErrorTask?.cancel()
+        guard isStarted else { return }
+        isStarted = false
         await engine?.stop()
     }
 
@@ -123,10 +136,11 @@ final class AppModel {
         queue.update(pending: pending)
         if queue.current?.id != previous { resetPromptState() }
         if queue.current == nil { promptRequested = false }
+        promptVisibilityChanged()
         scheduleClock()
     }
 
-    private func handle(_ note: EngineNotification) async {
+    func handle(_ note: EngineNotification) async {
         switch note {
         case .trashed(let files):
             notice.add(files, now: Date())
@@ -162,39 +176,66 @@ final class AppModel {
         }
     }
 
+    /// A notice that runs out while the prompt is shown is held; `promptVisibilityChanged` shows it afterwards.
     private func scheduleNoticeExpiry() {
         noticeTask?.cancel()
         guard let expiresAt = notice.expiresAt else { return }
         let delay = max(0, expiresAt.timeIntervalSinceNow)
         noticeTask = Task { [weak self] in
             try? await Task.sleep(for: .seconds(delay))
+            guard !Task.isCancelled, let self else { return }
+            self.notice.expireIfDue(now: Date(), promptShown: self.isPromptAvailable)
+        }
+    }
+
+    /// Call after anything that can open or close the prompt. When it closed, a notice that was hidden behind it
+    /// gets its full window now.
+    private func promptVisibilityChanged() {
+        let available = isPromptAvailable
+        defer { promptWasAvailable = available }
+        guard promptWasAvailable, !available, notice.isVisible else { return }
+        notice.release(now: Date())
+        scheduleNoticeExpiry()
+    }
+
+    private func showPanelError(_ failure: PanelFailure) {
+        panelError.show(failure.message, now: Date())
+        panelErrorTask?.cancel()
+        let delay = PanelError.window
+        panelErrorTask = Task { [weak self] in
+            try? await Task.sleep(for: .seconds(delay))
             guard !Task.isCancelled else { return }
-            self?.notice.expireIfDue(now: Date())
+            self?.panelError.expireIfDue(now: Date())
         }
     }
 
     // MARK: Prompt actions
 
-    /// Ignored while a previous decision is still running, so a double click never acts on the same files twice.
-    func decide() async {
+    /// `id` is the file the prompt showed when the user acted; the action is ignored if the prompt moved on.
+    /// Also ignored while a previous decision is still running, so a double click never acts on the same files
+    /// twice. On failure the prompt stays and the panel shows the error.
+    func decide(for id: FileID) async {
         guard !isDeciding else { return }
+        let ids = queue.targets(for: id, applyToAll: applyToAll)
+        guard !ids.isEmpty else { return }
         isDeciding = true
         defer { isDeciding = false }
-        let ids = queue.targets(applyToAll: applyToAll)
         let succeeded: Bool
         switch timeline.selected {
-        case .keep: succeeded = await perform { try await $0.keep(ids: ids) }
-        case .duration(let duration): succeeded = await perform { try await $0.schedule(ids: ids, duration: duration) }
+        case .keep: succeeded = await perform(.update) { try await $0.keep(ids: ids) }
+        case .duration(let duration):
+            succeeded = await perform(.update) { try await $0.schedule(ids: ids, duration: duration) }
         }
         if succeeded { finishDecision(ids) }
     }
 
-    func keepPrompted() async {
+    func keepPrompted(for id: FileID) async {
         guard !isDeciding else { return }
+        let ids = queue.targets(for: id, applyToAll: applyToAll)
+        guard !ids.isEmpty else { return }
         isDeciding = true
         defer { isDeciding = false }
-        let ids = queue.targets(applyToAll: applyToAll)
-        if await perform({ try await $0.keep(ids: ids) }) { finishDecision(ids) }
+        if await perform(.update, { try await $0.keep(ids: ids) }) { finishDecision(ids) }
     }
 
     /// Moves the prompt on right away instead of waiting for the file observation to catch up.
@@ -202,29 +243,46 @@ final class AppModel {
         queue.dismiss(ids: ids)
         if queue.current == nil { promptRequested = false }
         resetPromptState()
+        promptVisibilityChanged()
     }
 
+    /// Opens the prompt for a waiting file picked from the list, even one closed with Esc and even in Quiet
+    /// mode. Requests nothing when the file is no longer pending, so the next download can't bypass Quiet mode.
+    func review(_ id: FileID) {
+        let previous = queue.current?.id
+        queue.restore(ids: [id], pending: pending)
+        if queue.current?.id != previous { resetPromptState() }
+        promptRequested = queue.current?.id == id
+        promptVisibilityChanged()
+    }
+
+    /// Esc: closes the prompt without deciding. In Quiet mode it stays closed for the rest of the stack too.
     func dismissPrompt() {
         queue.dismiss(applyToAll: applyToAll)
-        if queue.current == nil { promptRequested = false }
+        promptRequested = false
         resetPromptState()
+        promptVisibilityChanged()
     }
 
     // MARK: File actions
 
-    func keep(_ ids: [FileID]) async { await perform { try await $0.keep(ids: ids) } }
+    func keep(_ ids: [FileID]) async { await perform(.update) { try await $0.keep(ids: ids) } }
 
     func schedule(_ ids: [FileID], duration: TimeInterval) async {
-        await perform { try await $0.schedule(ids: ids, duration: duration) }
+        await perform(.update) { try await $0.schedule(ids: ids, duration: duration) }
     }
 
+    /// The notice goes away only when Undo worked; after a failure it stays, so Undo can be tried again.
     func undoNotice() async {
         let ids = notice.files.map(\.id)
-        notice.clear()
-        await perform { try await $0.undoTrash(ids: ids) }
+        guard !ids.isEmpty else { return }
+        if await perform(.undo, { try await $0.undoTrash(ids: ids) }) {
+            // A trash merged in meanwhile keeps its notice.
+            notice.remove(ids: ids)
+        }
     }
 
-    func retry(_ ids: [FileID]) async { await perform { try await $0.retry(ids: ids) } }
+    func retry(_ ids: [FileID]) async { await perform(.retry) { try await $0.retry(ids: ids) } }
 
     // MARK: Folders & settings
 
@@ -241,7 +299,7 @@ final class AppModel {
 
     func removeFolder(id: Int64) async {
         let path = folders.first { $0.id == id }?.path
-        if await perform({ try await $0.removeFolder(id: id) }), let path {
+        if await perform(nil, { try await $0.removeFolder(id: id) }), let path {
             EngineBootstrap.forgetFolder(path: path, defaults: defaults)
         }
         await refreshState()
@@ -251,6 +309,7 @@ final class AppModel {
         let loginChanged = newSettings.launchAtLogin != settings.launchAtLogin
         await perform { try await $0.updateSettings(newSettings) }
         await refreshState()
+        promptVisibilityChanged()  // e.g. Quiet mode turned on while the prompt was open
         if loginChanged { applyLoginItem(settings.launchAtLogin) }
         let fresh = TimelineModel(durations: settings.timelineStops, defaultChoice: settings.defaultChoice)
         if timeline.stops != fresh.stops { resetPromptState() }
@@ -268,15 +327,19 @@ final class AppModel {
 
     // MARK: Helpers
 
-    /// Runs an engine action and reports its error; returns whether it succeeded.
+    /// Runs an engine action and reports its error; returns whether it succeeded. With `failure`, the error is
+    /// also shown in the panel (prompt, list and notice actions), because the user is looking there.
     @discardableResult
-    private func perform(_ action: (DropKeeperEngine) async throws -> Void) async -> Bool {
-        guard let engine else { return false }
+    private func perform(
+        _ failure: PanelFailure? = nil, _ action: (DropKeeperEngine) async throws -> Void
+    ) async -> Bool {
         do {
+            guard let engine else { throw NotStartedError() }
             try await action(engine)
             return true
         } catch {
             report(error)
+            if let failure { showPanelError(failure) }
             return false
         }
     }
@@ -286,6 +349,9 @@ final class AppModel {
         lastError = ErrorText.message(for: error)
     }
 }
+
+/// An action before the engine started (or after it failed to start).
+private struct NotStartedError: Error {}
 
 enum ErrorText {
     static func message(for error: any Error) -> String {

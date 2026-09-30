@@ -30,6 +30,25 @@ struct PromptQueue: Equatable {
         items.removeAll { ids.contains($0.id) }
     }
 
+    /// Brings these files back (e.g. a file closed with Esc, picked from the list) and shows them first.
+    /// Ids that are no longer pending are ignored.
+    mutating func restore(ids: [FileID], pending: [TrackedFile]) {
+        dismissed.subtract(ids)
+        let visible = pending.filter { !dismissed.contains($0.id) }
+        let restored = visible.filter { ids.contains($0.id) }
+        guard !restored.isEmpty else {
+            update(pending: pending)
+            return
+        }
+        items = restored + visible.filter { !ids.contains($0.id) }
+    }
+
+    /// The files an action from the prompt applies to, or none when the prompt no longer shows `displayedId`
+    /// (it moved on between the click and the action).
+    func targets(for displayedId: FileID, applyToAll: Bool) -> [FileID] {
+        current?.id == displayedId ? targets(applyToAll: applyToAll) : []
+    }
+
     func targets(applyToAll: Bool) -> [FileID] {
         applyToAll ? items.map(\.id) : current.map { [$0.id] } ?? []
     }

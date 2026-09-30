@@ -61,3 +61,34 @@ private func pending(_ id: String, seen offset: TimeInterval = 0) -> TrackedFile
     queue.update(pending: [pending("b", seen: 1)])
     #expect(queue.items.map(\.id) == ["b"])
 }
+
+@Test func closedFileCanBeReopenedFromTheList() {
+    var queue = PromptQueue()
+    let files = [pending("a"), pending("b", seen: 1)]
+    queue.update(pending: files)
+    queue.dismiss(applyToAll: false)
+    #expect(queue.current?.id == "b")
+    queue.restore(ids: ["a"], pending: files)
+    #expect(queue.items.map(\.id) == ["a", "b"])
+    queue.update(pending: files + [pending("c", seen: 2)])
+    #expect(queue.items.map(\.id) == ["a", "b", "c"])  // stays reopened
+}
+
+@Test func restoringAWaitingFileMovesItToTheFront() {
+    var queue = PromptQueue()
+    let files = [pending("a"), pending("b", seen: 1), pending("c", seen: 2)]
+    queue.update(pending: files)
+    queue.restore(ids: ["c"], pending: files)
+    #expect(queue.items.map(\.id) == ["c", "a", "b"])
+    queue.restore(ids: ["gone"], pending: files)  // no longer pending: nothing to show for it
+    #expect(queue.current?.id == "c")
+}
+
+@Test func targetsOnlyForTheDisplayedFile() {
+    var queue = PromptQueue()
+    queue.update(pending: [pending("a"), pending("b", seen: 1)])
+    #expect(queue.targets(for: "a", applyToAll: false) == ["a"])
+    #expect(queue.targets(for: "a", applyToAll: true) == ["a", "b"])
+    #expect(queue.targets(for: "b", applyToAll: false).isEmpty)  // the prompt moved on meanwhile
+    #expect(queue.targets(for: "b", applyToAll: true).isEmpty)
+}
