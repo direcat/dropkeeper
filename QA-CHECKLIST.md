@@ -18,6 +18,8 @@ Quit it from the menu bar item (or Ctrl-C in the terminal) when done.
 Release builds ignore these arguments.
 
 ## Presentation
+The default is "Under the menu bar icon" (the notch is opt-in). All notch checks below require switching Settings > Show new downloads to "Automatically" or "In the notch" first.
+
 - [ ] Notched MacBook, lid open, no external display: the prompt grows out of the notch and the closed notch shows the mark + count while files are scheduled.
 - [ ] File name fully visible below the notch (prompt, notice, hover list and error: nothing sits behind the cutout).
 - [ ] Hovering the closed notch opens the list; moving away closes it after a moment.

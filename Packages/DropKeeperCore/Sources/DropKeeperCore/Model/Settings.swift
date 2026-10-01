@@ -35,7 +35,7 @@ public struct Settings: Codable, Sendable, Equatable {
     public static let gracePeriodOptions: [TimeInterval] = [60, 300, 900, 3600]
 
     public var launchAtLogin = true
-    public var promptPresentation = PromptPresentation.automatic
+    public var promptPresentation = PromptPresentation.menuBar
     public var quietMode = false
     public var timelineStops: [TimeInterval] = [1800, 3600, 86_400, 864_000]
     public var gracePeriod: TimeInterval = 300

@@ -6,7 +6,7 @@ import Testing
 @Test func defaultsMatchSpec() {
     let settings = Settings()
     #expect(settings.launchAtLogin)
-    #expect(settings.promptPresentation == .automatic)
+    #expect(settings.promptPresentation == .menuBar)
     #expect(!settings.quietMode)
     #expect(settings.timelineStops == [1800, 3600, 86_400, 864_000])
     #expect(settings.gracePeriod == 300)

@@ -92,10 +92,13 @@ struct SettingsView: View {
         Section("General") {
             Toggle("Launch at login", isOn: $draft.launchAtLogin)
             Picker("Show new downloads", selection: $draft.promptPresentation) {
-                Text("Automatically").tag(PromptPresentation.automatic)
                 Text("Under the menu bar icon").tag(PromptPresentation.menuBar)
+                Text("Automatically").tag(PromptPresentation.automatic)
                 Text("In the notch").tag(PromptPresentation.notch)
             }
+            Text("Automatically shows new downloads in the notch when the pointer is on the laptop screen.")
+                .font(.caption)
+                .foregroundStyle(.secondary)
             Toggle(isOn: $draft.quietMode) {
                 Text("Quiet mode")
                 Text("Don't open the prompt by itself. A dot on the menu bar icon shows waiting files.")

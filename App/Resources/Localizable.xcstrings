@@ -289,6 +289,10 @@
       "comment" : "Settings option: show the prompt in the screen notch",
       "localizations" : { "cs" : { "stringUnit" : { "state" : "translated", "value" : "Ve výřezu" } } }
     },
+    "Automatically shows new downloads in the notch when the pointer is on the laptop screen." : {
+      "comment" : "Settings help text under the prompt presentation picker",
+      "localizations" : { "cs" : { "stringUnit" : { "state" : "translated", "value" : "Automaticky ukáže nová stažení ve výřezu, když je kurzor na displeji notebooku." } } }
+    },
     "Quiet mode" : {
       "comment" : "Settings toggle",
       "localizations" : { "cs" : { "stringUnit" : { "state" : "translated", "value" : "Tichý režim" } } }
