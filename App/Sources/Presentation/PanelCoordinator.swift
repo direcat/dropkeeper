@@ -1,4 +1,5 @@
 import AppKit
+import DropKeeperCore
 import SwiftUI
 
 /// Shows, moves and hides the single floating panel (prompt, notice, closed notch, hover list).
@@ -17,6 +18,10 @@ final class PanelCoordinator {
     private var isFadingOut = false
     private var collapseTask: Task<Void, Never>?
     private var screenObserver: NSObjectProtocol?
+    /// What the panel showed last, and where a prompt, notice or error opened (see `PanelDecision.target`).
+    private var lastContent = PanelContent.hidden
+    private var lockedTarget: PresentationTarget?
+    private var lockedSetting: PromptPresentation?
 
     init(
         model: AppModel, actions: AppActions, statusAnchor: @escaping @MainActor () -> CGRect?,
@@ -34,7 +39,13 @@ final class PanelCoordinator {
             onChange: { [weak self] in self?.render() })
         screenObserver = NotificationCenter.default.addObserver(
             forName: NSApplication.didChangeScreenParametersNotification, object: nil, queue: .main
-        ) { [weak self] _ in MainActor.assumeIsolated { self?.render() } }
+        ) { [weak self] _ in
+            MainActor.assumeIsolated {
+                // New display layout: place an open panel again.
+                self?.lockedTarget = nil
+                self?.render()
+            }
+        }
         render()
     }
 
@@ -53,12 +64,16 @@ final class PanelCoordinator {
     }
 
     func render() {
-        let target = PresentationResolver.resolve(
-            model.settings.promptPresentation, screens: ScreenDescriptor.current())
+        let setting = model.settings.promptPresentation
+        let screens = ScreenDescriptor.current()
+        let idleTarget = PresentationResolver.idleTarget(setting, screens: screens)
         let content = PanelDecision.content(
             promptAvailable: model.isPromptAvailable, noticeVisible: model.notice.isVisible,
-            errorVisible: model.panelError.isVisible && !isPopoverShown(), target: target,
+            errorVisible: model.panelError.isVisible && !isPopoverShown(), target: idleTarget,
             scheduledCount: model.scheduled.count, hovering: hovering)
+        let target = presentationTarget(
+            for: content, setting: setting, idleTarget: idleTarget, screens: screens)
+        lastContent = content
         if !PanelDecision.keepsHover(showing: content) { resetHover() }
         guard content != .hidden else {
             hide()
@@ -89,10 +104,29 @@ final class PanelCoordinator {
             hosting = hostingView
         }
         guard let frame = frame(for: content, target: target, fitting: hostingView.fittingSize) else {
+            lastContent = .hidden
+            lockedTarget = nil
             hide()
             return
         }
         show(frame: frame)
+    }
+
+    /// The closed notch uses the idle target; a prompt, notice or error keeps the target it opened with.
+    private func presentationTarget(
+        for content: PanelContent, setting: PromptPresentation, idleTarget: PresentationTarget,
+        screens: [ScreenDescriptor]
+    ) -> PresentationTarget {
+        if content == .idle || content == .idleExpanded || content == .hidden {
+            lockedTarget = nil
+            return idleTarget
+        }
+        let target = PanelDecision.target(
+            previous: lastContent, next: content, locked: lockedSetting == setting ? lockedTarget : nil,
+            resolved: PresentationResolver.resolve(setting, screens: screens), screens: screens)
+        lockedTarget = target
+        lockedSetting = setting
+        return target
     }
 
     private func frame(for content: PanelContent, target: PresentationTarget, fitting: CGSize) -> CGRect? {

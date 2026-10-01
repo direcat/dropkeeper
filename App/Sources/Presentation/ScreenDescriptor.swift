@@ -10,10 +10,13 @@ struct ScreenDescriptor: Equatable, Sendable {
     let isPrimary: Bool
     /// Hardware notch in global screen coordinates, nil without a notch.
     let notchRect: CGRect?
+    /// The mouse pointer is on this screen right now.
+    let containsPointer: Bool
 
     @MainActor
     static func current() -> [ScreenDescriptor] {
-        NSScreen.screens.enumerated().map { index, screen in
+        let pointer = NSEvent.mouseLocation
+        return NSScreen.screens.enumerated().map { index, screen in
             let number = screen.deviceDescription[NSDeviceDescriptionKey("NSScreenNumber")] as? NSNumber
             let id = number?.uint32Value ?? 0
             let notch = NotchGeometry.notchRect(
@@ -24,7 +27,8 @@ struct ScreenDescriptor: Equatable, Sendable {
             return ScreenDescriptor(
                 id: id, frame: screen.frame, visibleFrame: screen.visibleFrame,
                 isBuiltIn: number != nil && CGDisplayIsBuiltin(id) != 0,
-                isPrimary: index == 0, notchRect: notch)
+                isPrimary: index == 0, notchRect: notch,
+                containsPointer: NotchGeometry.contains(pointer, frame: screen.frame))
         }
     }
 }
@@ -35,20 +39,43 @@ enum PresentationTarget: Equatable {
 }
 
 enum PresentationResolver {
+    /// Where a prompt, notice or error opens. Automatic follows the pointer: the notch when the pointer is on a
+    /// notched built-in display, else the menu bar panel.
     static func resolve(_ setting: PromptPresentation, screens: [ScreenDescriptor]) -> PresentationTarget {
-        let notched = screens.filter { $0.isBuiltIn && $0.notchRect != nil }
+        let notched = notchedScreens(screens)
         switch setting {
         case .menuBar:
             return .menuBar
         case .automatic:
-            return notched.first(where: \.isPrimary).map(PresentationTarget.notch) ?? .menuBar
+            return notched.first(where: \.containsPointer).map(PresentationTarget.notch) ?? .menuBar
         case .notch:
             return notched.first.map(PresentationTarget.notch) ?? .menuBar
         }
     }
+
+    /// Where the closed notch and its hover list live: on any connected notched display, independent of the
+    /// pointer, so the list is always one hover away. Never with the menu bar setting.
+    static func idleTarget(_ setting: PromptPresentation, screens: [ScreenDescriptor]) -> PresentationTarget {
+        switch setting {
+        case .menuBar:
+            return .menuBar
+        case .automatic, .notch:
+            return notchedScreens(screens).first.map(PresentationTarget.notch) ?? .menuBar
+        }
+    }
+
+    static func notchedScreens(_ screens: [ScreenDescriptor]) -> [ScreenDescriptor] {
+        screens.filter { $0.isBuiltIn && $0.notchRect != nil }
+    }
 }
 
 enum NotchGeometry {
+    /// Pointer hit test in global AppKit coordinates. The left edge belongs to the screen (the right edge to its
+    /// neighbor); vertically both edges count, because the pointer on the top row reports `maxY`.
+    static func contains(_ point: CGPoint, frame: CGRect) -> Bool {
+        point.x >= frame.minX && point.x < frame.maxX && point.y >= frame.minY && point.y <= frame.maxY
+    }
+
     /// Width of the black area either side of the notch in the closed state.
     static let sideWidth: CGFloat = 56
 

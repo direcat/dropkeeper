@@ -9,35 +9,108 @@ private let notch = CGRect(x: 656, y: 950, width: 200, height: 32)
 private let builtIn = ScreenDescriptor(
     id: 1, frame: CGRect(x: 0, y: 0, width: 1512, height: 982),
     visibleFrame: CGRect(x: 0, y: 0, width: 1512, height: 950),
-    isBuiltIn: true, isPrimary: true, notchRect: notch)
+    isBuiltIn: true, isPrimary: true, notchRect: notch, containsPointer: true)
 private let external = ScreenDescriptor(
     id: 2, frame: CGRect(x: 1512, y: 0, width: 2560, height: 1440),
     visibleFrame: CGRect(x: 1512, y: 0, width: 2560, height: 1415),
-    isBuiltIn: false, isPrimary: false, notchRect: nil)
+    isBuiltIn: false, isPrimary: false, notchRect: nil, containsPointer: false)
 
-private func secondary(_ screen: ScreenDescriptor) -> ScreenDescriptor {
+private func with(_ screen: ScreenDescriptor, primary: Bool? = nil, pointer: Bool? = nil) -> ScreenDescriptor {
     ScreenDescriptor(
         id: screen.id, frame: screen.frame, visibleFrame: screen.visibleFrame, isBuiltIn: screen.isBuiltIn,
-        isPrimary: false, notchRect: screen.notchRect)
+        isPrimary: primary ?? screen.isPrimary, notchRect: screen.notchRect,
+        containsPointer: pointer ?? screen.containsPointer)
 }
 
-private func primary(_ screen: ScreenDescriptor) -> ScreenDescriptor {
-    ScreenDescriptor(
-        id: screen.id, frame: screen.frame, visibleFrame: screen.visibleFrame, isBuiltIn: screen.isBuiltIn,
-        isPrimary: true, notchRect: screen.notchRect)
-}
-
-@Test func automaticUsesNotchOnPrimaryNotchedLaptop() {
+@Test func automaticUsesNotchWhenThePointerIsOnTheNotchedLaptop() {
     #expect(PresentationResolver.resolve(.automatic, screens: [builtIn]) == .notch(builtIn))
     #expect(PresentationResolver.resolve(.automatic, screens: [builtIn, external]) == .notch(builtIn))
+    // External primary, lid open: the pointer decides, not the menu bar.
+    let laptop = with(builtIn, primary: false)
+    #expect(
+        PresentationResolver.resolve(.automatic, screens: [with(external, primary: true), laptop]) == .notch(laptop))
+}
+
+@Test func automaticUsesMenuBarWhenThePointerIsOnAnotherDisplay() {
+    let screens = [with(external, primary: true, pointer: true), with(builtIn, primary: false, pointer: false)]
+    #expect(PresentationResolver.resolve(.automatic, screens: screens) == .menuBar)
+    // Laptop primary, pointer on the external display.
+    #expect(
+        PresentationResolver.resolve(
+            .automatic, screens: [with(builtIn, pointer: false), with(external, pointer: true)])
+            == .menuBar)
 }
 
 @Test func reviewFocusClosedLidOrExternalPrimaryUsesMenuBar() {
-    #expect(PresentationResolver.resolve(.automatic, screens: [primary(external)]) == .menuBar)
-    #expect(PresentationResolver.resolve(.notch, screens: [primary(external)]) == .menuBar)
-    let externalMain = [primary(external), secondary(builtIn)]
-    #expect(PresentationResolver.resolve(.automatic, screens: externalMain) == .menuBar)
-    #expect(PresentationResolver.resolve(.notch, screens: externalMain) == .notch(secondary(builtIn)))
+    let lidClosed = [with(external, primary: true, pointer: true)]
+    #expect(PresentationResolver.resolve(.automatic, screens: lidClosed) == .menuBar)
+    #expect(PresentationResolver.resolve(.notch, screens: lidClosed) == .menuBar)
+    let externalMain = [with(external, primary: true, pointer: true), with(builtIn, primary: false, pointer: false)]
+    #expect(PresentationResolver.resolve(.notch, screens: externalMain) == .notch(externalMain[1]))
+}
+
+@Test func closedNotchShowsOnTheNotchedDisplayWhereverThePointerIs() {
+    let laptop = with(builtIn, primary: false, pointer: false)
+    let externalMain = [with(external, primary: true, pointer: true), laptop]
+    #expect(PresentationResolver.idleTarget(.automatic, screens: externalMain) == .notch(laptop))
+    #expect(PresentationResolver.idleTarget(.notch, screens: externalMain) == .notch(laptop))
+    #expect(PresentationResolver.idleTarget(.menuBar, screens: externalMain) == .menuBar)
+    let lidClosed = [with(external, primary: true, pointer: true)]
+    for setting in [PromptPresentation.automatic, .notch, .menuBar] {
+        #expect(PresentationResolver.idleTarget(setting, screens: lidClosed) == .menuBar)
+    }
+}
+
+@Test func pointerHitTestIncludesTheTopEdgeButNotTheSharedRightEdge() {
+    let frame = CGRect(x: -1470, y: -250, width: 1470, height: 956)
+    #expect(NotchGeometry.contains(CGPoint(x: -735, y: 0), frame: frame))
+    #expect(NotchGeometry.contains(CGPoint(x: -735, y: 706), frame: frame))  // top row reports maxY
+    #expect(NotchGeometry.contains(CGPoint(x: -1470, y: -250), frame: frame))
+    #expect(!NotchGeometry.contains(CGPoint(x: 0, y: 100), frame: frame))  // belongs to the display on the right
+    #expect(!NotchGeometry.contains(CGPoint(x: 100, y: 100), frame: frame))
+    #expect(!NotchGeometry.contains(CGPoint(x: -735, y: 707), frame: frame))
+}
+
+@Test func openPanelKeepsItsTargetUntilItWasHiddenOrIdle() {
+    let open: [PanelContent] = [.prompt, .notice, .error]
+    for previous in open {
+        for next in open { #expect(PanelDecision.keepsTarget(previous: previous, next: next)) }
+    }
+    for previous in [PanelContent.hidden, .idle, .idleExpanded] {
+        for next in open { #expect(!PanelDecision.keepsTarget(previous: previous, next: next)) }
+    }
+    // The closed notch and its list always use the idle target.
+    for next in [PanelContent.hidden, .idle, .idleExpanded] {
+        #expect(!PanelDecision.keepsTarget(previous: .prompt, next: next))
+    }
+}
+
+@Test func lockedTargetSurvivesPointerMovesButNotALostDisplay() {
+    let laptop = with(builtIn, primary: false, pointer: false)
+    let pointerOnExternal = [with(external, primary: true, pointer: true), laptop]
+    // Prompt opened in the notch, then the pointer moved to the external display.
+    #expect(
+        PanelDecision.target(
+            previous: .prompt, next: .prompt, locked: .notch(builtIn), resolved: .menuBar, screens: pointerOnExternal)
+            == .notch(laptop))
+    // Prompt opened under the menu bar icon, then the pointer moved to the laptop.
+    #expect(
+        PanelDecision.target(
+            previous: .prompt, next: .notice, locked: .menuBar, resolved: .notch(builtIn), screens: [builtIn, external])
+            == .menuBar)
+    // Lid closed while the prompt was in the notch.
+    #expect(
+        PanelDecision.target(
+            previous: .prompt, next: .prompt, locked: .notch(builtIn), resolved: .menuBar,
+            screens: [with(external, primary: true, pointer: true)]) == .menuBar)
+    // Panel was hidden: resolve again.
+    #expect(
+        PanelDecision.target(
+            previous: .hidden, next: .prompt, locked: .menuBar, resolved: .notch(builtIn), screens: [builtIn])
+            == .notch(builtIn))
+    #expect(
+        PanelDecision.target(previous: .prompt, next: .prompt, locked: nil, resolved: .menuBar, screens: [builtIn])
+            == .menuBar)
 }
 
 @Test func menuBarSettingAlwaysUsesMenuBar() {

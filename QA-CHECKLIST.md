@@ -23,7 +23,10 @@ Release builds ignore these arguments.
 - [ ] Hovering the closed notch opens the list; moving away closes it after a moment.
 - [ ] Hover while the panel resizes (closed notch → list) does not flicker.
 - [ ] Lid closed with an external display: the prompt appears under the menu bar icon.
-- [ ] External display as primary with the lid open (Automatic): prompt under the menu bar icon. With "In the notch": prompt in the notch.
+- [ ] Automatic follows the pointer: with an external display as primary and the lid open, a new download prompts in the notch when the pointer is on the laptop screen, and under the menu bar icon when the pointer is on the external display.
+- [ ] An open prompt, notice or error does not jump to the other display when the pointer crosses displays.
+- [ ] Automatic with the lid open: the closed notch (mark + count) stays on the laptop screen wherever the pointer is; hovering it opens the list.
+- [ ] With "In the notch": prompt in the notch regardless of the pointer. With "Under the menu bar icon": always under the icon, no closed notch.
 - [ ] Mac without a notch: the prompt appears under the menu bar icon.
 - [ ] Changing displays while a prompt is open moves the prompt to the right place.
 - [ ] Full-screen app in front: the prompt and notice still appear.
