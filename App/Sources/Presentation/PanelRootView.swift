@@ -16,6 +16,8 @@ struct PanelRootView: View {
             main
         }
         .padding(.top, topInset)
+        // The closed notch is taller than its content: fill the panel the coordinator sized.
+        .frame(maxWidth: content == .idle ? .infinity : nil, maxHeight: content == .idle ? .infinity : nil)
         .background(TK.Notch.surface)
         .clipShape(shape)
         .environment(\.colorScheme, .dark)

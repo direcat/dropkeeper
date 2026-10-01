@@ -82,6 +82,9 @@ final class PanelCoordinator {
             hostingView = hosting
         } else {
             hostingView = NSHostingView(rootView: root)
+            // The coordinator sizes the panel itself. Keep the intrinsic size (fittingSize needs it) but
+            // drop SwiftUI's window min/max constraints, which shrank the closed notch to its content height.
+            hostingView.sizingOptions = [.intrinsicContentSize]
             panel.contentView = hostingView
             hosting = hostingView
         }

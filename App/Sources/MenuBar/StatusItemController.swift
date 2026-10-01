@@ -45,7 +45,11 @@ final class StatusItemController: NSObject {
         popover.behavior = .transient
         popover.animates = true
         popover.appearance = NSAppearance(named: .darkAqua)
-        popover.contentViewController = NSHostingController(rootView: PendingListView(model: model, actions: actions))
+        let hosting = NSHostingController(rootView: PendingListView(model: model, actions: actions))
+        // Without this the popover is laid out at NSPopover's default 320×320 and then shrinks,
+        // leaving it hanging far below the menu bar icon.
+        hosting.sizingOptions = [.preferredContentSize]
+        popover.contentViewController = hosting
         if let button = item.button {
             button.target = self
             button.action = #selector(togglePopover(_:))
