@@ -17,12 +17,13 @@ jobs:
       - name: Install tools
         run: scripts/install-ci-tools.sh
       - name: Version
-        id: version
-        run: echo "version=${GITHUB_REF_NAME#v}" >> "$GITHUB_OUTPUT"
+        run: |
+          [[ "$GITHUB_REF_NAME" =~ ^v[0-9]+\.[0-9]+\.[0-9]+$ ]] || { echo "::error::Tag '$GITHUB_REF_NAME' is not vMAJOR.MINOR.PATCH"; exit 1; }
+          echo "VERSION=${GITHUB_REF_NAME#v}" >> "$GITHUB_ENV"
       - name: Release notes
         run: |
           mkdir -p build
-          scripts/changelog-section.sh "${{ steps.version.outputs.version }}" > build/notes.md
+          scripts/changelog-section.sh "$VERSION" > build/notes.md
       - name: Offline guard
         run: scripts/offline-guard.sh
       - name: Test
@@ -31,21 +32,20 @@ jobs:
           xcodegen generate
           xcodebuild test -project DropKeeper.xcodeproj -scheme DropKeeper -destination 'platform=macOS,arch=arm64' -quiet
       - name: Build
-        run: scripts/build-release.sh "${{ steps.version.outputs.version }}" "${{ github.run_number }}"
+        run: scripts/build-release.sh "$VERSION" "$GITHUB_RUN_NUMBER"
       - name: Binary offline check
         run: scripts/check-binary.sh build/release/DropKeeper.app
       - name: DMG
-        run: scripts/make-dmg.sh "${{ steps.version.outputs.version }}"
+        run: scripts/make-dmg.sh "$VERSION"
       - name: GitHub release
         uses: softprops/action-gh-release@v3
         with:
           body_path: build/notes.md
           files: |
-            build/release/DropKeeper-${{ steps.version.outputs.version }}.zip
-            build/release/DropKeeper-${{ steps.version.outputs.version }}.dmg
+            build/release/DropKeeper-${{ env.VERSION }}.zip
+            build/release/DropKeeper-${{ env.VERSION }}.dmg
       - name: Update Homebrew tap
         env:
           HOMEBREW_TAP_TOKEN: ${{ secrets.HOMEBREW_TAP_TOKEN }}
-        run: >-
-          scripts/update-tap.sh "${{ steps.version.outputs.version }}"
-          "$(cat build/release/DropKeeper-${{ steps.version.outputs.version }}.zip.sha256)"
+        run: |
+          scripts/update-tap.sh "$VERSION" "$(cat "build/release/DropKeeper-${VERSION}.zip.sha256")"
