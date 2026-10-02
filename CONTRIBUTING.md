@@ -11,7 +11,7 @@ Thanks for helping. A few rules keep the project what it promises to be.
 
 ## Workflow
 
-1. `brew install xcodegen swiftlint` and `xcodegen generate`.
+1. Install the CI-pinned tools with `scripts/install-ci-tools.sh`, put them first on your path with `PATH="$PWD/build/tools/bin:$PATH"` and run `xcodegen generate`. (`brew install xcodegen swiftlint` also works, but CI pins specific versions.)
 2. Make your change with tests (Swift Testing). Core logic belongs in `Packages/DropKeeperCore` and must be testable without UI.
 3. Before opening a PR run:
 

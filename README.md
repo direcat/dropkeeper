@@ -23,6 +23,8 @@ A new file lands in a watched folder, a small prompt opens, and you pick when it
 
     brew install --cask direcat/dropkeeper/dropkeeper
 
+The cask needs Homebrew 7 or newer (run `brew update` first).
+
 DropKeeper is not notarized by Apple (that needs a paid developer account). The cask therefore removes the macOS quarantine flag from the app after installing it, so it opens normally. If you prefer to keep Gatekeeper's check, install manually instead.
 
 ### Manual
