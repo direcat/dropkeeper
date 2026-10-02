@@ -10,6 +10,10 @@ jobs:
     runs-on: macos-26
     steps:
       - uses: actions/checkout@v7
+      - name: Select Xcode
+        run: sudo xcode-select -s /Applications/Xcode_26.6.app
+      - name: Install tools
+        run: scripts/install-ci-tools.sh
       - name: Toolchain
         run: swift --version
       - name: Offline guard
@@ -17,19 +21,19 @@ jobs:
       - name: swift-format
         run: swift format lint --strict --recursive Packages/DropKeeperCore/Sources Packages/DropKeeperCore/Tests
       - name: SwiftLint
-        run: |
-          brew install swiftlint
-          swiftlint lint --strict
+        run: swiftlint lint --strict
       - name: Test core
         run: swift test --package-path Packages/DropKeeperCore
   app:
     runs-on: macos-26
     steps:
       - uses: actions/checkout@v7
+      - name: Select Xcode
+        run: sudo xcode-select -s /Applications/Xcode_26.6.app
+      - name: Install tools
+        run: scripts/install-ci-tools.sh
       - name: Toolchain
         run: xcodebuild -version
-      - name: Install XcodeGen
-        run: brew install xcodegen
       - name: Generate project
         run: xcodegen generate
       - name: swift-format
@@ -38,3 +42,7 @@ jobs:
         run: python3 scripts/check-localizations.py
       - name: Test app
         run: xcodebuild test -project DropKeeper.xcodeproj -scheme DropKeeper -destination 'platform=macOS,arch=arm64' -quiet
+      - name: Release build
+        run: scripts/build-release.sh 0.0.0 "${{ github.run_number }}"
+      - name: Binary offline check
+        run: scripts/check-binary.sh build/release/DropKeeper.app
