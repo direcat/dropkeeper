@@ -7,7 +7,10 @@ cd "$(dirname "$0")/.."
 # (Data/String(contentsOf:) accept remote URLs; Process/NSTask can run curl).
 PATTERN='URLSession|URLRequest|NSURLConnection|import Network|NWConnection|NWBrowser|NWListener|CFNetwork|CFSocket|CFStream|(^|[^a-zA-Z_])socket\(|WKWebView|Data\(contentsOf:|String\(contentsOf:|Process\(|NSTask'
 DIRS=()
-for d in Packages/DropKeeperCore/Sources Packages/DropKeeperCore/Tests App/Sources App/Tests; do [ -d "$d" ] && DIRS+=("$d"); done
+# OFFLINE_GUARD_DIRS (space separated) overrides the scanned directories, for the guard's own fixture tests.
+for d in ${OFFLINE_GUARD_DIRS:-Packages/DropKeeperCore/Sources Packages/DropKeeperCore/Tests App/Sources App/Tests}; do
+  [ -d "$d" ] && DIRS+=("$d")
+done
 INCLUDES=(--include='*.swift' --include='*.m' --include='*.h')
 
 if grep -rnE "$PATTERN" "${INCLUDES[@]}" "${DIRS[@]}"; then
@@ -15,11 +18,18 @@ if grep -rnE "$PATTERN" "${INCLUDES[@]}" "${DIRS[@]}"; then
   exit 1
 fi
 
-# URL literals in code. Lines that are only a comment (doc links) are allowed.
-ALLOW=$(grep -vE '^[[:space:]]*(#|$)' scripts/offline-allowlist.txt | sed 's/[.[\*^$/]/\\&/g' | paste -sd'|' - || true)
+# URL literals in code. Lines that are only a comment (doc links) are allowed. Allowed entries are quoted literals
+# matched as fixed strings: all of them are stripped from each line and the rest is re-tested, so a second URL on
+# the same line is still caught.
 URLS=$(grep -rnE 'https?://' "${INCLUDES[@]}" "${DIRS[@]}" | grep -vE '^[^:]+:[0-9]+:[[:space:]]*(//|/\*|\*)' || true)
-if [ -n "$ALLOW" ] && [ -n "$URLS" ]; then
-  URLS=$(echo "$URLS" | grep -vE "\"($ALLOW)\"" || true)
+if [ -n "$URLS" ]; then
+  URLS=$(printf '%s\n' "$URLS" | awk '
+    FNR == NR { if ($0 !~ /^[[:space:]]*(#|$)/) allowed[++n] = "\"" $0 "\""; next }
+    {
+      line = $0
+      for (k = 1; k <= n; k++) while ((i = index(line, allowed[k])) > 0) line = substr(line, 1, i - 1) substr(line, i + length(allowed[k]))
+      if (line ~ /https?:\/\//) print $0
+    }' scripts/offline-allowlist.txt -)
 fi
 if [ -n "$URLS" ]; then
   echo "$URLS" >&2
