@@ -16,6 +16,7 @@ struct ScreenDescriptor: Equatable, Sendable {
     @MainActor
     static func current() -> [ScreenDescriptor] {
         let pointer = NSEvent.mouseLocation
+        let rightmostEdge = NSScreen.screens.map(\.frame.maxX).max()
         return NSScreen.screens.enumerated().map { index, screen in
             let number = screen.deviceDescription[NSDeviceDescriptionKey("NSScreenNumber")] as? NSNumber
             let id = number?.uint32Value ?? 0
@@ -28,7 +29,8 @@ struct ScreenDescriptor: Equatable, Sendable {
                 id: id, frame: screen.frame, visibleFrame: screen.visibleFrame,
                 isBuiltIn: number != nil && CGDisplayIsBuiltin(id) != 0,
                 isPrimary: index == 0, notchRect: notch,
-                containsPointer: NotchGeometry.contains(pointer, frame: screen.frame))
+                containsPointer: NotchGeometry.contains(
+                    pointer, frame: screen.frame, isRightmost: screen.frame.maxX == rightmostEdge))
         }
     }
 }
@@ -71,9 +73,11 @@ enum PresentationResolver {
 
 enum NotchGeometry {
     /// Pointer hit test in global AppKit coordinates. The left edge belongs to the screen (the right edge to its
-    /// neighbor); vertically both edges count, because the pointer on the top row reports `maxY`.
-    static func contains(_ point: CGPoint, frame: CGRect) -> Bool {
-        point.x >= frame.minX && point.x < frame.maxX && point.y >= frame.minY && point.y <= frame.maxY
+    /// neighbor), except on the rightmost display, which has no neighbor; vertically both edges count, because the
+    /// pointer on the top row reports `maxY`.
+    static func contains(_ point: CGPoint, frame: CGRect, isRightmost: Bool = false) -> Bool {
+        let insideX = point.x >= frame.minX && (isRightmost ? point.x <= frame.maxX : point.x < frame.maxX)
+        return insideX && point.y >= frame.minY && point.y <= frame.maxY
     }
 
     /// Width of the black area either side of the notch in the closed state.

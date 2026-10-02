@@ -71,6 +71,13 @@ private func with(_ screen: ScreenDescriptor, primary: Bool? = nil, pointer: Boo
     #expect(!NotchGeometry.contains(CGPoint(x: -735, y: 707), frame: frame))
 }
 
+@Test func rightmostDisplayOwnsItsRightEdge() {
+    let builtIn = CGRect(x: 0, y: 0, width: 1470, height: 956)
+    #expect(NotchGeometry.contains(CGPoint(x: 1470, y: 100), frame: builtIn, isRightmost: true))
+    #expect(!NotchGeometry.contains(CGPoint(x: 1470, y: 100), frame: builtIn, isRightmost: false))
+    #expect(!NotchGeometry.contains(CGPoint(x: 1471, y: 100), frame: builtIn, isRightmost: true))
+}
+
 @Test func openPanelKeepsItsTargetUntilItWasHiddenOrIdle() {
     let open: [PanelContent] = [.prompt, .notice, .error]
     for previous in open {

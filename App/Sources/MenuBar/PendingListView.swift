@@ -127,8 +127,8 @@ private struct PendingRow: View {
                 Button(DurationLabel.short(seconds)) { Task { await model.schedule([file.id], duration: seconds) } }
             }
         }
-        Button("Show in Finder") {
-            NSWorkspace.shared.activateFileViewerSelecting([URL(fileURLWithPath: file.path)])
-        }
+        let reveal = FinderReveal.target(for: file.path)
+        Button("Show in Finder") { FinderReveal.reveal(reveal) }
+            .disabled(reveal == .unavailable)
     }
 }

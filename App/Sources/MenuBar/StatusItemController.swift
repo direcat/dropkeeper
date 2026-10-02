@@ -30,19 +30,41 @@ enum StatusTitle: Equatable {
     }
 }
 
+enum StatusAccessibility {
+    /// VoiceOver value of the status item: the count, or the countdown during the last seconds.
+    static func value(scheduledCount: Int, urgentSeconds: Int?) -> String {
+        if let urgentSeconds { return String(localized: "Deleting in \(TimeLabels.countdown(urgentSeconds))") }
+        if scheduledCount == 0 { return String(localized: "No files scheduled") }
+        return String(localized: "\(scheduledCount) files scheduled")
+    }
+}
+
+enum StatusPulse {
+    static let dimmedAlpha: CGFloat = 0.3
+
+    /// The countdown dot alternates between full and dimmed on each second tick; Reduce Motion keeps it solid.
+    static func dotAlpha(now: Date, reduceMotion: Bool) -> CGFloat {
+        if reduceMotion { return 1 }
+        return Int(now.timeIntervalSince1970).isMultiple(of: 2) ? 1 : dimmedAlpha
+    }
+}
+
 /// The menu bar anchor: icon, count or countdown, and a popover with the pending list.
 @MainActor
-final class StatusItemController: NSObject {
+final class StatusItemController: NSObject, NSPopoverDelegate {
     private let model: AppModel
     private let actions: AppActions
     private let item = NSStatusBar.system.statusItem(withLength: NSStatusItem.variableLength)
     private let popover = NSPopover()
+    /// Called after the popover opened or closed, so the floating panel can stop or start showing errors.
+    var onPopoverChange: (@MainActor () -> Void)?
 
     init(model: AppModel, actions: AppActions) {
         self.model = model
         self.actions = actions
         super.init()
         popover.behavior = .transient
+        popover.delegate = self
         popover.animates = true
         popover.appearance = NSAppearance(named: .darkAqua)
         let hosting = NSHostingController(rootView: PendingListView(model: model, actions: actions))
@@ -74,6 +96,7 @@ final class StatusItemController: NSObject {
         _ = model.pending.count
         _ = model.scheduled.count
         _ = model.urgentSeconds
+        _ = model.now
     }
 
     private func update() {
@@ -83,6 +106,8 @@ final class StatusItemController: NSObject {
         let image = NSImage(named: icon.imageName)
         image?.isTemplate = true
         button.image = image
+        button.setAccessibilityValue(
+            StatusAccessibility.value(scheduledCount: model.scheduled.count, urgentSeconds: model.urgentSeconds))
         switch StatusTitle.make(scheduledCount: model.scheduled.count, urgentSeconds: model.urgentSeconds) {
         case .none:
             button.attributedTitle = NSAttributedString(string: "")
@@ -91,12 +116,18 @@ final class StatusItemController: NSObject {
                 string: " \(count)",
                 attributes: [.font: NSFont.systemFont(ofSize: 11, weight: .bold).rounded()])
         case .countdown(let seconds):
-            button.attributedTitle = NSAttributedString(
-                string: " \(TimeLabels.countdown(seconds))",
-                attributes: [
-                    .font: NSFont.monospacedSystemFont(ofSize: 12, weight: .semibold),
-                    .foregroundColor: NSColor(TK.Notch.urgent),
-                ])
+            let urgent = NSColor(TK.Notch.urgent)
+            let font = NSFont.monospacedSystemFont(ofSize: 12, weight: .semibold)
+            let alpha = StatusPulse.dotAlpha(
+                now: model.now, reduceMotion: NSWorkspace.shared.accessibilityDisplayShouldReduceMotion)
+            let title = NSMutableAttributedString(
+                string: " ●",
+                attributes: [.font: font, .foregroundColor: urgent.withAlphaComponent(alpha)])
+            title.append(
+                NSAttributedString(
+                    string: " \(TimeLabels.countdown(seconds))",
+                    attributes: [.font: font, .foregroundColor: urgent]))
+            button.attributedTitle = title
         }
     }
 
@@ -109,7 +140,12 @@ final class StatusItemController: NSObject {
             NSApp.activate()
             popover.show(relativeTo: button.bounds, of: button, preferredEdge: .minY)
             popover.contentViewController?.view.window?.makeKey()
+            onPopoverChange?()
         }
+    }
+
+    func popoverDidClose(_ notification: Notification) {
+        onPopoverChange?()
     }
 }
 
