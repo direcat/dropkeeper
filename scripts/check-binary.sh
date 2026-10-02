@@ -19,7 +19,7 @@ LINKED=$(for f in "${BINS[@]}"; do otool -L "$f" | tail -n +2 | awk '{print $1}'
 if echo "$LINKED" | grep -E 'Network\.framework|CFNetwork\.framework|WebKit\.framework|libcurl' ; then
   echo "check-binary: networking library linked (see above)" >&2; FAIL=1
 fi
-if [ -d "$APP/Contents/Frameworks" ] && ls "$APP/Contents/Frameworks" | grep -Ei 'network|curl|alamofire|sentry|firebase|analytics'; then
+if [ -d "$APP/Contents/Frameworks" ] && find "$APP/Contents/Frameworks" -mindepth 1 -maxdepth 1 | grep -Ei 'network|curl|alamofire|sentry|firebase|analytics'; then
   echo "check-binary: suspicious embedded framework (see above)" >&2; FAIL=1
 fi
 
