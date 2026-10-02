@@ -22,14 +22,16 @@ fi
 # matched as fixed strings: all of them are stripped from each line and the rest is re-tested, so a second URL on
 # the same line is still caught.
 URLS=$(grep -rnE 'https?://' "${INCLUDES[@]}" "${DIRS[@]}" | grep -vE '^[^:]+:[0-9]+:[[:space:]]*(//|/\*|\*)' || true)
+ALLOWLIST=${OFFLINE_GUARD_ALLOWLIST:-scripts/offline-allowlist.txt}
+[ -r "$ALLOWLIST" ] || { echo "offline-guard: cannot read $ALLOWLIST" >&2; exit 1; }
 if [ -n "$URLS" ]; then
-  URLS=$(printf '%s\n' "$URLS" | awk '
-    FNR == NR { if ($0 !~ /^[[:space:]]*(#|$)/) allowed[++n] = "\"" $0 "\""; next }
+  URLS=$(printf '%s\n' "$URLS" | awk -v list="$ALLOWLIST" '
+    BEGIN { while ((getline entry < list) > 0) if (entry !~ /^[[:space:]]*(#|$)/) allowed[++n] = "\"" entry "\"" }
     {
       line = $0
       for (k = 1; k <= n; k++) while ((i = index(line, allowed[k])) > 0) line = substr(line, 1, i - 1) substr(line, i + length(allowed[k]))
       if (line ~ /https?:\/\//) print $0
-    }' scripts/offline-allowlist.txt -)
+    }')
 fi
 if [ -n "$URLS" ]; then
   echo "$URLS" >&2
