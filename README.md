@@ -22,7 +22,7 @@ A new file lands in a watched folder, a small prompt opens, and you pick when it
 
 ### Homebrew
 
-    brew install --cask direcat/dropkeeper/dropkeeper
+    brew install --cask direcat/tap/dropkeeper
 
 The cask needs Homebrew 7 or newer (run `brew update` first).
 

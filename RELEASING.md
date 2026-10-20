@@ -2,8 +2,8 @@
 
 ## One-time setup (maintainer)
 
-1. Create the public repository `direcat/homebrew-dropkeeper` with an empty `Casks/` folder (a README is enough).
-2. Create a fine-grained personal access token with **Contents: Read and write** on `direcat/homebrew-dropkeeper` only.
+1. Create the public repository `direcat/homebrew-tap` with an empty `Casks/` folder (a README is enough).
+2. Create a fine-grained personal access token with **Contents: Read and write** on `direcat/homebrew-tap` only.
 3. In `direcat/dropkeeper` → Settings → Secrets and variables → Actions, add it as `HOMEBREW_TAP_TOKEN`.
 4. In `direcat/dropkeeper` → Settings → General → Social preview, upload `assets/social/dropkeeper-social-preview.png`.
 
@@ -17,7 +17,7 @@
    - If the DMG step fails on the runner because Finder scripting is unavailable, set `CREATE_DMG_EXTRA: --skip-jenkins` on the DMG step (the DMG then loses its background layout).
 5. The Release workflow tests, builds, checks the binary, publishes the zip and DMG to GitHub Releases and updates the cask in the tap. If the tap step only printed a warning, the token is missing — fix it and run `scripts/render-cask.sh x.y.z <sha256>` by hand into the tap.
    - If the token is set but the tap clone or push fails, the GitHub release is already published: fix the token or its permissions and update the tap by hand with `scripts/render-cask.sh`.
-6. Check `brew install --cask direcat/dropkeeper/dropkeeper` on a clean account:
+6. Check `brew install --cask direcat/tap/dropkeeper` on a clean account:
    - the first launch opens without a Gatekeeper prompt;
    - after `brew uninstall --zap --cask dropkeeper`, System Settings → General → Login Items no longer lists DropKeeper and `~/Library/Application Support/DropKeeper` is gone (the cask's `uninstall login_item` goes through System Events and may not remove an SMAppService item, so check it by hand).
 

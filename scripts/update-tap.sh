@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Commits the rendered cask to the direcat/homebrew-dropkeeper tap (release CI only).
+# Commits the rendered cask to the direcat/homebrew-tap tap (release CI only).
 # Usage: HOMEBREW_TAP_TOKEN=... scripts/update-tap.sh <version> <sha256>
 set -euo pipefail
 cd "$(dirname "$0")/.."
@@ -11,7 +11,7 @@ if [ -z "${HOMEBREW_TAP_TOKEN:-}" ]; then
 fi
 TAP_DIR=build/tap
 rm -rf "$TAP_DIR"
-git clone --depth 1 "https://x-access-token:${HOMEBREW_TAP_TOKEN}@github.com/direcat/homebrew-dropkeeper.git" "$TAP_DIR"
+git clone --depth 1 "https://x-access-token:${HOMEBREW_TAP_TOKEN}@github.com/direcat/homebrew-tap.git" "$TAP_DIR"
 mkdir -p "$TAP_DIR/Casks"
 scripts/render-cask.sh "$VERSION" "$SHA" > "$TAP_DIR/Casks/dropkeeper.rb"
 cd "$TAP_DIR"
