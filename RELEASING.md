@@ -20,7 +20,7 @@
    - If the key is set but the tap clone or push fails, the GitHub release is already published: check the deploy key (write access, matching secret) and update the tap by hand with `scripts/render-cask.sh`.
 6. Check `brew install --cask direcat/tap/dropkeeper` on a clean account:
    - the first launch opens without a Gatekeeper prompt;
-   - after `brew uninstall --zap --cask dropkeeper`, System Settings → General → Login Items no longer lists DropKeeper and `~/Library/Application Support/DropKeeper` is gone (the cask's `uninstall login_item` goes through System Events and may not remove an SMAppService item, so check it by hand).
+   - after `brew uninstall --zap --cask dropkeeper`, System Settings → General → Login Items no longer lists DropKeeper and `~/Library/Application Support/DropKeeper` is gone (verified for 1.0.0: the cask removes the login item too).
 
 ## Local dry run
 
