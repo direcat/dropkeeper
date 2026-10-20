@@ -44,7 +44,7 @@ The default is "Under the menu bar icon" (the notch is opt-in). All notch checks
 - [ ] A file expires while a prompt is open: after the prompt closes, the notice shows for 2.5 s with Undo.
 - [ ] Expiry: the file goes to the Trash, the notice shows for 2.5 s, and Undo puts it back.
 - [ ] Two expiries within 2.5 s: one merged notice; Undo restores both.
-- [ ] List row menu → Move to Trash: the file goes to the Trash at once and the notice with Undo appears; in permanent-delete mode the item reads "Delete Permanently…", asks for confirmation (Cancel keeps the file), and the notice has no Undo; disabled when the file is gone.
+- [ ] List row menu → Move to Trash: the file goes to the Trash at once and the notice with Undo appears; in permanent-delete mode the item reads "Delete Permanently…", asks for confirmation (Cancel keeps the file), and the notice has no Undo; disabled when the file is gone. Also try Delete from the notch hover list (not only the menu bar popover); the confirmation alert must come to the front.
 - [ ] Permanent-delete mode: confirmation on switching; the notice says "Deleted" and has no Undo.
 - [ ] Last 10 seconds: an amber countdown in the menu bar (and the closed notch).
 - [ ] Sleep the Mac past an expiry: after wake the file is trashed within seconds.

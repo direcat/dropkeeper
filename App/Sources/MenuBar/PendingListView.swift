@@ -155,7 +155,7 @@ private enum DeleteConfirmation {
     @MainActor
     static func confirm(name: String) -> Bool {
         let alert = NSAlert()
-        alert.messageText = String(localized: "Delete \(name) permanently?")
+        alert.messageText = String(localized: "Delete “\(name)” permanently?")
         alert.informativeText = String(localized: "This can't be undone.")
         alert.alertStyle = .warning
         let delete = alert.addButton(withTitle: String(localized: "Delete permanently"))

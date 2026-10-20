@@ -1,8 +1,9 @@
 import Foundation
 
-/// One `deleteNow` disposal attempt did not succeed; `forEach` reports the id.
+/// One `deleteNow` attempt did not succeed; `forEach` reports the id.
 private enum DeleteNowError: Error {
     case notDisposed
+    case folderUnavailable
 }
 
 extension DropKeeperEngine {
@@ -68,8 +69,8 @@ extension DropKeeperEngine {
 
     /// Disposes of active and failed items right away, honouring the delete mode, like an expiry would:
     /// the same notice (with Undo) is emitted. A missing file is recorded as `gone`. A disposal that fails is
-    /// not retried and leaves the record untouched. Every id is processed; failures are reported together
-    /// afterwards.
+    /// not retried and leaves the record untouched. Items of an unavailable folder are skipped and reported as
+    /// failures, like a paused expiry. Every id is processed; failures are reported together afterwards.
     public func deleteNow(ids: [FileID]) throws {
         let now = env.time.now()
         var trashed: [TrackedFile] = []
@@ -79,11 +80,22 @@ extension DropKeeperEngine {
         }
         try forEach(ids) { id in
             guard var file = try store.file(id: id), file.state.isActive || file.state == .failed else { return }
+            guard isFolderAvailable(file.folderId) else { throw DeleteNowError.folderUnavailable }
+            if file.state == .failed {
+                // Like `retry`, on the in-memory copy only: the reconciler skips inactive records, so without
+                // this the file identity (inode, volume, id xattr) would not be checked before disposal.
+                file.state = .scheduled
+                file.expiresAt = now
+                file.failureCount = 0
+                file.updatedAt = now
+            }
             let outcome = reconciler.reconcile(&file, folders: folders, now: now)
             if outcome == .kept || outcome == .gone {
+                if outcome == .gone, !confirmFolderAvailable(for: file) { throw DeleteNowError.folderUnavailable }
                 persist(file, outcome: outcome)
                 return
             }
+            // A failed disposal is never persisted, so a `failed` record stays `failed` (not `scheduled`).
             guard trasher.dispose(&file, mode: settings.deleteMode, now: now) == .disposed else {
                 throw DeleteNowError.notDisposed
             }
