@@ -6,7 +6,7 @@
       "localizations" : {
         "cs" : { "stringUnit" : { "state" : "translated", "value" : "DropKeeper v této složce sleduje nové soubory, aby mohl prošlé přesunout do Koše." } },
         "de" : { "stringUnit" : { "state" : "translated", "value" : "DropKeeper beobachtet diesen Ordner auf neue Dateien, um abgelaufene in den Papierkorb zu legen." } },
-        "es" : { "stringUnit" : { "state" : "translated", "value" : "DropKeeper vigila esta carpeta para detectar archivos nuevos y mover los caducados a la Papelera." } },
+        "es" : { "stringUnit" : { "state" : "translated", "value" : "DropKeeper supervisa esta carpeta para detectar archivos nuevos y mover los caducados a la Papelera." } },
         "fr" : { "stringUnit" : { "state" : "translated", "value" : "DropKeeper surveille ce dossier pour détecter les nouveaux fichiers et mettre ceux qui ont expiré à la corbeille." } }
       }
     },
@@ -15,7 +15,7 @@
       "localizations" : {
         "cs" : { "stringUnit" : { "state" : "translated", "value" : "DropKeeper v této složce sleduje nové soubory, aby mohl prošlé přesunout do Koše." } },
         "de" : { "stringUnit" : { "state" : "translated", "value" : "DropKeeper beobachtet diesen Ordner auf neue Dateien, um abgelaufene in den Papierkorb zu legen." } },
-        "es" : { "stringUnit" : { "state" : "translated", "value" : "DropKeeper vigila esta carpeta para detectar archivos nuevos y mover los caducados a la Papelera." } },
+        "es" : { "stringUnit" : { "state" : "translated", "value" : "DropKeeper supervisa esta carpeta para detectar archivos nuevos y mover los caducados a la Papelera." } },
         "fr" : { "stringUnit" : { "state" : "translated", "value" : "DropKeeper surveille ce dossier pour détecter les nouveaux fichiers et mettre ceux qui ont expiré à la corbeille." } }
       }
     },
@@ -24,7 +24,7 @@
       "localizations" : {
         "cs" : { "stringUnit" : { "state" : "translated", "value" : "DropKeeper v této složce sleduje nová stažení, aby mohl prošlá přesunout do Koše." } },
         "de" : { "stringUnit" : { "state" : "translated", "value" : "DropKeeper beobachtet diesen Ordner auf neue Downloads, um abgelaufene in den Papierkorb zu legen." } },
-        "es" : { "stringUnit" : { "state" : "translated", "value" : "DropKeeper vigila esta carpeta para detectar descargas nuevas y mover las caducadas a la Papelera." } },
+        "es" : { "stringUnit" : { "state" : "translated", "value" : "DropKeeper supervisa esta carpeta para detectar descargas nuevas y mover las caducadas a la Papelera." } },
         "fr" : { "stringUnit" : { "state" : "translated", "value" : "DropKeeper surveille ce dossier pour détecter les nouveaux téléchargements et mettre ceux qui ont expiré à la corbeille." } }
       }
     },

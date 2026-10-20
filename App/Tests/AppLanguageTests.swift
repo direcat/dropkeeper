@@ -59,6 +59,27 @@ private func makeDefaults() -> (UserDefaults, String) {
     #expect(language.selection == nil)
 }
 
+@Test func regionTaggedCodesFromSystemSettingsAreNormalized() {
+    let (defaults, name) = makeDefaults()
+    defer { defaults.removePersistentDomain(forName: name) }
+    defaults.set(["de-DE"], forKey: "AppleLanguages")
+    let language = AppLanguage(defaults: defaults, domain: name)
+    #expect(language.selection == "de")
+    #expect(language.launchedWith == "de")
+    #expect(!language.needsRestart)
+    language.select("de")
+    #expect(!language.needsRestart)
+}
+
+@Test func onlyTheFirstPreferredLanguageCounts() {
+    let (defaults, name) = makeDefaults()
+    defer { defaults.removePersistentDomain(forName: name) }
+    defaults.set(["en-US", "cs-CZ"], forKey: "AppleLanguages")
+    let language = AppLanguage(defaults: defaults, domain: name)
+    #expect(language.selection == "en")
+    #expect(!language.needsRestart)
+}
+
 @Test func supportedLanguagesMatchTheBundle() {
     let declared = Bundle.main.infoDictionary?["CFBundleLocalizations"] as? [String]
     if let declared { #expect(Set(declared) == Set(AppLanguage.supported)) }

@@ -61,3 +61,4 @@ The default is "Under the menu bar icon" (the notch is opt-in). All notch checks
 ## Languages
 - [ ] English, Czech, German, Spanish and French: no truncated or untranslated text.
 - [ ] Settings > Language: choosing a language shows the restart hint; Restart DropKeeper relaunches in that language; System restores the system language.
+- [ ] After choosing a language and before restarting, the UI may mix languages until Restart; Restart reopens DropKeeper in the chosen language; if the relaunch fails the app quits and the language applies on the next launch.

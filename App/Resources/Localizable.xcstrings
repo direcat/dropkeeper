@@ -17,11 +17,11 @@
           "other" : { "stringUnit" : { "state" : "translated", "value" : "%lld Tage" } } } } },
         "es" : { "variations" : { "plural" : {
           "one" : { "stringUnit" : { "state" : "translated", "value" : "%lld día" } },
-          "many" : { "stringUnit" : { "state" : "translated", "value" : "%lld de días" } },
+          "many" : { "stringUnit" : { "state" : "translated", "value" : "%lld días" } },
           "other" : { "stringUnit" : { "state" : "translated", "value" : "%lld días" } } } } },
         "fr" : { "variations" : { "plural" : {
           "one" : { "stringUnit" : { "state" : "translated", "value" : "%lld jour" } },
-          "many" : { "stringUnit" : { "state" : "translated", "value" : "%lld de jours" } },
+          "many" : { "stringUnit" : { "state" : "translated", "value" : "%lld jours" } },
           "other" : { "stringUnit" : { "state" : "translated", "value" : "%lld jours" } } } } }
       }
     },
@@ -104,11 +104,11 @@
           "other" : { "stringUnit" : { "state" : "translated", "value" : "in %lld Tagen" } } } } },
         "es" : { "variations" : { "plural" : {
           "one" : { "stringUnit" : { "state" : "translated", "value" : "en %lld día" } },
-          "many" : { "stringUnit" : { "state" : "translated", "value" : "en %lld de días" } },
+          "many" : { "stringUnit" : { "state" : "translated", "value" : "en %lld días" } },
           "other" : { "stringUnit" : { "state" : "translated", "value" : "en %lld días" } } } } },
         "fr" : { "variations" : { "plural" : {
           "one" : { "stringUnit" : { "state" : "translated", "value" : "dans %lld jour" } },
-          "many" : { "stringUnit" : { "state" : "translated", "value" : "dans %lld de jours" } },
+          "many" : { "stringUnit" : { "state" : "translated", "value" : "dans %lld jours" } },
           "other" : { "stringUnit" : { "state" : "translated", "value" : "dans %lld jours" } } } } }
       }
     },
@@ -126,7 +126,7 @@
       "localizations" : {
         "cs" : { "stringUnit" : { "state" : "translated", "value" : "Tuto složku nelze sledovat." } },
         "de" : { "stringUnit" : { "state" : "translated", "value" : "Dieser Ordner kann nicht überwacht werden." } },
-        "es" : { "stringUnit" : { "state" : "translated", "value" : "Esa carpeta no se puede vigilar." } },
+        "es" : { "stringUnit" : { "state" : "translated", "value" : "Esa carpeta no se puede supervisar." } },
         "fr" : { "stringUnit" : { "state" : "translated", "value" : "Ce dossier ne peut pas être surveillé." } }
       }
     },
@@ -135,7 +135,7 @@
       "localizations" : {
         "cs" : { "stringUnit" : { "state" : "translated", "value" : "Tato složka leží ve sledované složce, nebo sledovanou složku obsahuje." } },
         "de" : { "stringUnit" : { "state" : "translated", "value" : "Dieser Ordner liegt in einem überwachten Ordner oder enthält einen." } },
-        "es" : { "stringUnit" : { "state" : "translated", "value" : "Esta carpeta está dentro de una carpeta vigilada o contiene una." } },
+        "es" : { "stringUnit" : { "state" : "translated", "value" : "Esta carpeta está dentro de una carpeta supervisada o contiene una." } },
         "fr" : { "stringUnit" : { "state" : "translated", "value" : "Ce dossier se trouve dans un dossier surveillé ou en contient un." } }
       }
     },
@@ -155,11 +155,11 @@
           "other" : { "stringUnit" : { "state" : "translated", "value" : "%lld Dateien konnten nicht aktualisiert werden." } } } } },
         "es" : { "variations" : { "plural" : {
           "one" : { "stringUnit" : { "state" : "translated", "value" : "No se pudo actualizar %lld archivo." } },
-          "many" : { "stringUnit" : { "state" : "translated", "value" : "No se pudieron actualizar %lld de archivos." } },
+          "many" : { "stringUnit" : { "state" : "translated", "value" : "No se pudieron actualizar %lld archivos." } },
           "other" : { "stringUnit" : { "state" : "translated", "value" : "No se pudieron actualizar %lld archivos." } } } } },
         "fr" : { "variations" : { "plural" : {
           "one" : { "stringUnit" : { "state" : "translated", "value" : "%lld fichier n’a pas pu être mis à jour." } },
-          "many" : { "stringUnit" : { "state" : "translated", "value" : "%lld de fichiers n’ont pas pu être mis à jour." } },
+          "many" : { "stringUnit" : { "state" : "translated", "value" : "%lld fichiers n’ont pas pu être mis à jour." } },
           "other" : { "stringUnit" : { "state" : "translated", "value" : "%lld fichiers n’ont pas pu être mis à jour." } } } } }
       }
     },
@@ -213,7 +213,7 @@
       "localizations" : {
         "cs" : { "stringUnit" : { "state" : "translated", "value" : "Složku Stažené nelze sledovat" } },
         "de" : { "stringUnit" : { "state" : "translated", "value" : "Downloads kann nicht überwacht werden" } },
-        "es" : { "stringUnit" : { "state" : "translated", "value" : "No se pudo vigilar Descargas" } },
+        "es" : { "stringUnit" : { "state" : "translated", "value" : "No se pudo supervisar Descargas" } },
         "fr" : { "stringUnit" : { "state" : "translated", "value" : "Impossible de surveiller Téléchargements" } }
       }
     },
@@ -296,11 +296,11 @@
           "other" : { "stringUnit" : { "state" : "translated", "value" : "Auf alle %lld neuen Dateien anwenden" } } } } },
         "es" : { "variations" : { "plural" : {
           "one" : { "stringUnit" : { "state" : "translated", "value" : "Aplicar a %lld archivo nuevo" } },
-          "many" : { "stringUnit" : { "state" : "translated", "value" : "Aplicar a los %lld de archivos nuevos" } },
+          "many" : { "stringUnit" : { "state" : "translated", "value" : "Aplicar a los %lld archivos nuevos" } },
           "other" : { "stringUnit" : { "state" : "translated", "value" : "Aplicar a los %lld archivos nuevos" } } } } },
         "fr" : { "variations" : { "plural" : {
           "one" : { "stringUnit" : { "state" : "translated", "value" : "Appliquer à %lld nouveau fichier" } },
-          "many" : { "stringUnit" : { "state" : "translated", "value" : "Appliquer aux %lld de nouveaux fichiers" } },
+          "many" : { "stringUnit" : { "state" : "translated", "value" : "Appliquer aux %lld nouveaux fichiers" } },
           "other" : { "stringUnit" : { "state" : "translated", "value" : "Appliquer aux %lld nouveaux fichiers" } } } } }
       }
     },
@@ -320,11 +320,11 @@
           "other" : { "stringUnit" : { "state" : "translated", "value" : "%lld neue Dateien" } } } } },
         "es" : { "variations" : { "plural" : {
           "one" : { "stringUnit" : { "state" : "translated", "value" : "%lld archivo nuevo" } },
-          "many" : { "stringUnit" : { "state" : "translated", "value" : "%lld de archivos nuevos" } },
+          "many" : { "stringUnit" : { "state" : "translated", "value" : "%lld archivos nuevos" } },
           "other" : { "stringUnit" : { "state" : "translated", "value" : "%lld archivos nuevos" } } } } },
         "fr" : { "variations" : { "plural" : {
           "one" : { "stringUnit" : { "state" : "translated", "value" : "%lld nouveau fichier" } },
-          "many" : { "stringUnit" : { "state" : "translated", "value" : "%lld de nouveaux fichiers" } },
+          "many" : { "stringUnit" : { "state" : "translated", "value" : "%lld nouveaux fichiers" } },
           "other" : { "stringUnit" : { "state" : "translated", "value" : "%lld nouveaux fichiers" } } } } }
       }
     },
@@ -341,14 +341,14 @@
         "cs" : { "stringUnit" : { "state" : "translated", "value" : "Každé nové stažení dostane dobu platnosti. Vyberte 30 minut, den, nebo ho ponechte. Až čas vyprší, DropKeeper soubor přesune do Koše." } },
         "de" : { "stringUnit" : { "state" : "translated", "value" : "Jeder neue Download erhält ein Ablaufdatum: 30 Minuten, ein Tag oder Behalten. Ist die Zeit um, legt DropKeeper die Datei in den Papierkorb." } },
         "es" : { "stringUnit" : { "state" : "translated", "value" : "Cada descarga nueva recibe una fecha de caducidad. Elige 30 minutos, un día o conservarla. Al agotarse el tiempo, DropKeeper mueve el archivo a la Papelera." } },
-        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Chaque nouveau téléchargement reçoit une date d’expiration : 30 minutes, un jour ou le conserver. Une fois le délai écoulé, DropKeeper met le fichier à la corbeille." } }
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Chaque nouveau téléchargement reçoit une date d’expiration : 30 minutes, un jour ou le conserver. Une fois le délai écoulé, DropKeeper met le fichier à la corbeille." } }
       }
     },
     "100 % offline, no analytics, no tracking, nothing leaves your computer." : {
       "localizations" : {
         "cs" : { "stringUnit" : { "state" : "translated", "value" : "100% offline, žádná analytika, žádné sledování, nic neopustí váš počítač." } },
-        "de" : { "stringUnit" : { "state" : "translated", "value" : "100 % offline, keine Analyse, kein Tracking, nichts verlässt den Computer." } },
-        "es" : { "stringUnit" : { "state" : "translated", "value" : "100 % sin conexión, sin analíticas, sin rastreo, nada sale de tu ordenador." } },
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "100 % offline, keine Analysedaten, kein Tracking, nichts verlässt den Computer." } },
+        "es" : { "stringUnit" : { "state" : "translated", "value" : "100 % sin conexión, sin analíticas, sin rastreo, nada sale de tu equipo." } },
         "fr" : { "stringUnit" : { "state" : "translated", "value" : "100 % hors ligne, aucune analyse, aucun suivi, rien ne quitte votre ordinateur." } }
       }
     },
@@ -364,7 +364,7 @@
       "localizations" : {
         "cs" : { "stringUnit" : { "state" : "translated", "value" : "Složka Stažené je sledovaná" } },
         "de" : { "stringUnit" : { "state" : "translated", "value" : "Der Ordner „Downloads“ wird überwacht" } },
-        "es" : { "stringUnit" : { "state" : "translated", "value" : "Se vigila la carpeta Descargas" } },
+        "es" : { "stringUnit" : { "state" : "translated", "value" : "Se supervisa la carpeta Descargas" } },
         "fr" : { "stringUnit" : { "state" : "translated", "value" : "Le dossier Téléchargements est surveillé" } }
       }
     },
@@ -381,7 +381,7 @@
         "cs" : { "stringUnit" : { "state" : "translated", "value" : "Otevřít Nastavení systému" } },
         "de" : { "stringUnit" : { "state" : "translated", "value" : "Systemeinstellungen öffnen" } },
         "es" : { "stringUnit" : { "state" : "translated", "value" : "Abrir Ajustes del Sistema" } },
-        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Ouvrir Réglages Système" } }
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Ouvrir les Réglages Système" } }
       }
     },
     "Delete in %@" : {
@@ -454,11 +454,11 @@
           "other" : { "stringUnit" : { "state" : "translated", "value" : "%lld Dateien" } } } } },
         "es" : { "variations" : { "plural" : {
           "one" : { "stringUnit" : { "state" : "translated", "value" : "%lld archivo" } },
-          "many" : { "stringUnit" : { "state" : "translated", "value" : "%lld de archivos" } },
+          "many" : { "stringUnit" : { "state" : "translated", "value" : "%lld archivos" } },
           "other" : { "stringUnit" : { "state" : "translated", "value" : "%lld archivos" } } } } },
         "fr" : { "variations" : { "plural" : {
           "one" : { "stringUnit" : { "state" : "translated", "value" : "%lld fichier" } },
-          "many" : { "stringUnit" : { "state" : "translated", "value" : "%lld de fichiers" } },
+          "many" : { "stringUnit" : { "state" : "translated", "value" : "%lld fichiers" } },
           "other" : { "stringUnit" : { "state" : "translated", "value" : "%lld fichiers" } } } } }
       }
     },
@@ -467,8 +467,8 @@
       "localizations" : {
         "cs" : { "stringUnit" : { "state" : "translated", "value" : "Přesunuto do Koše" } },
         "de" : { "stringUnit" : { "state" : "translated", "value" : "In den Papierkorb gelegt" } },
-        "es" : { "stringUnit" : { "state" : "translated", "value" : "Movido a la Papelera" } },
-        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Mis à la corbeille" } }
+        "es" : { "stringUnit" : { "state" : "translated", "value" : "Trasladado a la Papelera" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Placé dans la corbeille" } }
       }
     },
     "Deleted" : {
@@ -505,11 +505,11 @@
           "other" : { "stringUnit" : { "state" : "translated", "value" : "%lld Dateien geplant" } } } } },
         "es" : { "variations" : { "plural" : {
           "one" : { "stringUnit" : { "state" : "translated", "value" : "%lld archivo programado" } },
-          "many" : { "stringUnit" : { "state" : "translated", "value" : "%lld de archivos programados" } },
+          "many" : { "stringUnit" : { "state" : "translated", "value" : "%lld archivos programados" } },
           "other" : { "stringUnit" : { "state" : "translated", "value" : "%lld archivos programados" } } } } },
         "fr" : { "variations" : { "plural" : {
           "one" : { "stringUnit" : { "state" : "translated", "value" : "%lld fichier planifié" } },
-          "many" : { "stringUnit" : { "state" : "translated", "value" : "%lld de fichiers planifiés" } },
+          "many" : { "stringUnit" : { "state" : "translated", "value" : "%lld fichiers planifiés" } },
           "other" : { "stringUnit" : { "state" : "translated", "value" : "%lld fichiers planifiés" } } } } }
       }
     },
@@ -517,7 +517,7 @@
       "comment" : "VoiceOver value of the closed notch during the last-seconds countdown, e.g. Deleting in 0:07",
       "localizations" : {
         "cs" : { "stringUnit" : { "state" : "translated", "value" : "Smazání za %@" } },
-        "de" : { "stringUnit" : { "state" : "translated", "value" : "Löschen in %@" } },
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Wird gelöscht in %@" } },
         "es" : { "stringUnit" : { "state" : "translated", "value" : "Eliminando en %@" } },
         "fr" : { "stringUnit" : { "state" : "translated", "value" : "Suppression dans %@" } }
       }
@@ -599,8 +599,8 @@
       "localizations" : {
         "cs" : { "stringUnit" : { "state" : "translated", "value" : "Změnit čas" } },
         "de" : { "stringUnit" : { "state" : "translated", "value" : "Zeit ändern" } },
-        "es" : { "stringUnit" : { "state" : "translated", "value" : "Cambiar hora" } },
-        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Modifier l’heure" } }
+        "es" : { "stringUnit" : { "state" : "translated", "value" : "Cambiar plazo" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Modifier le délai" } }
       }
     },
     "Show in Finder" : {
@@ -625,9 +625,9 @@
       "comment" : "Settings toggle",
       "localizations" : {
         "cs" : { "stringUnit" : { "state" : "translated", "value" : "Spouštět po přihlášení" } },
-        "de" : { "stringUnit" : { "state" : "translated", "value" : "Beim Anmelden starten" } },
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Bei der Anmeldung öffnen" } },
         "es" : { "stringUnit" : { "state" : "translated", "value" : "Abrir al iniciar sesión" } },
-        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Ouvrir à la connexion" } }
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Ouvrir à l’ouverture de session" } }
       }
     },
     "Language" : {
@@ -706,16 +706,16 @@
       "comment" : "Settings help text under the prompt presentation picker",
       "localizations" : {
         "cs" : { "stringUnit" : { "state" : "translated", "value" : "Automaticky ukáže nová stažení ve výřezu, když je kurzor na displeji notebooku." } },
-        "de" : { "stringUnit" : { "state" : "translated", "value" : "Zeigt neue Downloads im Notch an, wenn sich der Zeiger auf dem Laptop-Bildschirm befindet." } },
-        "es" : { "stringUnit" : { "state" : "translated", "value" : "Muestra las descargas nuevas en el notch cuando el puntero está en la pantalla del portátil." } },
-        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Affiche les nouveaux téléchargements dans l’encoche quand le pointeur est sur l’écran de l’ordinateur portable." } }
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "„Automatisch“ zeigt neue Downloads im Notch an, wenn sich der Zeiger auf dem Bildschirm des MacBook befindet." } },
+        "es" : { "stringUnit" : { "state" : "translated", "value" : "«Automáticamente» muestra las descargas nuevas en el notch cuando el puntero está en la pantalla del portátil." } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "« Automatiquement » affiche les nouveaux téléchargements dans l’encoche quand le pointeur est sur l’écran de l’ordinateur portable." } }
       }
     },
     "Quiet mode" : {
       "comment" : "Settings toggle",
       "localizations" : {
         "cs" : { "stringUnit" : { "state" : "translated", "value" : "Tichý režim" } },
-        "de" : { "stringUnit" : { "state" : "translated", "value" : "Ruhemodus" } },
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Stiller Modus" } },
         "es" : { "stringUnit" : { "state" : "translated", "value" : "Modo silencioso" } },
         "fr" : { "stringUnit" : { "state" : "translated", "value" : "Mode silencieux" } }
       }
@@ -734,7 +734,7 @@
       "localizations" : {
         "cs" : { "stringUnit" : { "state" : "translated", "value" : "Sledované složky" } },
         "de" : { "stringUnit" : { "state" : "translated", "value" : "Überwachte Ordner" } },
-        "es" : { "stringUnit" : { "state" : "translated", "value" : "Carpetas vigiladas" } },
+        "es" : { "stringUnit" : { "state" : "translated", "value" : "Carpetas supervisadas" } },
         "fr" : { "stringUnit" : { "state" : "translated", "value" : "Dossiers surveillés" } }
       }
     },
@@ -797,7 +797,7 @@
       "localizations" : {
         "cs" : { "stringUnit" : { "state" : "translated", "value" : "Sledovat složku" } },
         "de" : { "stringUnit" : { "state" : "translated", "value" : "Ordner überwachen" } },
-        "es" : { "stringUnit" : { "state" : "translated", "value" : "Vigilar carpeta" } },
+        "es" : { "stringUnit" : { "state" : "translated", "value" : "Supervisar carpeta" } },
         "fr" : { "stringUnit" : { "state" : "translated", "value" : "Surveiller le dossier" } }
       }
     },
@@ -887,8 +887,8 @@
       "localizations" : {
         "cs" : { "stringUnit" : { "state" : "translated", "value" : "Přesunout do Koše" } },
         "de" : { "stringUnit" : { "state" : "translated", "value" : "In den Papierkorb legen" } },
-        "es" : { "stringUnit" : { "state" : "translated", "value" : "Mover a la Papelera" } },
-        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Mettre à la corbeille" } }
+        "es" : { "stringUnit" : { "state" : "translated", "value" : "Trasladar a la Papelera" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Placer dans la corbeille" } }
       }
     },
     "Delete permanently" : {
@@ -940,7 +940,7 @@
       "comment" : "Settings section title",
       "localizations" : {
         "cs" : { "stringUnit" : { "state" : "translated", "value" : "Ignorované přípony" } },
-        "de" : { "stringUnit" : { "state" : "translated", "value" : "Ignorierte Endungen" } },
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Ignorierte Dateiendungen" } },
         "es" : { "stringUnit" : { "state" : "translated", "value" : "Extensiones ignoradas" } },
         "fr" : { "stringUnit" : { "state" : "translated", "value" : "Extensions ignorées" } }
       }
@@ -949,7 +949,7 @@
       "comment" : "VoiceOver label of the button that removes an ignored extension",
       "localizations" : {
         "cs" : { "stringUnit" : { "state" : "translated", "value" : "Odebrat příponu" } },
-        "de" : { "stringUnit" : { "state" : "translated", "value" : "Endung entfernen" } },
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Dateiendung entfernen" } },
         "es" : { "stringUnit" : { "state" : "translated", "value" : "Quitar extensión" } },
         "fr" : { "stringUnit" : { "state" : "translated", "value" : "Retirer l’extension" } }
       }
@@ -958,7 +958,7 @@
       "comment" : "Placeholder of the ignored extension text field",
       "localizations" : {
         "cs" : { "stringUnit" : { "state" : "translated", "value" : "Přípona, např. dmg" } },
-        "de" : { "stringUnit" : { "state" : "translated", "value" : "Endung, z. B. dmg" } },
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Dateiendung, z. B. dmg" } },
         "es" : { "stringUnit" : { "state" : "translated", "value" : "Extensión, p. ej. dmg" } },
         "fr" : { "stringUnit" : { "state" : "translated", "value" : "Extension, p. ex. dmg" } }
       }
@@ -1039,9 +1039,9 @@
       "comment" : "History retention option",
       "localizations" : {
         "cs" : { "stringUnit" : { "state" : "translated", "value" : "Navždy" } },
-        "de" : { "stringUnit" : { "state" : "translated", "value" : "Für immer" } },
-        "es" : { "stringUnit" : { "state" : "translated", "value" : "Siempre" } },
-        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Toujours" } }
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Unbegrenzt" } },
+        "es" : { "stringUnit" : { "state" : "translated", "value" : "Indefinidamente" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Indéfiniment" } }
       }
     },
     "Clear history now…" : {
@@ -1096,11 +1096,11 @@
           "other" : { "stringUnit" : { "state" : "translated", "value" : "%lld Einträge entfernt" } } } } },
         "es" : { "variations" : { "plural" : {
           "one" : { "stringUnit" : { "state" : "translated", "value" : "%lld registro eliminado" } },
-          "many" : { "stringUnit" : { "state" : "translated", "value" : "%lld de registros eliminados" } },
+          "many" : { "stringUnit" : { "state" : "translated", "value" : "%lld registros eliminados" } },
           "other" : { "stringUnit" : { "state" : "translated", "value" : "%lld registros eliminados" } } } } },
         "fr" : { "variations" : { "plural" : {
           "one" : { "stringUnit" : { "state" : "translated", "value" : "%lld entrée supprimée" } },
-          "many" : { "stringUnit" : { "state" : "translated", "value" : "%lld d’entrées supprimées" } },
+          "many" : { "stringUnit" : { "state" : "translated", "value" : "%lld entrées supprimées" } },
           "other" : { "stringUnit" : { "state" : "translated", "value" : "%lld entrées supprimées" } } } } }
       }
     },
@@ -1108,7 +1108,7 @@
       "comment" : "Settings section title",
       "localizations" : {
         "cs" : { "stringUnit" : { "state" : "translated", "value" : "O aplikaci" } },
-        "de" : { "stringUnit" : { "state" : "translated", "value" : "Über" } },
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Info" } },
         "es" : { "stringUnit" : { "state" : "translated", "value" : "Acerca de" } },
         "fr" : { "stringUnit" : { "state" : "translated", "value" : "À propos" } }
       }
@@ -1126,8 +1126,8 @@
       "comment" : "Settings: about text",
       "localizations" : {
         "cs" : { "stringUnit" : { "state" : "translated", "value" : "Zdarma a open source (MIT). 100% offline, žádná analytika, žádné sledování, nic neopustí váš počítač." } },
-        "de" : { "stringUnit" : { "state" : "translated", "value" : "Kostenlos und Open Source (MIT). 100 % offline, keine Analyse, kein Tracking, nichts verlässt den Computer." } },
-        "es" : { "stringUnit" : { "state" : "translated", "value" : "Gratis y de código abierto (MIT). 100 % sin conexión, sin analíticas, sin rastreo, nada sale de tu ordenador." } },
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Kostenlos und Open Source (MIT). 100 % offline, keine Analysedaten, kein Tracking, nichts verlässt den Computer." } },
+        "es" : { "stringUnit" : { "state" : "translated", "value" : "Gratis y de código abierto (MIT). 100 % sin conexión, sin analíticas, sin rastreo, nada sale de tu equipo." } },
         "fr" : { "stringUnit" : { "state" : "translated", "value" : "Gratuit et open source (MIT). 100 % hors ligne, aucune analyse, aucun suivi, rien ne quitte votre ordinateur." } }
       }
     },

@@ -30,7 +30,7 @@ struct AppLanguage: @unchecked Sendable {
     var needsRestart: Bool { selection != launchedWith }
 
     func select(_ code: String?) {
-        guard let code, Self.supported.contains(code) else {
+        guard let code = code.flatMap(Self.normalized) else {
             defaults.removeObject(forKey: key)
             return
         }
@@ -40,8 +40,16 @@ struct AppLanguage: @unchecked Sendable {
     /// Reads the app's own domain only: `array(forKey:)` would also return the system-wide list.
     private static func override(in defaults: UserDefaults, domain: String) -> String? {
         guard let list = defaults.persistentDomain(forName: domain)?["AppleLanguages"] as? [String],
-            let first = list.first, supported.contains(first)
+            let first = list.first
         else { return nil }
-        return first
+        return normalized(first)
+    }
+
+    /// System Settings writes region-tagged codes such as "de-DE"; reduce them to a shipped language code.
+    private static func normalized(_ identifier: String) -> String? {
+        guard let code = Locale.Language(identifier: identifier).languageCode?.identifier,
+            supported.contains(code)
+        else { return nil }
+        return code
     }
 }

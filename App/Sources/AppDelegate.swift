@@ -9,6 +9,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
     /// Set before terminating to open a new instance of the app once the engine has stopped (language change).
     static var relaunchOnQuit = false
+    /// Set while a quit is waiting for the engine to stop, so a second quit cannot start another shutdown.
+    private var isTerminating = false
 
     let model = AppDelegate.makeModel()
     private var systemEvents: SystemEvents?
@@ -171,10 +173,14 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
     func applicationShouldTerminate(_ sender: NSApplication) -> NSApplication.TerminateReply {
         guard !Self.isRunningTests else { return .terminateNow }
+        guard !isTerminating else { return .terminateLater }
+        isTerminating = true
+        let relaunch = Self.relaunchOnQuit
+        Self.relaunchOnQuit = false
         Task {
             await model.stop()
             // The engine is stopped first, so two instances never use the database at the same time.
-            if Self.relaunchOnQuit { await Self.relaunch() }
+            if relaunch { await Self.relaunch() }
             NSApp.reply(toApplicationShouldTerminate: true)
         }
         return .terminateLater
