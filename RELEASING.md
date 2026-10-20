@@ -12,7 +12,7 @@
 
 1. Go through [QA-CHECKLIST.md](QA-CHECKLIST.md) on real hardware.
 2. In `CHANGELOG.md`, move the `Unreleased` entries into a new `## [x.y.z] - YYYY-MM-DD` section (the first release section already exists with the placeholder). Replace the `YYYY-MM-DD` placeholder with today's date.
-3. Set `MARKETING_VERSION` in `project.yml` to `x.y.z` and commit: `chore: release x.y.z`.
+3. Choose the version (patch for fixes, minor for features, major for breaking changes), set it as `MARKETING_VERSION` in `project.yml` and as `DropKeeperCoreInfo.version` (plus its check in `SmokeTests.swift`), and commit: `chore: release x.y.z`. Between releases `master` keeps the last released version.
 4. Tag and push: `git tag vx.y.z && git push origin master vx.y.z`.
    - The first CI run after pushing is the real compile check against the CI Xcode (Xcode 26.6 on `macos-26`); local development uses a newer Xcode.
    - If the DMG step fails on the runner because Finder scripting is unavailable, set `CREATE_DMG_EXTRA: --skip-jenkins` on the DMG step (the DMG then loses its background layout).
