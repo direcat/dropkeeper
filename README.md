@@ -1,13 +1,13 @@
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="assets/readme/dropkeeper-readme-header-dark.png">
-  <img alt="DropKeeper — Downloads that clean up after themselves." src="assets/readme/dropkeeper-readme-header-light.png">
+  <img alt="DropKeeper — Keep what matters. Let the rest disappear." src="assets/readme/dropkeeper-readme-header-light.png">
 </picture>
 
 # DropKeeper
 
 **Website: <https://direcat.github.io/dropkeeper/>**
 
-Downloads that clean up after themselves. Every new download gets an expiry — 30 minutes, an hour, a day, ten days, or keep it. When time is up, DropKeeper moves the file to the Trash.
+Keep what matters. Let the rest disappear. When a file lands in a watched folder, DropKeeper asks how long it should stay — half an hour, a day, ten days, or for good. Expired files go to the Trash, so you can still bring them back.
 
 - **100 % offline** — no analytics, no tracking, no update checks, no network access at all. Enforced in CI.
 - **Free and open source** (MIT).
