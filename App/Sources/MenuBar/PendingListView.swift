@@ -40,7 +40,7 @@ struct PendingListView: View {
             if showsFooter {
                 Rectangle().fill(TK.Notch.hairline).frame(height: 1)
                 HStack {
-                    Button("Settings…") { actions.openSettings() }
+                    Button("Settings") { actions.openSettings() }
                         .keyboardShortcut(",", modifiers: .command)
                     Spacer()
                     Button("Quit DropKeeper") { actions.quit() }

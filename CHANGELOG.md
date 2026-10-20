@@ -10,7 +10,7 @@ All notable changes to DropKeeper are documented here. The format follows [Keep 
 
 ### Changed
 - Larger text in the prompt, notice, list, Settings and onboarding.
-- The list footer (Settings…, Quit DropKeeper) uses the same text size and row height as the file rows.
+- The list footer (Settings, Quit DropKeeper) uses the same text size and row height as the file rows; "Settings" has no ellipsis there.
 - Bigger timeout slider: larger dots, a halo around the selected one and thicker track lines.
 - Clearer prompt buttons: "Keep" instead of "Keep it", and the main button says what it does ("Delete in 1 h" or "Keep") instead of "Done".
 - Settings: "Default action" (was "If you don't choose") now comes before "Apply default action after" (was "Apply default after").
