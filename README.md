@@ -5,6 +5,8 @@
 
 # DropKeeper
 
+**Website: <https://direcat.github.io/dropkeeper/>**
+
 Downloads that clean up after themselves. Every new download gets an expiry — 30 minutes, an hour, a day, ten days, or keep it. When time is up, DropKeeper moves the file to the Trash.
 
 - **100 % offline** — no analytics, no tracking, no update checks, no network access at all. Enforced in CI.
@@ -13,6 +15,18 @@ Downloads that clean up after themselves. Every new download gets an expiry — 
 - **Several watched folders** — Downloads by default, add Desktop or any other folder.
 - **Speaks your language** — English, Czech, German, Spanish and French, switchable in Settings.
 - Apple Silicon, macOS 15 Sequoia or later.
+
+![DropKeeper demo: a downloaded file appears, the prompt drops out of the notch, a slider picks one day, and the file is later moved to the Trash with an Undo button](assets/demo/dropkeeper-demo.gif)
+
+### Screenshots
+
+<table>
+  <tr>
+    <td align="center" width="40%"><img src="assets/demo/prompt.png" alt="The prompt with the expiry slider set to one day" width="300"><br><sub>Pick when a new download goes.</sub></td>
+    <td align="center" width="30%"><img src="assets/demo/list.png" alt="The list of tracked files with their remaining time" width="240"><br><sub>See what is tracked and when it leaves.</sub></td>
+    <td align="center" width="30%"><img src="assets/demo/notice.png" alt="The notice that a file was moved to the Trash, with an Undo button" width="240"><br><sub>Changed your mind? Undo.</sub></td>
+  </tr>
+</table>
 
 ## How it works
 

@@ -1,0 +1,207 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="referrer" content="no-referrer">
+<meta name="color-scheme" content="light dark">
+<title>DropKeeper – Downloads that clean up after themselves</title>
+<meta name="description" content="DropKeeper gives every new download an expiry and moves it to the Trash when time is up. A free, open source, 100 % offline menu bar app for macOS.">
+<link rel="canonical" href="https://direcat.github.io/dropkeeper/">
+<link rel="icon" type="image/png" sizes="32x32" href="assets/favicon-32.png">
+<link rel="icon" type="image/svg+xml" href="assets/dropkeeper-mark.svg">
+<link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
+<meta name="theme-color" content="#002A2D">
+
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="DropKeeper">
+<meta property="og:title" content="DropKeeper – Downloads that clean up after themselves">
+<meta property="og:description" content="Every new download gets an expiry. When time is up, DropKeeper moves the file to the Trash. Free, open source, 100 % offline.">
+<meta property="og:url" content="https://direcat.github.io/dropkeeper/">
+<meta property="og:image" content="https://direcat.github.io/dropkeeper/assets/social-preview.png">
+<meta property="og:image:width" content="1280">
+<meta property="og:image:height" content="640">
+<meta property="og:image:alt" content="DropKeeper – Downloads that clean up after themselves.">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="DropKeeper – Downloads that clean up after themselves">
+<meta name="twitter:description" content="Every new download gets an expiry. When time is up, DropKeeper moves the file to the Trash. Free, open source, 100 % offline.">
+<meta name="twitter:image" content="https://direcat.github.io/dropkeeper/assets/social-preview.png">
+<meta name="twitter:image:alt" content="DropKeeper – Downloads that clean up after themselves.">
+
+<link rel="stylesheet" href="assets/site.css">
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+
+<header class="hero">
+  <div class="wrap">
+    <nav class="top" aria-label="Main">
+      <a class="brand" href="#top" aria-label="DropKeeper, back to top"><img src="assets/dropkeeper-lockup-white.svg" alt="DropKeeper" width="160" height="28"></a>
+      <ul>
+        <li><a href="#how">How it works</a></li>
+        <li><a href="#privacy">Privacy</a></li>
+        <li><a href="#install">Install</a></li>
+        <li><a href="https://github.com/direcat/dropkeeper">GitHub</a></li>
+      </ul>
+    </nav>
+
+    <div class="hero-copy" id="top">
+      <h1>Downloads that clean up after themselves.</h1>
+      <p class="lede">Every new download gets an expiry: 30 minutes, an hour, a day, ten days, or keep it. When time is up, DropKeeper moves the file to the Trash.</p>
+      <div class="cta">
+        <a class="btn" href="https://github.com/direcat/dropkeeper/releases/latest">Download for Mac</a>
+        <div class="brew">
+          <code id="brew-cmd">brew install --cask direcat/tap/dropkeeper</code>
+          <button type="button" id="copy" class="copy" aria-label="Copy the Homebrew command">Copy</button>
+        </div>
+      </div>
+      <p class="small">Free &amp; open source · Apple Silicon · macOS 15 Sequoia or later</p>
+      <p class="sr" role="status" id="copy-status"></p>
+    </div>
+
+    <figure class="screen">
+      <video id="demo" autoplay muted loop playsinline preload="metadata" poster="assets/demo-poster.jpg" width="920" height="540" aria-label="Demo: a downloaded file appears, the prompt drops out of the notch, a slider picks one day, and the file is later moved to the Trash with an Undo button.">
+        <source src="assets/dropkeeper-demo.mp4" type="video/mp4">
+      </video>
+      <button type="button" class="pp" id="pp" aria-label="Pause the demo video" hidden>Pause</button>
+    </figure>
+  </div>
+</header>
+
+<main id="main">
+
+  <section class="sec" id="how" aria-labelledby="how-h">
+    <div class="wrap">
+      <h2 id="how-h">A prompt, a choice, and it is handled.</h2>
+      <ol class="track">
+        <li>
+          <h3>A file lands</h3>
+          <p>Download something into a watched folder and a small prompt opens, under the menu bar icon or from the notch.</p>
+        </li>
+        <li>
+          <h3>You pick when it goes</h3>
+          <p>30 minutes, an hour, a day, ten days, or keep it. One slider, one button.</p>
+        </li>
+        <li>
+          <h3>It leaves on time</h3>
+          <p>When the time is up, the file moves to the Trash. Undo is one click away.</p>
+        </li>
+      </ol>
+    </div>
+  </section>
+
+  <section class="sec alt" aria-labelledby="feat-h">
+    <div class="wrap">
+      <h2 id="feat-h">Small app, careful about your files.</h2>
+      <dl class="feats">
+        <div>
+          <dt>Five expiry choices</dt>
+          <dd>30 minutes, an hour, a day, ten days, or keep the file for good.</dd>
+        </div>
+        <div>
+          <dt>Trash, never delete</dt>
+          <dd>Expired files go to the Trash and the notice has an Undo button. Nothing is gone until you empty the Trash.</dd>
+        </div>
+        <div>
+          <dt>Notch or menu bar</dt>
+          <dd>The prompt works on any display setup: under the menu bar icon, or optionally from the notch.</dd>
+        </div>
+        <div>
+          <dt>Several folders</dt>
+          <dd>Downloads by default. Add Desktop or any other folder you want watched.</dd>
+        </div>
+        <div>
+          <dt>Renames and moves are tracked</dt>
+          <dd>Rename a file or move it into a subfolder and it is still tracked. Move it out of the watched folders and it is kept.</dd>
+        </div>
+        <div>
+          <dt>Old files stay untouched</dt>
+          <dd>Files that were already there before you installed DropKeeper are never touched.</dd>
+        </div>
+        <div>
+          <dt>Speaks your language</dt>
+          <dd>English, Czech, German, Spanish and French, switchable in Settings.</dd>
+        </div>
+        <div>
+          <dt>Free and open source</dt>
+          <dd>MIT licensed. Read the code, build it yourself, change it.</dd>
+        </div>
+      </dl>
+    </div>
+  </section>
+
+  <section class="sec" aria-labelledby="shots-h">
+    <div class="wrap">
+      <h2 id="shots-h">What you will see.</h2>
+      <div class="stage">
+        <figure class="s-prompt">
+          <img src="assets/prompt.png" width="840" height="502" loading="lazy" alt="The prompt for a new file named Mountain trip.jpg with a slider set to one day, showing the deletion time Tomorrow 21:16, a Keep button and a Delete in 1 day button.">
+          <figcaption>Pick when a new download goes.</figcaption>
+        </figure>
+        <figure class="s-list">
+          <img src="assets/list.png" width="840" height="268" loading="lazy" alt="A list of tracked files, Iridescence.jpg expiring in 1 hour and Valley at dawn.jpg in 23 hours.">
+          <figcaption>See what is tracked and when it leaves.</figcaption>
+        </figure>
+        <figure class="s-notice">
+          <img src="assets/notice.png" width="840" height="240" loading="lazy" alt="A notice saying Setup-v2.4.zip was moved to the Trash, with an Undo button.">
+          <figcaption>Changed your mind? Undo.</figcaption>
+        </figure>
+      </div>
+    </div>
+  </section>
+
+  <section class="sec dark" id="privacy" aria-labelledby="priv-h">
+    <div class="wrap">
+      <h2 id="priv-h">100 % offline.</h2>
+      <ul class="nots" aria-label="What DropKeeper does not do">
+        <li>No analytics.</li>
+        <li>No tracking.</li>
+        <li>No update checks.</li>
+        <li>No network access at all.</li>
+      </ul>
+      <div class="prose">
+        <p>There is no networking code in the app. CI fails if any networking API appears in the sources, or if the release binary links a networking framework. File names, contents and history stay in a local database on your Mac.</p>
+        <p>This website has no analytics either and loads no fonts, scripts or images from other servers.</p>
+        <p><a class="link" href="https://github.com/direcat/dropkeeper#privacy">Read the privacy notes</a></p>
+      </div>
+    </div>
+  </section>
+
+  <section class="sec" id="install" aria-labelledby="inst-h">
+    <div class="wrap two">
+      <div>
+        <h2 id="inst-h">Install it.</h2>
+        <p class="prose-p">Homebrew needs version 7 or newer, so run <code>brew update</code> first.</p>
+        <div class="brew on-page">
+          <code>brew install --cask direcat/tap/dropkeeper</code>
+          <button type="button" class="copy" data-copy aria-label="Copy the Homebrew command">Copy</button>
+        </div>
+        <p class="prose-p">Or <a class="link" href="https://github.com/direcat/dropkeeper/releases/latest">download the latest release</a> (.dmg or .zip) and drag DropKeeper to Applications. On first launch it asks for access to your Downloads folder.</p>
+      </div>
+      <div class="note">
+        <h3>Not notarized</h3>
+        <p>DropKeeper is not notarized by Apple, because that needs a paid developer account. The Homebrew cask removes the macOS quarantine flag after installing, so the app opens normally. If you prefer to keep Gatekeeper's check, install manually and follow the <a class="link" href="https://github.com/direcat/dropkeeper#install">steps in the README</a>.</p>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<footer class="foot">
+  <div class="wrap">
+    <picture>
+      <source media="(prefers-color-scheme: dark)" srcset="assets/dropkeeper-lockup-white.svg">
+      <img src="assets/dropkeeper-lockup.svg" alt="DropKeeper" width="128" height="22">
+    </picture>
+    <ul>
+      <li><a href="https://github.com/direcat/dropkeeper">GitHub</a></li>
+      <li><a href="https://github.com/direcat/dropkeeper/releases">Releases</a></li>
+      <li><a href="https://github.com/direcat/dropkeeper/blob/master/LICENSE">MIT license</a></li>
+    </ul>
+    <p>© direcat. No analytics, no external requests.</p>
+  </div>
+</footer>
+
+<script src="assets/site.js"></script>
+</body>
+</html>
