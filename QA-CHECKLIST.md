@@ -35,11 +35,12 @@ The default is "Under the menu bar icon" (the notch is opt-in). All notch checks
 - [ ] Typing in another app is not interrupted when a prompt appears; after clicking the prompt, ←/→, Return and Esc work.
 
 ## Flows
+- [ ] Clicking a file name in the prompt or the list opens the file in its default app; Open in the row menu does the same and is disabled when the file and its folder are gone.
 - [ ] Browser download (Safari, Chrome, Firefox): exactly one prompt per finished file, none for partial files.
 - [ ] Three files at once: one stack, "Apply to all" applies to all three.
 - [ ] Esc: the prompt closes; the file gets the default choice after the grace period.
-- [ ] Quiet mode: no prompt opens by itself; a dot appears on the menu bar icon; clicking a waiting file in the list opens the prompt for that file.
-- [ ] Close a prompt with Esc, then click that file ("Waiting") in the list: its prompt opens again. In Quiet mode the next download still doesn't open by itself.
+- [ ] Quiet mode: no prompt opens by itself; a dot appears on the menu bar icon; clicking a waiting file in the list (outside its name) or choosing Show prompt in its menu opens the prompt for that file.
+- [ ] Close a prompt with Esc, then click that file ("Waiting") in the list outside its name: its prompt opens again. In Quiet mode the next download still doesn't open by itself.
 - [ ] A file expires while a prompt is open: after the prompt closes, the notice shows for 2.5 s with Undo.
 - [ ] Expiry: the file goes to the Trash, the notice shows for 2.5 s, and Undo puts it back.
 - [ ] Two expiries within 2.5 s: one merged notice; Undo restores both.

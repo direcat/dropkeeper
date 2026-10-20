@@ -195,6 +195,10 @@
       "comment" : "VoiceOver label of a file name (prompt, list) that opens the file, e.g. Open report.pdf",
       "localizations" : { "cs" : { "stringUnit" : { "state" : "translated", "value" : "Otevřít %@" } } }
     },
+    "Show prompt" : {
+      "comment" : "List row action for a waiting file: open its prompt",
+      "localizations" : { "cs" : { "stringUnit" : { "state" : "translated", "value" : "Zobrazit výzvu" } } }
+    },
     "Open" : {
       "comment" : "List row action: open the file in its default app",
       "localizations" : { "cs" : { "stringUnit" : { "state" : "translated", "value" : "Otevřít" } } }

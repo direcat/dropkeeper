@@ -116,17 +116,21 @@ private struct PendingRow: View {
 
     @ViewBuilder
     private var menuItems: some View {
+        let reveal = FinderReveal.target(for: file.path)
+        if file.state == .pending {
+            Button("Show prompt") { actions.review(file.id) }
+        }
         if file.state == .failed {
             Button("Retry") { Task { await model.retry([file.id]) } }
         }
         Button("Open") { FileOpener.open(FinderReveal.target(for: file.path)) }
+            .disabled(reveal == .unavailable)
         Button("Keep") { Task { await model.keep([file.id]) } }
         Menu("Change time") {
             ForEach(model.settings.timelineStops, id: \.self) { seconds in
                 Button(DurationLabel.short(seconds)) { Task { await model.schedule([file.id], duration: seconds) } }
             }
         }
-        let reveal = FinderReveal.target(for: file.path)
         Button("Show in Finder") { FinderReveal.reveal(reveal) }
             .disabled(reveal == .unavailable)
     }
