@@ -52,7 +52,8 @@ struct SettingsView: View {
         Form {
             general
             folders
-            behavior
+            timeline
+            expiry
             ignored
             data
             about
@@ -109,7 +110,7 @@ struct SettingsView: View {
     }
 
     private var folders: some View {
-        Section("Folders") {
+        Section("Watch folders") {
             ForEach(model.folders) { folder in
                 HStack {
                     Image(systemName: folder.status == .ok ? "folder" : "exclamationmark.triangle")
@@ -144,14 +145,16 @@ struct SettingsView: View {
         }
     }
 
-    private var behavior: some View {
-        Section("Behavior") {
+    private var timeline: some View {
+        Section {
             ForEach(draft.timelineStops.indices, id: \.self) { index in
                 HStack {
-                    Picker("Stop \(index + 1)", selection: stopBinding(index)) {
+                    Picker(selection: stopBinding(index)) {
                         ForEach(StopPresets.options(for: index, in: draft.timelineStops), id: \.self) {
                             Text(DurationLabel.short($0)).tag($0)
                         }
+                    } label: {
+                        Text(verbatim: "#\(index + 1)")
                     }
                     Button {
                         draft.timelineStops.remove(at: index)
@@ -160,13 +163,24 @@ struct SettingsView: View {
                     }
                     .buttonStyle(.borderless)
                     .disabled(draft.timelineStops.count <= 2)
-                    .accessibilityLabel(Text("Remove stop"))
+                    .accessibilityLabel(Text("Remove time"))
                 }
             }
-            Button("Add stop") {
+            Button("Add time") {
                 if let stop = StopPresets.stopToAdd(to: draft.timelineStops) { draft.timelineStops.append(stop) }
             }
             .disabled(draft.timelineStops.count >= 5 || StopPresets.stopToAdd(to: draft.timelineStops) == nil)
+        } header: {
+            Text("Timeline")
+        } footer: {
+            Text("Times you can pick in the prompt.")
+                .font(.system(size: TK.TextSize.formCaption))
+                .foregroundStyle(.secondary)
+        }
+    }
+
+    private var expiry: some View {
+        Section("Expiry") {
             Picker(
                 "Default action",
                 selection: Binding(

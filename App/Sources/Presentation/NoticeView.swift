@@ -13,7 +13,8 @@ struct NoticeView: View {
 
     var body: some View {
         HStack(spacing: TK.Space.m) {
-            FileGlyph(kind: files.first?.kind ?? .other)
+            // The file is already in the Trash, so its icon comes from there (permanent deletes keep the glyph).
+            FinderIcon(path: files.first?.trashPath ?? "", kind: files.first?.kind ?? .other)
             VStack(alignment: .leading, spacing: 2) {
                 Text(Self.title(for: files))
                     .font(.system(size: TK.TextSize.title, weight: .semibold))

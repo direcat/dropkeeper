@@ -6,13 +6,14 @@ All notable changes to DropKeeper are documented here. The format follows [Keep 
 
 ### Added
 - The file name in the new-download prompt and in the list opens the file in its default app (the folder if the file is gone); the list menu also has Open, and Show prompt for a waiting file.
-- The prompt and the list show the same file icon as Finder.
+- The prompt, the list and the "Moved to Trash" notice show the same file icon as Finder.
 
 ### Changed
 - Larger text in the prompt, notice, list, Settings and onboarding.
 - Bigger timeout slider: larger dots, a halo around the selected one and thicker track lines.
 - Clearer prompt buttons: "Keep" instead of "Keep it", and the main button says what it does ("Delete in 1 h" or "Keep") instead of "Done".
 - Settings: "Default action" (was "If you don't choose") now comes before "Apply default action after" (was "Apply default after").
+- Settings: "Watch folders" (was "Folders"); "Behavior" is split into "Timeline" (times numbered #1, #2… instead of Stop 1, Stop 2…) and "Expiry".
 - Settings shows the build number next to the version, e.g. "Version 0.1.0 (68)".
 - Settings and onboarding say "nothing leaves your computer".
 

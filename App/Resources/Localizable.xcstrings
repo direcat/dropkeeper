@@ -317,9 +317,9 @@
       "comment" : "Settings: Quiet mode explanation",
       "localizations" : { "cs" : { "stringUnit" : { "state" : "translated", "value" : "Výzva se neotevře sama. Čekající soubory ukáže tečka na ikoně v menu baru." } } }
     },
-    "Folders" : {
+    "Watch folders" : {
       "comment" : "Settings section title",
-      "localizations" : { "cs" : { "stringUnit" : { "state" : "translated", "value" : "Složky" } } }
+      "localizations" : { "cs" : { "stringUnit" : { "state" : "translated", "value" : "Sledované složky" } } }
     },
     "DropKeeper has no access to this folder." : {
       "comment" : "Settings: watched folder without file access",
@@ -349,21 +349,25 @@
       "comment" : "Open panel confirm button when adding a watched folder",
       "localizations" : { "cs" : { "stringUnit" : { "state" : "translated", "value" : "Sledovat složku" } } }
     },
-    "Behavior" : {
-      "comment" : "Settings section title",
-      "localizations" : { "cs" : { "stringUnit" : { "state" : "translated", "value" : "Chování" } } }
+    "Expiry" : {
+      "comment" : "Settings section title: default action, grace period and what happens to expired files",
+      "localizations" : { "cs" : { "stringUnit" : { "state" : "translated", "value" : "Vypršení" } } }
     },
-    "Stop %lld" : {
-      "comment" : "Settings picker label of a timeline stop, e.g. Stop 1",
-      "localizations" : { "cs" : { "stringUnit" : { "state" : "translated", "value" : "Bod %lld" } } }
+    "Timeline" : {
+      "comment" : "Settings section title: the times offered on the prompt timeline",
+      "localizations" : { "cs" : { "stringUnit" : { "state" : "translated", "value" : "Časová osa" } } }
     },
-    "Remove stop" : {
-      "comment" : "VoiceOver label of the button that removes a timeline stop",
-      "localizations" : { "cs" : { "stringUnit" : { "state" : "translated", "value" : "Odebrat bod" } } }
+    "Times you can pick in the prompt." : {
+      "comment" : "Settings footer of the Timeline section",
+      "localizations" : { "cs" : { "stringUnit" : { "state" : "translated", "value" : "Časy, které můžete vybrat ve výzvě." } } }
     },
-    "Add stop" : {
-      "comment" : "Settings button that adds a timeline stop",
-      "localizations" : { "cs" : { "stringUnit" : { "state" : "translated", "value" : "Přidat bod" } } }
+    "Remove time" : {
+      "comment" : "VoiceOver label of the button that removes a timeline time",
+      "localizations" : { "cs" : { "stringUnit" : { "state" : "translated", "value" : "Odebrat čas" } } }
+    },
+    "Add time" : {
+      "comment" : "Settings button that adds a timeline time",
+      "localizations" : { "cs" : { "stringUnit" : { "state" : "translated", "value" : "Přidat čas" } } }
     },
     "Apply default action after" : {
       "comment" : "Settings picker: grace period before the default action applies",
