@@ -6,6 +6,10 @@ struct NoticeView: View {
     let files: [TrackedFile]
     let canUndo: Bool
     let onUndo: () -> Void
+    /// The model clears the files when the notice ends, while the panel is still fading out; keep showing the last ones.
+    @State private var lastFiles: [TrackedFile] = []
+
+    private var shown: [TrackedFile] { files.isEmpty ? lastFiles : files }
 
     nonisolated static func title(for files: [TrackedFile]) -> String {
         files.count == 1 ? files[0].displayName : String(localized: "\(files.count) files")
@@ -14,9 +18,9 @@ struct NoticeView: View {
     var body: some View {
         HStack(spacing: TK.Space.m) {
             // The file is already in the Trash, so its icon comes from there (permanent deletes keep the glyph).
-            FinderIcon(path: files.first?.trashPath ?? "", kind: files.first?.kind ?? .other)
+            FinderIcon(path: shown.first?.trashPath ?? "", kind: shown.first?.kind ?? .other)
             VStack(alignment: .leading, spacing: 2) {
-                Text(Self.title(for: files))
+                Text(Self.title(for: shown))
                     .font(.system(size: TK.TextSize.title, weight: .semibold))
                     .strikethrough()
                     .foregroundStyle(TK.Notch.textSecondary)
@@ -43,6 +47,9 @@ struct NoticeView: View {
         }
         .padding(TK.Space.l)
         .frame(width: TK.Size.notchPanelWidth)
+        .onChange(of: files, initial: true) { _, new in
+            if !new.isEmpty { lastFiles = new }
+        }
     }
 }
 

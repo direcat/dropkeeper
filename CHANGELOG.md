@@ -6,6 +6,7 @@ All notable changes to DropKeeper are documented here. The format follows [Keep 
 
 ### Fixed
 - The first click on the prompt's timeline now picks the time; before, it only focused the panel and a second click was needed.
+- The "Moved to Trash" notice no longer flashes "0 files" while it fades out.
 
 ## [1.0.0] - 2026-10-20
 
