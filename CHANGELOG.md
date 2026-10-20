@@ -4,6 +4,9 @@ All notable changes to DropKeeper are documented here. The format follows [Keep 
 
 ## [Unreleased]
 
+### Fixed
+- The first click on the prompt's timeline now picks the time; before, it only focused the panel and a second click was needed.
+
 ## [1.0.0] - 2026-10-20
 
 ### Added

@@ -11,7 +11,7 @@ final class PanelCoordinator {
     /// The open popover shows errors in its list; the panel then doesn't show them a second time.
     private let isPopoverShown: @MainActor () -> Bool
     private let panel = FloatingPanel()
-    private var hosting: NSHostingView<PanelRootView>?
+    private var hosting: FirstMouseHostingView<PanelRootView>?
     private var hovering = false
     /// True from the start of a hide's fade until the panel is ordered out; a show in between clears it and keeps
     /// the panel.
@@ -95,12 +95,12 @@ final class PanelCoordinator {
             model: model, content: content, isNotch: isNotch, notchWidth: notchWidth,
             topInset: PanelDecision.topInset(for: content, notchHeight: notchHeight), actions: actions,
             onHover: { [weak self] inside in self?.setHovering(inside) })
-        let hostingView: NSHostingView<PanelRootView>
+        let hostingView: FirstMouseHostingView<PanelRootView>
         if let hosting {
             hosting.rootView = root
             hostingView = hosting
         } else {
-            hostingView = NSHostingView(rootView: root)
+            hostingView = FirstMouseHostingView(rootView: root)
             // The coordinator sizes the panel itself. Keep the intrinsic size (fittingSize needs it) but
             // drop SwiftUI's window min/max constraints, which shrank the closed notch to its content height.
             hostingView.sizingOptions = [.intrinsicContentSize]

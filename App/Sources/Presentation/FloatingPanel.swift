@@ -1,4 +1,5 @@
 import AppKit
+import SwiftUI
 
 /// Borderless, non-activating panel above the menu bar. It never takes focus by itself;
 /// a click inside makes it key so the prompt's keyboard shortcuts work.
@@ -23,4 +24,10 @@ final class FloatingPanel: NSPanel {
 
     override var canBecomeKey: Bool { true }
     override var canBecomeMain: Bool { false }
+}
+
+/// The panel never becomes key on its own, so the first click in it would only make it key. Taking the first
+/// mouse lets that click reach the content (e.g. a timeline stop), not just buttons.
+final class FirstMouseHostingView<Content: View>: NSHostingView<Content> {
+    override func acceptsFirstMouse(for event: NSEvent?) -> Bool { true }
 }
