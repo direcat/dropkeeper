@@ -16,5 +16,5 @@ All notable changes to DropKeeper are documented here. The format follows [Keep 
 - Tracks renames and moves inside watched folders; files moved out are kept; files present before install are never touched.
 - Survives sleep, relaunch and a lost database (expiry stored on the file).
 - Optional "Temporary" Finder tag, ignored extensions, quiet mode, a default action applied after a grace period, history retention.
-- Several watched folders, launch at login, English and Czech (including the system privacy prompts).
+- Several watched folders, launch at login, English, Czech, German, Spanish and French with a language picker in Settings (including the system privacy prompts).
 - 100 % offline: no networking code, enforced in CI.

@@ -59,4 +59,5 @@ The default is "Under the menu bar icon" (the notch is opt-in). All notch checks
 - [ ] Light and dark appearance: Settings and onboarding look right; the notch UI is always black.
 
 ## Languages
-- [ ] English and Czech: no truncated or untranslated text.
+- [ ] English, Czech, German, Spanish and French: no truncated or untranslated text.
+- [ ] Settings > Language: choosing a language shows the restart hint; Restart DropKeeper relaunches in that language; System restores the system language.

@@ -11,36 +11,82 @@
           "one" : { "stringUnit" : { "state" : "translated", "value" : "%lld den" } },
           "few" : { "stringUnit" : { "state" : "translated", "value" : "%lld dny" } },
           "many" : { "stringUnit" : { "state" : "translated", "value" : "%lld dne" } },
-          "other" : { "stringUnit" : { "state" : "translated", "value" : "%lld dní" } } } } }
+          "other" : { "stringUnit" : { "state" : "translated", "value" : "%lld dní" } } } } },
+        "de" : { "variations" : { "plural" : {
+          "one" : { "stringUnit" : { "state" : "translated", "value" : "%lld Tag" } },
+          "other" : { "stringUnit" : { "state" : "translated", "value" : "%lld Tage" } } } } },
+        "es" : { "variations" : { "plural" : {
+          "one" : { "stringUnit" : { "state" : "translated", "value" : "%lld día" } },
+          "many" : { "stringUnit" : { "state" : "translated", "value" : "%lld de días" } },
+          "other" : { "stringUnit" : { "state" : "translated", "value" : "%lld días" } } } } },
+        "fr" : { "variations" : { "plural" : {
+          "one" : { "stringUnit" : { "state" : "translated", "value" : "%lld jour" } },
+          "many" : { "stringUnit" : { "state" : "translated", "value" : "%lld de jours" } },
+          "other" : { "stringUnit" : { "state" : "translated", "value" : "%lld jours" } } } } }
       }
     },
     "%lld h" : {
       "comment" : "Timeline stop in hours, e.g. 1 h",
-      "localizations" : { "cs" : { "stringUnit" : { "state" : "translated", "value" : "%lld h" } } }
+      "localizations" : {
+        "cs" : { "stringUnit" : { "state" : "translated", "value" : "%lld h" } },
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "%lld Std." } },
+        "es" : { "stringUnit" : { "state" : "translated", "value" : "%lld h" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "%lld h" } }
+      }
     },
     "%lld min" : {
       "comment" : "Timeline stop in minutes, e.g. 30 min",
-      "localizations" : { "cs" : { "stringUnit" : { "state" : "translated", "value" : "%lld min" } } }
+      "localizations" : {
+        "cs" : { "stringUnit" : { "state" : "translated", "value" : "%lld min" } },
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "%lld Min." } },
+        "es" : { "stringUnit" : { "state" : "translated", "value" : "%lld min" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "%lld min" } }
+      }
     },
     "Today %@" : {
       "comment" : "Deletion time today, e.g. Today 16:40",
-      "localizations" : { "cs" : { "stringUnit" : { "state" : "translated", "value" : "Dnes %@" } } }
+      "localizations" : {
+        "cs" : { "stringUnit" : { "state" : "translated", "value" : "Dnes %@" } },
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Heute %@" } },
+        "es" : { "stringUnit" : { "state" : "translated", "value" : "Hoy %@" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Aujourd’hui %@" } }
+      }
     },
     "Tomorrow %@" : {
       "comment" : "Deletion time tomorrow, e.g. Tomorrow 09:15",
-      "localizations" : { "cs" : { "stringUnit" : { "state" : "translated", "value" : "Zítra %@" } } }
+      "localizations" : {
+        "cs" : { "stringUnit" : { "state" : "translated", "value" : "Zítra %@" } },
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Morgen %@" } },
+        "es" : { "stringUnit" : { "state" : "translated", "value" : "Mañana %@" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Demain %@" } }
+      }
     },
     "in <1 min" : {
       "comment" : "Less than a minute left",
-      "localizations" : { "cs" : { "stringUnit" : { "state" : "translated", "value" : "za <1 min" } } }
+      "localizations" : {
+        "cs" : { "stringUnit" : { "state" : "translated", "value" : "za <1 min" } },
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "in <1 Min." } },
+        "es" : { "stringUnit" : { "state" : "translated", "value" : "en <1 min" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "dans <1 min" } }
+      }
     },
     "in %lld min" : {
       "comment" : "Minutes left, e.g. in 42 min",
-      "localizations" : { "cs" : { "stringUnit" : { "state" : "translated", "value" : "za %lld min" } } }
+      "localizations" : {
+        "cs" : { "stringUnit" : { "state" : "translated", "value" : "za %lld min" } },
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "in %lld Min." } },
+        "es" : { "stringUnit" : { "state" : "translated", "value" : "en %lld min" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "dans %lld min" } }
+      }
     },
     "in %lld h" : {
       "comment" : "Hours left, e.g. in 3 h",
-      "localizations" : { "cs" : { "stringUnit" : { "state" : "translated", "value" : "za %lld h" } } }
+      "localizations" : {
+        "cs" : { "stringUnit" : { "state" : "translated", "value" : "za %lld h" } },
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "in %lld Std." } },
+        "es" : { "stringUnit" : { "state" : "translated", "value" : "en %lld h" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "dans %lld h" } }
+      }
     },
     "in %lld days" : {
       "comment" : "Days left, e.g. in 2 days",
@@ -52,20 +98,46 @@
           "one" : { "stringUnit" : { "state" : "translated", "value" : "za %lld den" } },
           "few" : { "stringUnit" : { "state" : "translated", "value" : "za %lld dny" } },
           "many" : { "stringUnit" : { "state" : "translated", "value" : "za %lld dne" } },
-          "other" : { "stringUnit" : { "state" : "translated", "value" : "za %lld dní" } } } } }
+          "other" : { "stringUnit" : { "state" : "translated", "value" : "za %lld dní" } } } } },
+        "de" : { "variations" : { "plural" : {
+          "one" : { "stringUnit" : { "state" : "translated", "value" : "in %lld Tag" } },
+          "other" : { "stringUnit" : { "state" : "translated", "value" : "in %lld Tagen" } } } } },
+        "es" : { "variations" : { "plural" : {
+          "one" : { "stringUnit" : { "state" : "translated", "value" : "en %lld día" } },
+          "many" : { "stringUnit" : { "state" : "translated", "value" : "en %lld de días" } },
+          "other" : { "stringUnit" : { "state" : "translated", "value" : "en %lld días" } } } } },
+        "fr" : { "variations" : { "plural" : {
+          "one" : { "stringUnit" : { "state" : "translated", "value" : "dans %lld jour" } },
+          "many" : { "stringUnit" : { "state" : "translated", "value" : "dans %lld de jours" } },
+          "other" : { "stringUnit" : { "state" : "translated", "value" : "dans %lld jours" } } } } }
       }
     },
     "That item is not a folder." : {
       "comment" : "Error when a dropped or chosen item is not a folder",
-      "localizations" : { "cs" : { "stringUnit" : { "state" : "translated", "value" : "Tato položka není složka." } } }
+      "localizations" : {
+        "cs" : { "stringUnit" : { "state" : "translated", "value" : "Tato položka není složka." } },
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Dieses Objekt ist kein Ordner." } },
+        "es" : { "stringUnit" : { "state" : "translated", "value" : "Ese elemento no es una carpeta." } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Cet élément n’est pas un dossier." } }
+      }
     },
     "That folder can't be watched." : {
       "comment" : "Error when a folder cannot be watched, e.g. the disk root",
-      "localizations" : { "cs" : { "stringUnit" : { "state" : "translated", "value" : "Tuto složku nelze sledovat." } } }
+      "localizations" : {
+        "cs" : { "stringUnit" : { "state" : "translated", "value" : "Tuto složku nelze sledovat." } },
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Dieser Ordner kann nicht überwacht werden." } },
+        "es" : { "stringUnit" : { "state" : "translated", "value" : "Esa carpeta no se puede vigilar." } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Ce dossier ne peut pas être surveillé." } }
+      }
     },
     "That folder is inside, or contains, a folder that is already watched." : {
       "comment" : "Error when a new folder overlaps a watched one",
-      "localizations" : { "cs" : { "stringUnit" : { "state" : "translated", "value" : "Tato složka leží ve sledované složce, nebo sledovanou složku obsahuje." } } }
+      "localizations" : {
+        "cs" : { "stringUnit" : { "state" : "translated", "value" : "Tato složka leží ve sledované složce, nebo sledovanou složku obsahuje." } },
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Dieser Ordner liegt in einem überwachten Ordner oder enthält einen." } },
+        "es" : { "stringUnit" : { "state" : "translated", "value" : "Esta carpeta está dentro de una carpeta vigilada o contiene una." } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Ce dossier se trouve dans un dossier surveillé ou en contient un." } }
+      }
     },
     "%lld files could not be updated." : {
       "comment" : "Error after a batch action where some files failed",
@@ -77,60 +149,136 @@
           "one" : { "stringUnit" : { "state" : "translated", "value" : "%lld soubor se nepodařilo upravit." } },
           "few" : { "stringUnit" : { "state" : "translated", "value" : "%lld soubory se nepodařilo upravit." } },
           "many" : { "stringUnit" : { "state" : "translated", "value" : "%lld souboru se nepodařilo upravit." } },
-          "other" : { "stringUnit" : { "state" : "translated", "value" : "%lld souborů se nepodařilo upravit." } } } } }
+          "other" : { "stringUnit" : { "state" : "translated", "value" : "%lld souborů se nepodařilo upravit." } } } } },
+        "de" : { "variations" : { "plural" : {
+          "one" : { "stringUnit" : { "state" : "translated", "value" : "%lld Datei konnte nicht aktualisiert werden." } },
+          "other" : { "stringUnit" : { "state" : "translated", "value" : "%lld Dateien konnten nicht aktualisiert werden." } } } } },
+        "es" : { "variations" : { "plural" : {
+          "one" : { "stringUnit" : { "state" : "translated", "value" : "No se pudo actualizar %lld archivo." } },
+          "many" : { "stringUnit" : { "state" : "translated", "value" : "No se pudieron actualizar %lld de archivos." } },
+          "other" : { "stringUnit" : { "state" : "translated", "value" : "No se pudieron actualizar %lld archivos." } } } } },
+        "fr" : { "variations" : { "plural" : {
+          "one" : { "stringUnit" : { "state" : "translated", "value" : "%lld fichier n’a pas pu être mis à jour." } },
+          "many" : { "stringUnit" : { "state" : "translated", "value" : "%lld de fichiers n’ont pas pu être mis à jour." } },
+          "other" : { "stringUnit" : { "state" : "translated", "value" : "%lld fichiers n’ont pas pu être mis à jour." } } } } }
       }
     },
     "Something went wrong. Please try again." : {
       "comment" : "Generic error message",
-      "localizations" : { "cs" : { "stringUnit" : { "state" : "translated", "value" : "Něco se pokazilo. Zkuste to prosím znovu." } } }
+      "localizations" : {
+        "cs" : { "stringUnit" : { "state" : "translated", "value" : "Něco se pokazilo. Zkuste to prosím znovu." } },
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Etwas ist schiefgelaufen. Bitte erneut versuchen." } },
+        "es" : { "stringUnit" : { "state" : "translated", "value" : "Algo salió mal. Inténtalo de nuevo." } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Une erreur s’est produite. Veuillez réessayer." } }
+      }
     },
     "DropKeeper can't start" : {
       "comment" : "Fatal alert title when the engine fails to start",
-      "localizations" : { "cs" : { "stringUnit" : { "state" : "translated", "value" : "DropKeeper se nepodařilo spustit" } } }
+      "localizations" : {
+        "cs" : { "stringUnit" : { "state" : "translated", "value" : "DropKeeper se nepodařilo spustit" } },
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "DropKeeper kann nicht gestartet werden" } },
+        "es" : { "stringUnit" : { "state" : "translated", "value" : "DropKeeper no se puede iniciar" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "DropKeeper ne peut pas démarrer" } }
+      }
     },
     "Couldn't update the file. Please try again." : {
       "comment" : "Panel error after a failed prompt or list action",
-      "localizations" : { "cs" : { "stringUnit" : { "state" : "translated", "value" : "Soubor se nepodařilo upravit. Zkuste to prosím znovu." } } }
+      "localizations" : {
+        "cs" : { "stringUnit" : { "state" : "translated", "value" : "Soubor se nepodařilo upravit. Zkuste to prosím znovu." } },
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Die Datei konnte nicht aktualisiert werden. Bitte erneut versuchen." } },
+        "es" : { "stringUnit" : { "state" : "translated", "value" : "No se pudo actualizar el archivo. Inténtalo de nuevo." } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Impossible de mettre à jour le fichier. Veuillez réessayer." } }
+      }
     },
     "Couldn't put the file back from the Trash." : {
       "comment" : "Panel error after a failed Undo",
-      "localizations" : { "cs" : { "stringUnit" : { "state" : "translated", "value" : "Soubor se nepodařilo vrátit z Koše." } } }
+      "localizations" : {
+        "cs" : { "stringUnit" : { "state" : "translated", "value" : "Soubor se nepodařilo vrátit z Koše." } },
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Die Datei konnte nicht aus dem Papierkorb zurückgelegt werden." } },
+        "es" : { "stringUnit" : { "state" : "translated", "value" : "No se pudo recuperar el archivo de la Papelera." } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Impossible de remettre le fichier depuis la corbeille." } }
+      }
     },
     "Couldn't move the file to the Trash. Please try again later." : {
       "comment" : "Panel error after a failed Retry",
-      "localizations" : { "cs" : { "stringUnit" : { "state" : "translated", "value" : "Soubor se nepodařilo přesunout do Koše. Zkuste to prosím později." } } }
+      "localizations" : {
+        "cs" : { "stringUnit" : { "state" : "translated", "value" : "Soubor se nepodařilo přesunout do Koše. Zkuste to prosím později." } },
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Die Datei konnte nicht in den Papierkorb gelegt werden. Bitte später erneut versuchen." } },
+        "es" : { "stringUnit" : { "state" : "translated", "value" : "No se pudo mover el archivo a la Papelera. Inténtalo de nuevo más tarde." } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Impossible de mettre le fichier à la corbeille. Veuillez réessayer plus tard." } }
+      }
     },
     "Couldn't watch Downloads" : {
       "comment" : "Onboarding alert title when adding Downloads fails",
-      "localizations" : { "cs" : { "stringUnit" : { "state" : "translated", "value" : "Složku Stažené nelze sledovat" } } }
+      "localizations" : {
+        "cs" : { "stringUnit" : { "state" : "translated", "value" : "Složku Stažené nelze sledovat" } },
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Downloads kann nicht überwacht werden" } },
+        "es" : { "stringUnit" : { "state" : "translated", "value" : "No se pudo vigilar Descargas" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Impossible de surveiller Téléchargements" } }
+      }
     },
     "DropKeeper can't open its database" : {
       "comment" : "Fatal alert title at launch",
-      "localizations" : { "cs" : { "stringUnit" : { "state" : "translated", "value" : "DropKeeper nemůže otevřít svou databázi" } } }
+      "localizations" : {
+        "cs" : { "stringUnit" : { "state" : "translated", "value" : "DropKeeper nemůže otevřít svou databázi" } },
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "DropKeeper kann seine Datenbank nicht öffnen" } },
+        "es" : { "stringUnit" : { "state" : "translated", "value" : "DropKeeper no puede abrir su base de datos" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "DropKeeper ne peut pas ouvrir sa base de données" } }
+      }
     },
     "Quit DropKeeper and try again. Your files have not been touched." : {
       "comment" : "Fatal alert message at launch",
-      "localizations" : { "cs" : { "stringUnit" : { "state" : "translated", "value" : "Ukončete DropKeeper a zkuste to znovu. Vašich souborů se nic nedotklo." } } }
+      "localizations" : {
+        "cs" : { "stringUnit" : { "state" : "translated", "value" : "Ukončete DropKeeper a zkuste to znovu. Vašich souborů se nic nedotklo." } },
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "DropKeeper beenden und erneut versuchen. Es wurden keine Dateien verändert." } },
+        "es" : { "stringUnit" : { "state" : "translated", "value" : "Cierra DropKeeper e inténtalo de nuevo. No se ha tocado ningún archivo." } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Quittez DropKeeper et réessayez. Vos fichiers n’ont pas été modifiés." } }
+      }
     },
     "Delete after" : {
       "comment" : "VoiceOver label of the timeline",
-      "localizations" : { "cs" : { "stringUnit" : { "state" : "translated", "value" : "Smazat po" } } }
+      "localizations" : {
+        "cs" : { "stringUnit" : { "state" : "translated", "value" : "Smazat po" } },
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Löschen nach" } },
+        "es" : { "stringUnit" : { "state" : "translated", "value" : "Eliminar tras" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Supprimer après" } }
+      }
     },
     "Kept" : {
       "comment" : "Shown above the Keep stop on the timeline",
-      "localizations" : { "cs" : { "stringUnit" : { "state" : "translated", "value" : "Ponecháno" } } }
+      "localizations" : {
+        "cs" : { "stringUnit" : { "state" : "translated", "value" : "Ponecháno" } },
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Behalten" } },
+        "es" : { "stringUnit" : { "state" : "translated", "value" : "Conservado" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Gardé" } }
+      }
     },
     "Keep" : {
       "comment" : "Last timeline stop, prompt buttons and VoiceOver value: keep the file",
-      "localizations" : { "cs" : { "stringUnit" : { "state" : "translated", "value" : "Ponechat" } } }
+      "localizations" : {
+        "cs" : { "stringUnit" : { "state" : "translated", "value" : "Ponechat" } },
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Behalten" } },
+        "es" : { "stringUnit" : { "state" : "translated", "value" : "Conservar" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Garder" } }
+      }
     },
     "Keep it" : {
       "comment" : "Settings: default choice that keeps the file",
-      "localizations" : { "cs" : { "stringUnit" : { "state" : "translated", "value" : "Ponechat" } } }
+      "localizations" : {
+        "cs" : { "stringUnit" : { "state" : "translated", "value" : "Ponechat" } },
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Behalten" } },
+        "es" : { "stringUnit" : { "state" : "translated", "value" : "Conservar" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Garder" } }
+      }
     },
     "Delete in %@, at %@" : {
       "comment" : "VoiceOver value of the timeline, e.g. Delete in 1 hour, at Today 16:40",
-      "localizations" : { "cs" : { "stringUnit" : { "state" : "translated", "value" : "Smazat za %@, %@" } } }
+      "localizations" : {
+        "cs" : { "stringUnit" : { "state" : "translated", "value" : "Smazat za %@, %@" } },
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Löschen in %@, %@" } },
+        "es" : { "stringUnit" : { "state" : "translated", "value" : "Eliminar en %@, %@" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Supprimer dans %@, %@" } }
+      }
     },
     "Apply to all %lld new files" : {
       "comment" : "Prompt checkbox when several new files are stacked",
@@ -142,7 +290,18 @@
           "one" : { "stringUnit" : { "state" : "translated", "value" : "Použít pro %lld nový soubor" } },
           "few" : { "stringUnit" : { "state" : "translated", "value" : "Použít pro všechny %lld nové soubory" } },
           "many" : { "stringUnit" : { "state" : "translated", "value" : "Použít pro všech %lld nového souboru" } },
-          "other" : { "stringUnit" : { "state" : "translated", "value" : "Použít pro všech %lld nových souborů" } } } } }
+          "other" : { "stringUnit" : { "state" : "translated", "value" : "Použít pro všech %lld nových souborů" } } } } },
+        "de" : { "variations" : { "plural" : {
+          "one" : { "stringUnit" : { "state" : "translated", "value" : "Auf %lld neue Datei anwenden" } },
+          "other" : { "stringUnit" : { "state" : "translated", "value" : "Auf alle %lld neuen Dateien anwenden" } } } } },
+        "es" : { "variations" : { "plural" : {
+          "one" : { "stringUnit" : { "state" : "translated", "value" : "Aplicar a %lld archivo nuevo" } },
+          "many" : { "stringUnit" : { "state" : "translated", "value" : "Aplicar a los %lld de archivos nuevos" } },
+          "other" : { "stringUnit" : { "state" : "translated", "value" : "Aplicar a los %lld archivos nuevos" } } } } },
+        "fr" : { "variations" : { "plural" : {
+          "one" : { "stringUnit" : { "state" : "translated", "value" : "Appliquer à %lld nouveau fichier" } },
+          "many" : { "stringUnit" : { "state" : "translated", "value" : "Appliquer aux %lld de nouveaux fichiers" } },
+          "other" : { "stringUnit" : { "state" : "translated", "value" : "Appliquer aux %lld nouveaux fichiers" } } } } }
       }
     },
     "%lld new files" : {
@@ -155,53 +314,129 @@
           "one" : { "stringUnit" : { "state" : "translated", "value" : "%lld nový soubor" } },
           "few" : { "stringUnit" : { "state" : "translated", "value" : "%lld nové soubory" } },
           "many" : { "stringUnit" : { "state" : "translated", "value" : "%lld nového souboru" } },
-          "other" : { "stringUnit" : { "state" : "translated", "value" : "%lld nových souborů" } } } } }
+          "other" : { "stringUnit" : { "state" : "translated", "value" : "%lld nových souborů" } } } } },
+        "de" : { "variations" : { "plural" : {
+          "one" : { "stringUnit" : { "state" : "translated", "value" : "%lld neue Datei" } },
+          "other" : { "stringUnit" : { "state" : "translated", "value" : "%lld neue Dateien" } } } } },
+        "es" : { "variations" : { "plural" : {
+          "one" : { "stringUnit" : { "state" : "translated", "value" : "%lld archivo nuevo" } },
+          "many" : { "stringUnit" : { "state" : "translated", "value" : "%lld de archivos nuevos" } },
+          "other" : { "stringUnit" : { "state" : "translated", "value" : "%lld archivos nuevos" } } } } },
+        "fr" : { "variations" : { "plural" : {
+          "one" : { "stringUnit" : { "state" : "translated", "value" : "%lld nouveau fichier" } },
+          "many" : { "stringUnit" : { "state" : "translated", "value" : "%lld de nouveaux fichiers" } },
+          "other" : { "stringUnit" : { "state" : "translated", "value" : "%lld nouveaux fichiers" } } } } }
       }
     },
     "Welcome to DropKeeper" : {
-      "localizations" : { "cs" : { "stringUnit" : { "state" : "translated", "value" : "Vítá vás DropKeeper" } } }
+      "localizations" : {
+        "cs" : { "stringUnit" : { "state" : "translated", "value" : "Vítá vás DropKeeper" } },
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Willkommen bei DropKeeper" } },
+        "es" : { "stringUnit" : { "state" : "translated", "value" : "Te damos la bienvenida a DropKeeper" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Bienvenue dans DropKeeper" } }
+      }
     },
     "Every new download gets an expiry. Pick 30 minutes, a day, or keep it. When time is up, DropKeeper moves the file to the Trash." : {
-      "localizations" : { "cs" : { "stringUnit" : { "state" : "translated", "value" : "Každé nové stažení dostane dobu platnosti. Vyberte 30 minut, den, nebo ho ponechte. Až čas vyprší, DropKeeper soubor přesune do Koše." } } }
+      "localizations" : {
+        "cs" : { "stringUnit" : { "state" : "translated", "value" : "Každé nové stažení dostane dobu platnosti. Vyberte 30 minut, den, nebo ho ponechte. Až čas vyprší, DropKeeper soubor přesune do Koše." } },
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Jeder neue Download erhält ein Ablaufdatum: 30 Minuten, ein Tag oder Behalten. Ist die Zeit um, legt DropKeeper die Datei in den Papierkorb." } },
+        "es" : { "stringUnit" : { "state" : "translated", "value" : "Cada descarga nueva recibe una fecha de caducidad. Elige 30 minutos, un día o conservarla. Al agotarse el tiempo, DropKeeper mueve el archivo a la Papelera." } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Chaque nouveau téléchargement reçoit une date d’expiration : 30 minutes, un jour ou le conserver. Une fois le délai écoulé, DropKeeper met le fichier à la corbeille." } }
+      }
     },
     "100 % offline, no analytics, no tracking, nothing leaves your computer." : {
-      "localizations" : { "cs" : { "stringUnit" : { "state" : "translated", "value" : "100% offline, žádná analytika, žádné sledování, nic neopustí váš počítač." } } }
+      "localizations" : {
+        "cs" : { "stringUnit" : { "state" : "translated", "value" : "100% offline, žádná analytika, žádné sledování, nic neopustí váš počítač." } },
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "100 % offline, keine Analyse, kein Tracking, nichts verlässt den Computer." } },
+        "es" : { "stringUnit" : { "state" : "translated", "value" : "100 % sin conexión, sin analíticas, sin rastreo, nada sale de tu ordenador." } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "100 % hors ligne, aucune analyse, aucun suivi, rien ne quitte votre ordinateur." } }
+      }
     },
     "Allow access to Downloads" : {
-      "localizations" : { "cs" : { "stringUnit" : { "state" : "translated", "value" : "Povolit přístup ke složce Stažené" } } }
+      "localizations" : {
+        "cs" : { "stringUnit" : { "state" : "translated", "value" : "Povolit přístup ke složce Stažené" } },
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Zugriff auf Downloads erlauben" } },
+        "es" : { "stringUnit" : { "state" : "translated", "value" : "Permitir acceso a Descargas" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Autoriser l’accès à Téléchargements" } }
+      }
     },
     "Downloads is watched" : {
-      "localizations" : { "cs" : { "stringUnit" : { "state" : "translated", "value" : "Složka Stažené je sledovaná" } } }
+      "localizations" : {
+        "cs" : { "stringUnit" : { "state" : "translated", "value" : "Složka Stažené je sledovaná" } },
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Downloads wird überwacht" } },
+        "es" : { "stringUnit" : { "state" : "translated", "value" : "Descargas se está vigilando" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Téléchargements est surveillé" } }
+      }
     },
     "DropKeeper has no access to Downloads. Allow it in System Settings → Privacy & Security → Files and Folders." : {
-      "localizations" : { "cs" : { "stringUnit" : { "state" : "translated", "value" : "DropKeeper nemá přístup ke složce Stažené. Povolte ho v Nastavení systému → Soukromí a zabezpečení → Soubory a složky." } } }
+      "localizations" : {
+        "cs" : { "stringUnit" : { "state" : "translated", "value" : "DropKeeper nemá přístup ke složce Stažené. Povolte ho v Nastavení systému → Soukromí a zabezpečení → Soubory a složky." } },
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "DropKeeper hat keinen Zugriff auf Downloads. Zugriff erlauben unter Systemeinstellungen → Datenschutz & Sicherheit → Dateien und Ordner." } },
+        "es" : { "stringUnit" : { "state" : "translated", "value" : "DropKeeper no tiene acceso a Descargas. Permítelo en Ajustes del Sistema → Privacidad y seguridad → Archivos y carpetas." } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "DropKeeper n’a pas accès à Téléchargements. Autorisez-le dans Réglages Système → Confidentialité et sécurité → Fichiers et dossiers." } }
+      }
     },
     "Open System Settings" : {
-      "localizations" : { "cs" : { "stringUnit" : { "state" : "translated", "value" : "Otevřít Nastavení systému" } } }
+      "localizations" : {
+        "cs" : { "stringUnit" : { "state" : "translated", "value" : "Otevřít Nastavení systému" } },
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Systemeinstellungen öffnen" } },
+        "es" : { "stringUnit" : { "state" : "translated", "value" : "Abrir Ajustes del Sistema" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Ouvrir Réglages Système" } }
+      }
     },
     "Delete in %@" : {
       "comment" : "Prompt primary button for the selected timeline stop, e.g. Delete in 1 h",
-      "localizations" : { "cs" : { "stringUnit" : { "state" : "translated", "value" : "Smazat za %@" } } }
+      "localizations" : {
+        "cs" : { "stringUnit" : { "state" : "translated", "value" : "Smazat za %@" } },
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Löschen in %@" } },
+        "es" : { "stringUnit" : { "state" : "translated", "value" : "Eliminar en %@" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Supprimer dans %@" } }
+      }
     },
     "Done" : {
       "comment" : "Onboarding primary button",
-      "localizations" : { "cs" : { "stringUnit" : { "state" : "translated", "value" : "Hotovo" } } }
+      "localizations" : {
+        "cs" : { "stringUnit" : { "state" : "translated", "value" : "Hotovo" } },
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Fertig" } },
+        "es" : { "stringUnit" : { "state" : "translated", "value" : "Hecho" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Terminé" } }
+      }
     },
     "Close" : {
       "comment" : "Prompt close button (VoiceOver)",
-      "localizations" : { "cs" : { "stringUnit" : { "state" : "translated", "value" : "Zavřít" } } }
+      "localizations" : {
+        "cs" : { "stringUnit" : { "state" : "translated", "value" : "Zavřít" } },
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Schließen" } },
+        "es" : { "stringUnit" : { "state" : "translated", "value" : "Cerrar" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Fermer" } }
+      }
     },
     "Open %@" : {
       "comment" : "VoiceOver label of a file name (prompt, list) that opens the file, e.g. Open report.pdf",
-      "localizations" : { "cs" : { "stringUnit" : { "state" : "translated", "value" : "Otevřít %@" } } }
+      "localizations" : {
+        "cs" : { "stringUnit" : { "state" : "translated", "value" : "Otevřít %@" } },
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "%@ öffnen" } },
+        "es" : { "stringUnit" : { "state" : "translated", "value" : "Abrir %@" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Ouvrir %@" } }
+      }
     },
     "Show prompt" : {
       "comment" : "List row action for a waiting file: open its prompt",
-      "localizations" : { "cs" : { "stringUnit" : { "state" : "translated", "value" : "Zobrazit výzvu" } } }
+      "localizations" : {
+        "cs" : { "stringUnit" : { "state" : "translated", "value" : "Zobrazit výzvu" } },
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Abfrage anzeigen" } },
+        "es" : { "stringUnit" : { "state" : "translated", "value" : "Mostrar aviso" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Afficher l’invite" } }
+      }
     },
     "Open" : {
       "comment" : "List row action: open the file in its default app",
-      "localizations" : { "cs" : { "stringUnit" : { "state" : "translated", "value" : "Otevřít" } } }
+      "localizations" : {
+        "cs" : { "stringUnit" : { "state" : "translated", "value" : "Otevřít" } },
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Öffnen" } },
+        "es" : { "stringUnit" : { "state" : "translated", "value" : "Abrir" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Ouvrir" } }
+      }
     },
     "%lld files" : {
       "comment" : "Notice title when several files were deleted at once",
@@ -213,20 +448,46 @@
           "one" : { "stringUnit" : { "state" : "translated", "value" : "%lld soubor" } },
           "few" : { "stringUnit" : { "state" : "translated", "value" : "%lld soubory" } },
           "many" : { "stringUnit" : { "state" : "translated", "value" : "%lld souboru" } },
-          "other" : { "stringUnit" : { "state" : "translated", "value" : "%lld souborů" } } } } }
+          "other" : { "stringUnit" : { "state" : "translated", "value" : "%lld souborů" } } } } },
+        "de" : { "variations" : { "plural" : {
+          "one" : { "stringUnit" : { "state" : "translated", "value" : "%lld Datei" } },
+          "other" : { "stringUnit" : { "state" : "translated", "value" : "%lld Dateien" } } } } },
+        "es" : { "variations" : { "plural" : {
+          "one" : { "stringUnit" : { "state" : "translated", "value" : "%lld archivo" } },
+          "many" : { "stringUnit" : { "state" : "translated", "value" : "%lld de archivos" } },
+          "other" : { "stringUnit" : { "state" : "translated", "value" : "%lld archivos" } } } } },
+        "fr" : { "variations" : { "plural" : {
+          "one" : { "stringUnit" : { "state" : "translated", "value" : "%lld fichier" } },
+          "many" : { "stringUnit" : { "state" : "translated", "value" : "%lld de fichiers" } },
+          "other" : { "stringUnit" : { "state" : "translated", "value" : "%lld fichiers" } } } } }
       }
     },
     "Moved to Trash" : {
       "comment" : "Notice subtitle after a file was moved to the Trash",
-      "localizations" : { "cs" : { "stringUnit" : { "state" : "translated", "value" : "Přesunuto do Koše" } } }
+      "localizations" : {
+        "cs" : { "stringUnit" : { "state" : "translated", "value" : "Přesunuto do Koše" } },
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "In den Papierkorb gelegt" } },
+        "es" : { "stringUnit" : { "state" : "translated", "value" : "Movido a la Papelera" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Mis à la corbeille" } }
+      }
     },
     "Deleted" : {
       "comment" : "Notice subtitle after a file was deleted permanently",
-      "localizations" : { "cs" : { "stringUnit" : { "state" : "translated", "value" : "Smazáno" } } }
+      "localizations" : {
+        "cs" : { "stringUnit" : { "state" : "translated", "value" : "Smazáno" } },
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Gelöscht" } },
+        "es" : { "stringUnit" : { "state" : "translated", "value" : "Eliminado" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Supprimé" } }
+      }
     },
     "Undo" : {
       "comment" : "Notice button: restore the file from the Trash",
-      "localizations" : { "cs" : { "stringUnit" : { "state" : "translated", "value" : "Vrátit" } } }
+      "localizations" : {
+        "cs" : { "stringUnit" : { "state" : "translated", "value" : "Vrátit" } },
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Rückgängig" } },
+        "es" : { "stringUnit" : { "state" : "translated", "value" : "Deshacer" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Annuler" } }
+      }
     },
     "%lld files scheduled" : {
       "comment" : "VoiceOver label of the closed notch",
@@ -238,244 +499,586 @@
           "one" : { "stringUnit" : { "state" : "translated", "value" : "%lld soubor naplánován" } },
           "few" : { "stringUnit" : { "state" : "translated", "value" : "%lld soubory naplánovány" } },
           "many" : { "stringUnit" : { "state" : "translated", "value" : "%lld souboru naplánováno" } },
-          "other" : { "stringUnit" : { "state" : "translated", "value" : "%lld souborů naplánováno" } } } } }
+          "other" : { "stringUnit" : { "state" : "translated", "value" : "%lld souborů naplánováno" } } } } },
+        "de" : { "variations" : { "plural" : {
+          "one" : { "stringUnit" : { "state" : "translated", "value" : "%lld Datei geplant" } },
+          "other" : { "stringUnit" : { "state" : "translated", "value" : "%lld Dateien geplant" } } } } },
+        "es" : { "variations" : { "plural" : {
+          "one" : { "stringUnit" : { "state" : "translated", "value" : "%lld archivo programado" } },
+          "many" : { "stringUnit" : { "state" : "translated", "value" : "%lld de archivos programados" } },
+          "other" : { "stringUnit" : { "state" : "translated", "value" : "%lld archivos programados" } } } } },
+        "fr" : { "variations" : { "plural" : {
+          "one" : { "stringUnit" : { "state" : "translated", "value" : "%lld fichier planifié" } },
+          "many" : { "stringUnit" : { "state" : "translated", "value" : "%lld de fichiers planifiés" } },
+          "other" : { "stringUnit" : { "state" : "translated", "value" : "%lld fichiers planifiés" } } } } }
       }
     },
     "Deleting in %@" : {
       "comment" : "VoiceOver value of the closed notch during the last-seconds countdown, e.g. Deleting in 0:07",
-      "localizations" : { "cs" : { "stringUnit" : { "state" : "translated", "value" : "Smazání za %@" } } }
+      "localizations" : {
+        "cs" : { "stringUnit" : { "state" : "translated", "value" : "Smazání za %@" } },
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Löschen in %@" } },
+        "es" : { "stringUnit" : { "state" : "translated", "value" : "Eliminando en %@" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Suppression dans %@" } }
+      }
     },
     "No files scheduled" : {
       "comment" : "Empty state of the pending list",
-      "localizations" : { "cs" : { "stringUnit" : { "state" : "translated", "value" : "Nic není naplánováno" } } }
+      "localizations" : {
+        "cs" : { "stringUnit" : { "state" : "translated", "value" : "Nic není naplánováno" } },
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Keine Dateien geplant" } },
+        "es" : { "stringUnit" : { "state" : "translated", "value" : "Ningún archivo programado" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Aucun fichier planifié" } }
+      }
     },
     "Settings…" : {
       "comment" : "App menu item that opens Settings",
-      "localizations" : { "cs" : { "stringUnit" : { "state" : "translated", "value" : "Nastavení…" } } }
+      "localizations" : {
+        "cs" : { "stringUnit" : { "state" : "translated", "value" : "Nastavení…" } },
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Einstellungen…" } },
+        "es" : { "stringUnit" : { "state" : "translated", "value" : "Ajustes…" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Réglages…" } }
+      }
     },
     "Settings" : {
       "comment" : "Pending list footer button that opens Settings",
-      "localizations" : { "cs" : { "stringUnit" : { "state" : "translated", "value" : "Nastavení" } } }
+      "localizations" : {
+        "cs" : { "stringUnit" : { "state" : "translated", "value" : "Nastavení" } },
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Einstellungen" } },
+        "es" : { "stringUnit" : { "state" : "translated", "value" : "Ajustes" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Réglages" } }
+      }
     },
     "Quit DropKeeper" : {
       "comment" : "Pending list footer button that quits the app",
-      "localizations" : { "cs" : { "stringUnit" : { "state" : "translated", "value" : "Ukončit DropKeeper" } } }
+      "localizations" : {
+        "cs" : { "stringUnit" : { "state" : "translated", "value" : "Ukončit DropKeeper" } },
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "DropKeeper beenden" } },
+        "es" : { "stringUnit" : { "state" : "translated", "value" : "Salir de DropKeeper" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Quitter DropKeeper" } }
+      }
     },
     "Waiting" : {
       "comment" : "Pending list status of a file waiting for a decision",
-      "localizations" : { "cs" : { "stringUnit" : { "state" : "translated", "value" : "Čeká" } } }
+      "localizations" : {
+        "cs" : { "stringUnit" : { "state" : "translated", "value" : "Čeká" } },
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Wartet" } },
+        "es" : { "stringUnit" : { "state" : "translated", "value" : "En espera" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "En attente" } }
+      }
     },
     "Couldn't move" : {
       "comment" : "Pending list status of a file that could not be moved to the Trash",
-      "localizations" : { "cs" : { "stringUnit" : { "state" : "translated", "value" : "Nelze přesunout" } } }
+      "localizations" : {
+        "cs" : { "stringUnit" : { "state" : "translated", "value" : "Nelze přesunout" } },
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Verschieben fehlgeschlagen" } },
+        "es" : { "stringUnit" : { "state" : "translated", "value" : "No se pudo mover" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Échec du déplacement" } }
+      }
     },
     "Actions" : {
       "comment" : "VoiceOver label of a pending list row's actions menu",
-      "localizations" : { "cs" : { "stringUnit" : { "state" : "translated", "value" : "Akce" } } }
+      "localizations" : {
+        "cs" : { "stringUnit" : { "state" : "translated", "value" : "Akce" } },
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Aktionen" } },
+        "es" : { "stringUnit" : { "state" : "translated", "value" : "Acciones" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Actions" } }
+      }
     },
     "Retry" : {
       "comment" : "Pending list action that retries a failed file",
-      "localizations" : { "cs" : { "stringUnit" : { "state" : "translated", "value" : "Zkusit znovu" } } }
+      "localizations" : {
+        "cs" : { "stringUnit" : { "state" : "translated", "value" : "Zkusit znovu" } },
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Erneut versuchen" } },
+        "es" : { "stringUnit" : { "state" : "translated", "value" : "Reintentar" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Réessayer" } }
+      }
     },
     "Change time" : {
       "comment" : "Pending list submenu that reschedules a file",
-      "localizations" : { "cs" : { "stringUnit" : { "state" : "translated", "value" : "Změnit čas" } } }
+      "localizations" : {
+        "cs" : { "stringUnit" : { "state" : "translated", "value" : "Změnit čas" } },
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Zeit ändern" } },
+        "es" : { "stringUnit" : { "state" : "translated", "value" : "Cambiar hora" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Modifier l’heure" } }
+      }
     },
     "Show in Finder" : {
       "comment" : "Pending list action that reveals a file in Finder",
-      "localizations" : { "cs" : { "stringUnit" : { "state" : "translated", "value" : "Zobrazit ve Finderu" } } }
+      "localizations" : {
+        "cs" : { "stringUnit" : { "state" : "translated", "value" : "Zobrazit ve Finderu" } },
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Im Finder anzeigen" } },
+        "es" : { "stringUnit" : { "state" : "translated", "value" : "Mostrar en el Finder" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Afficher dans le Finder" } }
+      }
     },
     "General" : {
       "comment" : "Settings section title",
-      "localizations" : { "cs" : { "stringUnit" : { "state" : "translated", "value" : "Obecné" } } }
+      "localizations" : {
+        "cs" : { "stringUnit" : { "state" : "translated", "value" : "Obecné" } },
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Allgemein" } },
+        "es" : { "stringUnit" : { "state" : "translated", "value" : "General" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Général" } }
+      }
     },
     "Launch at login" : {
       "comment" : "Settings toggle",
-      "localizations" : { "cs" : { "stringUnit" : { "state" : "translated", "value" : "Spouštět po přihlášení" } } }
+      "localizations" : {
+        "cs" : { "stringUnit" : { "state" : "translated", "value" : "Spouštět po přihlášení" } },
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Beim Anmelden starten" } },
+        "es" : { "stringUnit" : { "state" : "translated", "value" : "Abrir al iniciar sesión" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Ouvrir à la connexion" } }
+      }
+    },
+    "Language" : {
+      "comment" : "Settings picker: app language",
+      "localizations" : {
+        "cs" : { "stringUnit" : { "state" : "translated", "value" : "Jazyk" } },
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Sprache" } },
+        "es" : { "stringUnit" : { "state" : "translated", "value" : "Idioma" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Langue" } }
+      }
+    },
+    "System" : {
+      "comment" : "Settings language option: follow the system language",
+      "localizations" : {
+        "cs" : { "stringUnit" : { "state" : "translated", "value" : "Podle systému" } },
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "System" } },
+        "es" : { "stringUnit" : { "state" : "translated", "value" : "Sistema" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Système" } }
+      }
+    },
+    "DropKeeper needs to restart to change the language." : {
+      "comment" : "Settings caption shown after the language was changed",
+      "localizations" : {
+        "cs" : { "stringUnit" : { "state" : "translated", "value" : "DropKeeper se musí restartovat, aby se změnil jazyk." } },
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "DropKeeper muss neu gestartet werden, um die Sprache zu ändern." } },
+        "es" : { "stringUnit" : { "state" : "translated", "value" : "DropKeeper debe reiniciarse para cambiar el idioma." } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "DropKeeper doit redémarrer pour changer de langue." } }
+      }
+    },
+    "Restart DropKeeper" : {
+      "comment" : "Settings button that relaunches the app to apply the language",
+      "localizations" : {
+        "cs" : { "stringUnit" : { "state" : "translated", "value" : "Restartovat DropKeeper" } },
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "DropKeeper neu starten" } },
+        "es" : { "stringUnit" : { "state" : "translated", "value" : "Reiniciar DropKeeper" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Redémarrer DropKeeper" } }
+      }
     },
     "Show new downloads" : {
       "comment" : "Settings picker: where the prompt for new downloads appears",
-      "localizations" : { "cs" : { "stringUnit" : { "state" : "translated", "value" : "Zobrazovat nová stažení" } } }
+      "localizations" : {
+        "cs" : { "stringUnit" : { "state" : "translated", "value" : "Zobrazovat nová stažení" } },
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Neue Downloads anzeigen" } },
+        "es" : { "stringUnit" : { "state" : "translated", "value" : "Mostrar descargas nuevas" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Afficher les nouveaux téléchargements" } }
+      }
     },
     "Automatically" : {
       "comment" : "Settings option: pick the prompt location automatically",
-      "localizations" : { "cs" : { "stringUnit" : { "state" : "translated", "value" : "Automaticky" } } }
+      "localizations" : {
+        "cs" : { "stringUnit" : { "state" : "translated", "value" : "Automaticky" } },
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Automatisch" } },
+        "es" : { "stringUnit" : { "state" : "translated", "value" : "Automáticamente" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Automatiquement" } }
+      }
     },
     "Under the menu bar icon" : {
       "comment" : "Settings option: show the prompt under the menu bar icon",
-      "localizations" : { "cs" : { "stringUnit" : { "state" : "translated", "value" : "Pod ikonou v menu baru" } } }
+      "localizations" : {
+        "cs" : { "stringUnit" : { "state" : "translated", "value" : "Pod ikonou v menu baru" } },
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Unter dem Menüleistensymbol" } },
+        "es" : { "stringUnit" : { "state" : "translated", "value" : "Bajo el icono de la barra de menús" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Sous l’icône de la barre des menus" } }
+      }
     },
     "In the notch" : {
       "comment" : "Settings option: show the prompt in the screen notch",
-      "localizations" : { "cs" : { "stringUnit" : { "state" : "translated", "value" : "Ve výřezu" } } }
+      "localizations" : {
+        "cs" : { "stringUnit" : { "state" : "translated", "value" : "Ve výřezu" } },
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Im Notch" } },
+        "es" : { "stringUnit" : { "state" : "translated", "value" : "En el notch" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Dans l’encoche" } }
+      }
     },
     "Automatically shows new downloads in the notch when the pointer is on the laptop screen." : {
       "comment" : "Settings help text under the prompt presentation picker",
-      "localizations" : { "cs" : { "stringUnit" : { "state" : "translated", "value" : "Automaticky ukáže nová stažení ve výřezu, když je kurzor na displeji notebooku." } } }
+      "localizations" : {
+        "cs" : { "stringUnit" : { "state" : "translated", "value" : "Automaticky ukáže nová stažení ve výřezu, když je kurzor na displeji notebooku." } },
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Zeigt neue Downloads im Notch an, wenn sich der Zeiger auf dem Laptop-Bildschirm befindet." } },
+        "es" : { "stringUnit" : { "state" : "translated", "value" : "Muestra las descargas nuevas en el notch cuando el puntero está en la pantalla del portátil." } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Affiche les nouveaux téléchargements dans l’encoche quand le pointeur est sur l’écran de l’ordinateur portable." } }
+      }
     },
     "Quiet mode" : {
       "comment" : "Settings toggle",
-      "localizations" : { "cs" : { "stringUnit" : { "state" : "translated", "value" : "Tichý režim" } } }
+      "localizations" : {
+        "cs" : { "stringUnit" : { "state" : "translated", "value" : "Tichý režim" } },
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Ruhemodus" } },
+        "es" : { "stringUnit" : { "state" : "translated", "value" : "Modo silencioso" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Mode silencieux" } }
+      }
     },
     "Don't open the prompt by itself. A dot on the menu bar icon shows waiting files." : {
       "comment" : "Settings: Quiet mode explanation",
-      "localizations" : { "cs" : { "stringUnit" : { "state" : "translated", "value" : "Výzva se neotevře sama. Čekající soubory ukáže tečka na ikoně v menu baru." } } }
+      "localizations" : {
+        "cs" : { "stringUnit" : { "state" : "translated", "value" : "Výzva se neotevře sama. Čekající soubory ukáže tečka na ikoně v menu baru." } },
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Die Abfrage nicht von selbst öffnen. Ein Punkt am Menüleistensymbol zeigt wartende Dateien an." } },
+        "es" : { "stringUnit" : { "state" : "translated", "value" : "No abrir el aviso automáticamente. Un punto en el icono de la barra de menús indica los archivos en espera." } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Ne pas ouvrir l’invite d’elle-même. Un point sur l’icône de la barre des menus indique les fichiers en attente." } }
+      }
     },
     "Watch folders" : {
       "comment" : "Settings section title",
-      "localizations" : { "cs" : { "stringUnit" : { "state" : "translated", "value" : "Sledované složky" } } }
+      "localizations" : {
+        "cs" : { "stringUnit" : { "state" : "translated", "value" : "Sledované složky" } },
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Überwachte Ordner" } },
+        "es" : { "stringUnit" : { "state" : "translated", "value" : "Carpetas vigiladas" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Dossiers surveillés" } }
+      }
     },
     "DropKeeper has no access to this folder." : {
       "comment" : "Settings: watched folder without file access",
-      "localizations" : { "cs" : { "stringUnit" : { "state" : "translated", "value" : "DropKeeper nemá k této složce přístup." } } }
+      "localizations" : {
+        "cs" : { "stringUnit" : { "state" : "translated", "value" : "DropKeeper nemá k této složce přístup." } },
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "DropKeeper hat keinen Zugriff auf diesen Ordner." } },
+        "es" : { "stringUnit" : { "state" : "translated", "value" : "DropKeeper no tiene acceso a esta carpeta." } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "DropKeeper n’a pas accès à ce dossier." } }
+      }
     },
     "This folder is not available." : {
       "comment" : "Settings: watched folder that is missing or on an unmounted disk",
-      "localizations" : { "cs" : { "stringUnit" : { "state" : "translated", "value" : "Tato složka není dostupná." } } }
+      "localizations" : {
+        "cs" : { "stringUnit" : { "state" : "translated", "value" : "Tato složka není dostupná." } },
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Dieser Ordner ist nicht verfügbar." } },
+        "es" : { "stringUnit" : { "state" : "translated", "value" : "Esta carpeta no está disponible." } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Ce dossier n’est pas disponible." } }
+      }
     },
     "Grant access" : {
       "comment" : "Settings button that opens Files and Folders privacy settings",
-      "localizations" : { "cs" : { "stringUnit" : { "state" : "translated", "value" : "Povolit přístup" } } }
+      "localizations" : {
+        "cs" : { "stringUnit" : { "state" : "translated", "value" : "Povolit přístup" } },
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Zugriff erlauben" } },
+        "es" : { "stringUnit" : { "state" : "translated", "value" : "Permitir acceso" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Autoriser l’accès" } }
+      }
     },
     "Check again" : {
       "comment" : "Settings button that re-checks folder access",
-      "localizations" : { "cs" : { "stringUnit" : { "state" : "translated", "value" : "Zkontrolovat znovu" } } }
+      "localizations" : {
+        "cs" : { "stringUnit" : { "state" : "translated", "value" : "Zkontrolovat znovu" } },
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Erneut prüfen" } },
+        "es" : { "stringUnit" : { "state" : "translated", "value" : "Comprobar de nuevo" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Vérifier à nouveau" } }
+      }
     },
     "Remove folder" : {
       "comment" : "VoiceOver label of the button that stops watching a folder",
-      "localizations" : { "cs" : { "stringUnit" : { "state" : "translated", "value" : "Odebrat složku" } } }
+      "localizations" : {
+        "cs" : { "stringUnit" : { "state" : "translated", "value" : "Odebrat složku" } },
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Ordner entfernen" } },
+        "es" : { "stringUnit" : { "state" : "translated", "value" : "Quitar carpeta" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Retirer le dossier" } }
+      }
     },
     "Add folder…" : {
       "comment" : "Settings button that adds a watched folder",
-      "localizations" : { "cs" : { "stringUnit" : { "state" : "translated", "value" : "Přidat složku…" } } }
+      "localizations" : {
+        "cs" : { "stringUnit" : { "state" : "translated", "value" : "Přidat složku…" } },
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Ordner hinzufügen…" } },
+        "es" : { "stringUnit" : { "state" : "translated", "value" : "Añadir carpeta…" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Ajouter un dossier…" } }
+      }
     },
     "Watch folder" : {
       "comment" : "Open panel confirm button when adding a watched folder",
-      "localizations" : { "cs" : { "stringUnit" : { "state" : "translated", "value" : "Sledovat složku" } } }
+      "localizations" : {
+        "cs" : { "stringUnit" : { "state" : "translated", "value" : "Sledovat složku" } },
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Ordner überwachen" } },
+        "es" : { "stringUnit" : { "state" : "translated", "value" : "Vigilar carpeta" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Surveiller le dossier" } }
+      }
     },
     "Expiry" : {
       "comment" : "Settings section title: default action, grace period and what happens to expired files",
-      "localizations" : { "cs" : { "stringUnit" : { "state" : "translated", "value" : "Vypršení" } } }
+      "localizations" : {
+        "cs" : { "stringUnit" : { "state" : "translated", "value" : "Vypršení" } },
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Ablauf" } },
+        "es" : { "stringUnit" : { "state" : "translated", "value" : "Caducidad" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Expiration" } }
+      }
     },
     "Timeline" : {
       "comment" : "Settings section title: the times offered on the prompt timeline",
-      "localizations" : { "cs" : { "stringUnit" : { "state" : "translated", "value" : "Časová osa" } } }
+      "localizations" : {
+        "cs" : { "stringUnit" : { "state" : "translated", "value" : "Časová osa" } },
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Zeitleiste" } },
+        "es" : { "stringUnit" : { "state" : "translated", "value" : "Línea de tiempo" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Chronologie" } }
+      }
     },
     "Times you can pick in the prompt." : {
       "comment" : "Settings footer of the Timeline section",
-      "localizations" : { "cs" : { "stringUnit" : { "state" : "translated", "value" : "Časy, které můžete vybrat ve výzvě." } } }
+      "localizations" : {
+        "cs" : { "stringUnit" : { "state" : "translated", "value" : "Časy, které můžete vybrat ve výzvě." } },
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Zeiten, die in der Abfrage zur Auswahl stehen." } },
+        "es" : { "stringUnit" : { "state" : "translated", "value" : "Tiempos que puedes elegir en el aviso." } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Délais proposés dans l’invite." } }
+      }
     },
     "Remove time" : {
       "comment" : "VoiceOver label of the button that removes a timeline time",
-      "localizations" : { "cs" : { "stringUnit" : { "state" : "translated", "value" : "Odebrat čas" } } }
+      "localizations" : {
+        "cs" : { "stringUnit" : { "state" : "translated", "value" : "Odebrat čas" } },
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Zeit entfernen" } },
+        "es" : { "stringUnit" : { "state" : "translated", "value" : "Quitar tiempo" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Retirer le délai" } }
+      }
     },
     "Add time" : {
       "comment" : "Settings button that adds a timeline time",
-      "localizations" : { "cs" : { "stringUnit" : { "state" : "translated", "value" : "Přidat čas" } } }
+      "localizations" : {
+        "cs" : { "stringUnit" : { "state" : "translated", "value" : "Přidat čas" } },
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Zeit hinzufügen" } },
+        "es" : { "stringUnit" : { "state" : "translated", "value" : "Añadir tiempo" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Ajouter un délai" } }
+      }
     },
     "Apply default action after" : {
       "comment" : "Settings picker: grace period before the default action applies",
-      "localizations" : { "cs" : { "stringUnit" : { "state" : "translated", "value" : "Použít výchozí akci po" } } }
+      "localizations" : {
+        "cs" : { "stringUnit" : { "state" : "translated", "value" : "Použít výchozí akci po" } },
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Standardaktion anwenden nach" } },
+        "es" : { "stringUnit" : { "state" : "translated", "value" : "Aplicar la acción predeterminada tras" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Appliquer l’action par défaut après" } }
+      }
     },
     "Default action" : {
       "comment" : "Settings picker: what happens when the user makes no choice",
-      "localizations" : { "cs" : { "stringUnit" : { "state" : "translated", "value" : "Výchozí akce" } } }
+      "localizations" : {
+        "cs" : { "stringUnit" : { "state" : "translated", "value" : "Výchozí akce" } },
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Standardaktion" } },
+        "es" : { "stringUnit" : { "state" : "translated", "value" : "Acción predeterminada" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Action par défaut" } }
+      }
     },
     "Delete after %@" : {
       "comment" : "Settings option: default choice, e.g. Delete after 1 hour",
-      "localizations" : { "cs" : { "stringUnit" : { "state" : "translated", "value" : "Smazat po %@" } } }
+      "localizations" : {
+        "cs" : { "stringUnit" : { "state" : "translated", "value" : "Smazat po %@" } },
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Löschen nach %@" } },
+        "es" : { "stringUnit" : { "state" : "translated", "value" : "Eliminar tras %@" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Supprimer après %@" } }
+      }
     },
     "Expired files" : {
       "comment" : "Settings picker: what happens to expired files",
-      "localizations" : { "cs" : { "stringUnit" : { "state" : "translated", "value" : "Soubory po vypršení" } } }
+      "localizations" : {
+        "cs" : { "stringUnit" : { "state" : "translated", "value" : "Soubory po vypršení" } },
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Abgelaufene Dateien" } },
+        "es" : { "stringUnit" : { "state" : "translated", "value" : "Archivos caducados" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Fichiers expirés" } }
+      }
     },
     "Move to Trash" : {
       "comment" : "Settings option: expired files go to the Trash",
-      "localizations" : { "cs" : { "stringUnit" : { "state" : "translated", "value" : "Přesunout do Koše" } } }
+      "localizations" : {
+        "cs" : { "stringUnit" : { "state" : "translated", "value" : "Přesunout do Koše" } },
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "In den Papierkorb legen" } },
+        "es" : { "stringUnit" : { "state" : "translated", "value" : "Mover a la Papelera" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Mettre à la corbeille" } }
+      }
     },
     "Delete permanently" : {
       "comment" : "Settings option and confirm button: expired files are deleted permanently",
-      "localizations" : { "cs" : { "stringUnit" : { "state" : "translated", "value" : "Trvale smazat" } } }
+      "localizations" : {
+        "cs" : { "stringUnit" : { "state" : "translated", "value" : "Trvale smazat" } },
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Endgültig löschen" } },
+        "es" : { "stringUnit" : { "state" : "translated", "value" : "Eliminar permanentemente" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Supprimer définitivement" } }
+      }
     },
     "Mark scheduled files with the “Temporary” Finder tag" : {
       "comment" : "Settings toggle",
-      "localizations" : { "cs" : { "stringUnit" : { "state" : "translated", "value" : "Označit naplánované soubory štítkem Finderu „Temporary“" } } }
+      "localizations" : {
+        "cs" : { "stringUnit" : { "state" : "translated", "value" : "Označit naplánované soubory štítkem Finderu „Temporary“" } },
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Geplante Dateien mit dem Finder-Tag „Temporary“ markieren" } },
+        "es" : { "stringUnit" : { "state" : "translated", "value" : "Marcar los archivos programados con la etiqueta «Temporary» del Finder" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Marquer les fichiers planifiés avec le marqueur Finder « Temporary »" } }
+      }
     },
     "Delete files permanently?" : {
       "comment" : "Confirmation title before switching to permanent deletion",
-      "localizations" : { "cs" : { "stringUnit" : { "state" : "translated", "value" : "Mazat soubory trvale?" } } }
+      "localizations" : {
+        "cs" : { "stringUnit" : { "state" : "translated", "value" : "Mazat soubory trvale?" } },
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Dateien endgültig löschen?" } },
+        "es" : { "stringUnit" : { "state" : "translated", "value" : "¿Eliminar archivos permanentemente?" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Supprimer les fichiers définitivement ?" } }
+      }
     },
     "Expired files will be deleted right away instead of going to the Trash. This can't be undone." : {
       "comment" : "Confirmation message before switching to permanent deletion",
-      "localizations" : { "cs" : { "stringUnit" : { "state" : "translated", "value" : "Soubory po vypršení se smažou hned, místo aby šly do Koše. Nejde to vrátit." } } }
+      "localizations" : {
+        "cs" : { "stringUnit" : { "state" : "translated", "value" : "Soubory po vypršení se smažou hned, místo aby šly do Koše. Nejde to vrátit." } },
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Abgelaufene Dateien werden sofort gelöscht, statt in den Papierkorb zu gelangen. Das kann nicht rückgängig gemacht werden." } },
+        "es" : { "stringUnit" : { "state" : "translated", "value" : "Los archivos caducados se eliminarán de inmediato en lugar de ir a la Papelera. No se puede deshacer." } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Les fichiers expirés seront supprimés immédiatement au lieu d’aller à la corbeille. Cette action est irréversible." } }
+      }
     },
     "Cancel" : {
       "comment" : "Cancel button of a confirmation",
-      "localizations" : { "cs" : { "stringUnit" : { "state" : "translated", "value" : "Zrušit" } } }
+      "localizations" : {
+        "cs" : { "stringUnit" : { "state" : "translated", "value" : "Zrušit" } },
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Abbrechen" } },
+        "es" : { "stringUnit" : { "state" : "translated", "value" : "Cancelar" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Annuler" } }
+      }
     },
     "Ignored extensions" : {
       "comment" : "Settings section title",
-      "localizations" : { "cs" : { "stringUnit" : { "state" : "translated", "value" : "Ignorované přípony" } } }
+      "localizations" : {
+        "cs" : { "stringUnit" : { "state" : "translated", "value" : "Ignorované přípony" } },
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Ignorierte Endungen" } },
+        "es" : { "stringUnit" : { "state" : "translated", "value" : "Extensiones ignoradas" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Extensions ignorées" } }
+      }
     },
     "Remove extension" : {
       "comment" : "VoiceOver label of the button that removes an ignored extension",
-      "localizations" : { "cs" : { "stringUnit" : { "state" : "translated", "value" : "Odebrat příponu" } } }
+      "localizations" : {
+        "cs" : { "stringUnit" : { "state" : "translated", "value" : "Odebrat příponu" } },
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Endung entfernen" } },
+        "es" : { "stringUnit" : { "state" : "translated", "value" : "Quitar extensión" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Retirer l’extension" } }
+      }
     },
     "Extension, e.g. dmg" : {
       "comment" : "Placeholder of the ignored extension text field",
-      "localizations" : { "cs" : { "stringUnit" : { "state" : "translated", "value" : "Přípona, např. dmg" } } }
+      "localizations" : {
+        "cs" : { "stringUnit" : { "state" : "translated", "value" : "Přípona, např. dmg" } },
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Endung, z. B. dmg" } },
+        "es" : { "stringUnit" : { "state" : "translated", "value" : "Extensión, p. ej. dmg" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Extension, p. ex. dmg" } }
+      }
     },
     "Add" : {
       "comment" : "Button that adds an ignored extension",
-      "localizations" : { "cs" : { "stringUnit" : { "state" : "translated", "value" : "Přidat" } } }
+      "localizations" : {
+        "cs" : { "stringUnit" : { "state" : "translated", "value" : "Přidat" } },
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Hinzufügen" } },
+        "es" : { "stringUnit" : { "state" : "translated", "value" : "Añadir" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Ajouter" } }
+      }
     },
     "Data" : {
       "comment" : "Settings section title",
-      "localizations" : { "cs" : { "stringUnit" : { "state" : "translated", "value" : "Data" } } }
+      "localizations" : {
+        "cs" : { "stringUnit" : { "state" : "translated", "value" : "Data" } },
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Daten" } },
+        "es" : { "stringUnit" : { "state" : "translated", "value" : "Datos" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Données" } }
+      }
     },
     "Keep history for" : {
       "comment" : "Settings picker: history retention",
-      "localizations" : { "cs" : { "stringUnit" : { "state" : "translated", "value" : "Uchovávat historii" } } }
+      "localizations" : {
+        "cs" : { "stringUnit" : { "state" : "translated", "value" : "Uchovávat historii" } },
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Verlauf behalten für" } },
+        "es" : { "stringUnit" : { "state" : "translated", "value" : "Conservar el historial durante" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Conserver l’historique pendant" } }
+      }
     },
     "1 month" : {
       "comment" : "History retention option",
-      "localizations" : { "cs" : { "stringUnit" : { "state" : "translated", "value" : "1 měsíc" } } }
+      "localizations" : {
+        "cs" : { "stringUnit" : { "state" : "translated", "value" : "1 měsíc" } },
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "1 Monat" } },
+        "es" : { "stringUnit" : { "state" : "translated", "value" : "1 mes" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "1 mois" } }
+      }
     },
     "3 months" : {
       "comment" : "History retention option",
-      "localizations" : { "cs" : { "stringUnit" : { "state" : "translated", "value" : "3 měsíce" } } }
+      "localizations" : {
+        "cs" : { "stringUnit" : { "state" : "translated", "value" : "3 měsíce" } },
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "3 Monate" } },
+        "es" : { "stringUnit" : { "state" : "translated", "value" : "3 meses" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "3 mois" } }
+      }
     },
     "6 months" : {
       "comment" : "History retention option",
-      "localizations" : { "cs" : { "stringUnit" : { "state" : "translated", "value" : "6 měsíců" } } }
+      "localizations" : {
+        "cs" : { "stringUnit" : { "state" : "translated", "value" : "6 měsíců" } },
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "6 Monate" } },
+        "es" : { "stringUnit" : { "state" : "translated", "value" : "6 meses" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "6 mois" } }
+      }
     },
     "1 year" : {
       "comment" : "History retention option",
-      "localizations" : { "cs" : { "stringUnit" : { "state" : "translated", "value" : "1 rok" } } }
+      "localizations" : {
+        "cs" : { "stringUnit" : { "state" : "translated", "value" : "1 rok" } },
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "1 Jahr" } },
+        "es" : { "stringUnit" : { "state" : "translated", "value" : "1 año" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "1 an" } }
+      }
     },
     "2 years" : {
       "comment" : "History retention option",
-      "localizations" : { "cs" : { "stringUnit" : { "state" : "translated", "value" : "2 roky" } } }
+      "localizations" : {
+        "cs" : { "stringUnit" : { "state" : "translated", "value" : "2 roky" } },
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "2 Jahre" } },
+        "es" : { "stringUnit" : { "state" : "translated", "value" : "2 años" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "2 ans" } }
+      }
     },
     "Forever" : {
       "comment" : "History retention option",
-      "localizations" : { "cs" : { "stringUnit" : { "state" : "translated", "value" : "Navždy" } } }
+      "localizations" : {
+        "cs" : { "stringUnit" : { "state" : "translated", "value" : "Navždy" } },
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Für immer" } },
+        "es" : { "stringUnit" : { "state" : "translated", "value" : "Siempre" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Toujours" } }
+      }
     },
     "Clear history now…" : {
       "comment" : "Settings button that asks to clear the history",
-      "localizations" : { "cs" : { "stringUnit" : { "state" : "translated", "value" : "Vymazat historii…" } } }
+      "localizations" : {
+        "cs" : { "stringUnit" : { "state" : "translated", "value" : "Vymazat historii…" } },
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Verlauf jetzt löschen…" } },
+        "es" : { "stringUnit" : { "state" : "translated", "value" : "Borrar historial ahora…" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Effacer l’historique maintenant…" } }
+      }
     },
     "Clear history?" : {
       "comment" : "Confirmation title before clearing the history",
-      "localizations" : { "cs" : { "stringUnit" : { "state" : "translated", "value" : "Vymazat historii?" } } }
+      "localizations" : {
+        "cs" : { "stringUnit" : { "state" : "translated", "value" : "Vymazat historii?" } },
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Verlauf löschen?" } },
+        "es" : { "stringUnit" : { "state" : "translated", "value" : "¿Borrar el historial?" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Effacer l’historique ?" } }
+      }
     },
     "Clear history" : {
       "comment" : "Confirm button that clears the history",
-      "localizations" : { "cs" : { "stringUnit" : { "state" : "translated", "value" : "Vymazat historii" } } }
+      "localizations" : {
+        "cs" : { "stringUnit" : { "state" : "translated", "value" : "Vymazat historii" } },
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Verlauf löschen" } },
+        "es" : { "stringUnit" : { "state" : "translated", "value" : "Borrar historial" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Effacer l’historique" } }
+      }
     },
     "Scheduled and waiting files are not affected." : {
       "comment" : "Confirmation message before clearing the history",
-      "localizations" : { "cs" : { "stringUnit" : { "state" : "translated", "value" : "Naplánovaných a čekajících souborů se to netýká." } } }
+      "localizations" : {
+        "cs" : { "stringUnit" : { "state" : "translated", "value" : "Naplánovaných a čekajících souborů se to netýká." } },
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Geplante und wartende Dateien sind nicht betroffen." } },
+        "es" : { "stringUnit" : { "state" : "translated", "value" : "Los archivos programados y en espera no se ven afectados." } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Les fichiers planifiés et en attente ne sont pas concernés." } }
+      }
     },
     "Removed %lld records" : {
       "comment" : "Settings: number of history records removed, e.g. Removed 12 records",
@@ -487,24 +1090,55 @@
           "one" : { "stringUnit" : { "state" : "translated", "value" : "Odstraněn %lld záznam" } },
           "few" : { "stringUnit" : { "state" : "translated", "value" : "Odstraněny %lld záznamy" } },
           "many" : { "stringUnit" : { "state" : "translated", "value" : "Odstraněno %lld záznamu" } },
-          "other" : { "stringUnit" : { "state" : "translated", "value" : "Odstraněno %lld záznamů" } } } } }
+          "other" : { "stringUnit" : { "state" : "translated", "value" : "Odstraněno %lld záznamů" } } } } },
+        "de" : { "variations" : { "plural" : {
+          "one" : { "stringUnit" : { "state" : "translated", "value" : "%lld Eintrag entfernt" } },
+          "other" : { "stringUnit" : { "state" : "translated", "value" : "%lld Einträge entfernt" } } } } },
+        "es" : { "variations" : { "plural" : {
+          "one" : { "stringUnit" : { "state" : "translated", "value" : "%lld registro eliminado" } },
+          "many" : { "stringUnit" : { "state" : "translated", "value" : "%lld de registros eliminados" } },
+          "other" : { "stringUnit" : { "state" : "translated", "value" : "%lld registros eliminados" } } } } },
+        "fr" : { "variations" : { "plural" : {
+          "one" : { "stringUnit" : { "state" : "translated", "value" : "%lld entrée supprimée" } },
+          "many" : { "stringUnit" : { "state" : "translated", "value" : "%lld d’entrées supprimées" } },
+          "other" : { "stringUnit" : { "state" : "translated", "value" : "%lld entrées supprimées" } } } } }
       }
     },
     "About" : {
       "comment" : "Settings section title",
-      "localizations" : { "cs" : { "stringUnit" : { "state" : "translated", "value" : "O aplikaci" } } }
+      "localizations" : {
+        "cs" : { "stringUnit" : { "state" : "translated", "value" : "O aplikaci" } },
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Über" } },
+        "es" : { "stringUnit" : { "state" : "translated", "value" : "Acerca de" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "À propos" } }
+      }
     },
     "Version %@" : {
       "comment" : "Settings: app version, e.g. Version 1.0.0",
-      "localizations" : { "cs" : { "stringUnit" : { "state" : "translated", "value" : "Verze %@" } } }
+      "localizations" : {
+        "cs" : { "stringUnit" : { "state" : "translated", "value" : "Verze %@" } },
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Version %@" } },
+        "es" : { "stringUnit" : { "state" : "translated", "value" : "Versión %@" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Version %@" } }
+      }
     },
     "Free and open source (MIT). 100 % offline, no analytics, no tracking, nothing leaves your computer." : {
       "comment" : "Settings: about text",
-      "localizations" : { "cs" : { "stringUnit" : { "state" : "translated", "value" : "Zdarma a open source (MIT). 100% offline, žádná analytika, žádné sledování, nic neopustí váš počítač." } } }
+      "localizations" : {
+        "cs" : { "stringUnit" : { "state" : "translated", "value" : "Zdarma a open source (MIT). 100% offline, žádná analytika, žádné sledování, nic neopustí váš počítač." } },
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Kostenlos und Open Source (MIT). 100 % offline, keine Analyse, kein Tracking, nichts verlässt den Computer." } },
+        "es" : { "stringUnit" : { "state" : "translated", "value" : "Gratis y de código abierto (MIT). 100 % sin conexión, sin analíticas, sin rastreo, nada sale de tu ordenador." } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Gratuit et open source (MIT). 100 % hors ligne, aucune analyse, aucun suivi, rien ne quitte votre ordinateur." } }
+      }
     },
     "Inspired by TempCat." : {
       "comment" : "Settings: credit to the app that inspired DropKeeper",
-      "localizations" : { "cs" : { "stringUnit" : { "state" : "translated", "value" : "Inspirováno aplikací TempCat." } } }
+      "localizations" : {
+        "cs" : { "stringUnit" : { "state" : "translated", "value" : "Inspirováno aplikací TempCat." } },
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Inspiriert von TempCat." } },
+        "es" : { "stringUnit" : { "state" : "translated", "value" : "Inspirado en TempCat." } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Inspiré de TempCat." } }
+      }
     },
     "github.com/direcat/dropkeeper" : {
       "comment" : "Settings: link to the project repository",
@@ -512,39 +1146,84 @@
     },
     "OK" : {
       "comment" : "Button that dismisses an error alert",
-      "localizations" : { "cs" : { "stringUnit" : { "state" : "translated", "value" : "OK" } } }
+      "localizations" : {
+        "cs" : { "stringUnit" : { "state" : "translated", "value" : "OK" } },
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "OK" } },
+        "es" : { "stringUnit" : { "state" : "translated", "value" : "OK" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "OK" } }
+      }
     },
     "DropKeeper Settings" : {
       "comment" : "Settings window title",
-      "localizations" : { "cs" : { "stringUnit" : { "state" : "translated", "value" : "Nastavení DropKeeperu" } } }
+      "localizations" : {
+        "cs" : { "stringUnit" : { "state" : "translated", "value" : "Nastavení DropKeeperu" } },
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "DropKeeper-Einstellungen" } },
+        "es" : { "stringUnit" : { "state" : "translated", "value" : "Ajustes de DropKeeper" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Réglages de DropKeeper" } }
+      }
     },
     "Edit" : {
       "comment" : "Main menu: Edit menu",
-      "localizations" : { "cs" : { "stringUnit" : { "state" : "translated", "value" : "Úpravy" } } }
+      "localizations" : {
+        "cs" : { "stringUnit" : { "state" : "translated", "value" : "Úpravy" } },
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Bearbeiten" } },
+        "es" : { "stringUnit" : { "state" : "translated", "value" : "Edición" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Édition" } }
+      }
     },
     "Redo" : {
       "comment" : "Main menu: Edit > Redo",
-      "localizations" : { "cs" : { "stringUnit" : { "state" : "translated", "value" : "Opakovat" } } }
+      "localizations" : {
+        "cs" : { "stringUnit" : { "state" : "translated", "value" : "Opakovat" } },
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Wiederholen" } },
+        "es" : { "stringUnit" : { "state" : "translated", "value" : "Rehacer" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Rétablir" } }
+      }
     },
     "Cut" : {
       "comment" : "Main menu: Edit > Cut",
-      "localizations" : { "cs" : { "stringUnit" : { "state" : "translated", "value" : "Vyjmout" } } }
+      "localizations" : {
+        "cs" : { "stringUnit" : { "state" : "translated", "value" : "Vyjmout" } },
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Ausschneiden" } },
+        "es" : { "stringUnit" : { "state" : "translated", "value" : "Cortar" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Couper" } }
+      }
     },
     "Copy" : {
       "comment" : "Main menu: Edit > Copy",
-      "localizations" : { "cs" : { "stringUnit" : { "state" : "translated", "value" : "Kopírovat" } } }
+      "localizations" : {
+        "cs" : { "stringUnit" : { "state" : "translated", "value" : "Kopírovat" } },
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Kopieren" } },
+        "es" : { "stringUnit" : { "state" : "translated", "value" : "Copiar" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Copier" } }
+      }
     },
     "Paste" : {
       "comment" : "Main menu: Edit > Paste",
-      "localizations" : { "cs" : { "stringUnit" : { "state" : "translated", "value" : "Vložit" } } }
+      "localizations" : {
+        "cs" : { "stringUnit" : { "state" : "translated", "value" : "Vložit" } },
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Einsetzen" } },
+        "es" : { "stringUnit" : { "state" : "translated", "value" : "Pegar" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Coller" } }
+      }
     },
     "Select All" : {
       "comment" : "Main menu: Edit > Select All",
-      "localizations" : { "cs" : { "stringUnit" : { "state" : "translated", "value" : "Vybrat vše" } } }
+      "localizations" : {
+        "cs" : { "stringUnit" : { "state" : "translated", "value" : "Vybrat vše" } },
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Alles auswählen" } },
+        "es" : { "stringUnit" : { "state" : "translated", "value" : "Seleccionar todo" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Tout sélectionner" } }
+      }
     },
     "Window" : {
       "comment" : "Main menu: Window menu",
-      "localizations" : { "cs" : { "stringUnit" : { "state" : "translated", "value" : "Okno" } } }
+      "localizations" : {
+        "cs" : { "stringUnit" : { "state" : "translated", "value" : "Okno" } },
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Fenster" } },
+        "es" : { "stringUnit" : { "state" : "translated", "value" : "Ventana" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Fenêtre" } }
+      }
     },
     "DropKeeper" : {
       "comment" : "App name, VoiceOver label of the menu bar item",

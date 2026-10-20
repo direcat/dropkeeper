@@ -11,6 +11,7 @@ Downloads that clean up after themselves. Every new download gets an expiry — 
 - **Free and open source** (MIT).
 - **Works on any display setup** — a prompt under the menu bar icon, or (optional) from the notch.
 - **Several watched folders** — Downloads by default, add Desktop or any other folder.
+- **Speaks your language** — English, Czech, German, Spanish and French, switchable in Settings.
 - Apple Silicon, macOS 15 Sequoia or later.
 
 ## How it works

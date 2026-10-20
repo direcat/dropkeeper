@@ -43,7 +43,7 @@ targets:
         CFBundleShortVersionString: "$(MARKETING_VERSION)"
         CFBundleVersion: "$(CURRENT_PROJECT_VERSION)"
         CFBundleDevelopmentRegion: en
-        CFBundleLocalizations: [en, cs]
+        CFBundleLocalizations: [en, cs, de, es, fr]
         LSUIElement: true
         LSApplicationCategoryType: public.app-category.utilities
         NSHumanReadableCopyright: "© 2026 DropKeeper contributors. MIT License."

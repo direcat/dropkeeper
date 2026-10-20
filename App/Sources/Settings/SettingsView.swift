@@ -43,6 +43,7 @@ struct SettingsView: View {
     @State private var confirmPermanent = false
     @State private var confirmClear = false
     @State private var clearedCount: Int?
+    @State private var language = AppLanguage.shared.selection
 
     init(model: AppModel) {
         self.model = model
@@ -102,9 +103,44 @@ struct SettingsView: View {
             Text("Automatically shows new downloads in the notch when the pointer is on the laptop screen.")
                 .font(.system(size: TK.TextSize.formCaption))
                 .foregroundStyle(.secondary)
+            languagePicker
             Toggle(isOn: $draft.quietMode) {
                 Text("Quiet mode")
                 Text("Don't open the prompt by itself. A dot on the menu bar icon shows waiting files.")
+            }
+        }
+    }
+
+    /// Names are endonyms, so a language is findable whatever the current one is.
+    private static let languageNames = [
+        "en": "English", "cs": "Čeština", "de": "Deutsch", "es": "Español", "fr": "Français",
+    ]
+
+    @ViewBuilder private var languagePicker: some View {
+        Picker(
+            "Language",
+            selection: Binding(
+                get: { language },
+                set: {
+                    language = $0
+                    AppLanguage.shared.select($0)
+                })
+        ) {
+            Text("System").tag(String?.none)
+            ForEach(AppLanguage.supported, id: \.self) { code in
+                Text(verbatim: Self.languageNames[code] ?? code).tag(Optional(code))
+            }
+        }
+        if AppLanguage.shared.needsRestart {
+            HStack {
+                Text("DropKeeper needs to restart to change the language.")
+                    .font(.system(size: TK.TextSize.formCaption))
+                    .foregroundStyle(.secondary)
+                Spacer()
+                Button("Restart DropKeeper") {
+                    AppDelegate.relaunchOnQuit = true
+                    NSApp.terminate(nil)
+                }
             }
         }
     }

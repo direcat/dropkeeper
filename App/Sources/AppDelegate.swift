@@ -7,6 +7,9 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         ProcessInfo.processInfo.environment["XCTestConfigurationFilePath"] != nil
     }
 
+    /// Set before terminating to open a new instance of the app once the engine has stopped (language change).
+    static var relaunchOnQuit = false
+
     let model = AppDelegate.makeModel()
     private var systemEvents: SystemEvents?
     private var panels: PanelCoordinator?
@@ -27,6 +30,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
     func applicationDidFinishLaunching(_ notification: Notification) {
         guard !Self.isRunningTests else { return }
+        _ = AppLanguage.shared
         installMainMenu()
         Task { await launch() }
     }
@@ -169,9 +173,22 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         guard !Self.isRunningTests else { return .terminateNow }
         Task {
             await model.stop()
+            // The engine is stopped first, so two instances never use the database at the same time.
+            if Self.relaunchOnQuit { await Self.relaunch() }
             NSApp.reply(toApplicationShouldTerminate: true)
         }
         return .terminateLater
+    }
+
+    private static func relaunch() async {
+        let configuration = NSWorkspace.OpenConfiguration()
+        configuration.createsNewApplicationInstance = true
+        do {
+            try await NSWorkspace.shared.openApplication(at: Bundle.main.bundleURL, configuration: configuration)
+        } catch {
+            Logger(subsystem: "net.direcat.dropkeeper", category: "app")
+                .error("Relaunch failed: \(String(describing: error), privacy: .public)")
+        }
     }
 
     private func presentFatal(_ message: String) {

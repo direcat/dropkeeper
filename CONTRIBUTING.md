@@ -7,7 +7,7 @@ Thanks for helping. A few rules keep the project what it promises to be.
 - **No networking. Ever.** No `URLSession`, `Network.framework`, web views, analytics, crash reporters or update checks. `scripts/offline-guard.sh` and `scripts/check-binary.sh` enforce it; PRs that add network access will not be merged.
 - **No new dependencies** without an issue discussing why (today the only one is GRDB).
 - Apple Silicon and macOS 15+ only.
-- Everything in the repository is in English. UI strings live in `App/Resources/Localizable.xcstrings`; add a Czech translation (or ask in the PR and we will help).
+- Everything in the repository is in English. UI strings live in `App/Resources/Localizable.xcstrings`; add translations for every supported language: Czech, German, Spanish and French (or ask in the PR and we will help).
 
 ## Workflow
 
