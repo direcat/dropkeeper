@@ -6,7 +6,7 @@ struct NoticeView: View {
     let files: [TrackedFile]
     let canUndo: Bool
     let onUndo: () -> Void
-    /// The model clears the files when the notice ends, while the panel is still fading out; keep showing the last ones.
+    /// The model clears the files when the notice ends, while the panel still fades out; keep the last ones.
     @State private var lastFiles: [TrackedFile] = []
 
     private var shown: [TrackedFile] { files.isEmpty ? lastFiles : files }
