@@ -121,11 +121,11 @@
       "localizations" : { "cs" : { "stringUnit" : { "state" : "translated", "value" : "Ponecháno" } } }
     },
     "Keep" : {
-      "comment" : "Last timeline stop: keep the file",
+      "comment" : "Last timeline stop, prompt primary button when it is selected, and VoiceOver value: keep the file",
       "localizations" : { "cs" : { "stringUnit" : { "state" : "translated", "value" : "Ponechat" } } }
     },
     "Keep it" : {
-      "comment" : "Prompt button and VoiceOver value: keep the file",
+      "comment" : "Settings: default choice that keeps the file",
       "localizations" : { "cs" : { "stringUnit" : { "state" : "translated", "value" : "Ponechat" } } }
     },
     "Delete in %@, at %@" : {
@@ -179,8 +179,16 @@
     "Open System Settings" : {
       "localizations" : { "cs" : { "stringUnit" : { "state" : "translated", "value" : "Otevřít Nastavení systému" } } }
     },
+    "Ignore" : {
+      "comment" : "Prompt secondary button: leave the file alone",
+      "localizations" : { "cs" : { "stringUnit" : { "state" : "translated", "value" : "Ignorovat" } } }
+    },
+    "Delete in %@" : {
+      "comment" : "Prompt primary button for the selected timeline stop, e.g. Delete in 1 h",
+      "localizations" : { "cs" : { "stringUnit" : { "state" : "translated", "value" : "Smazat za %@" } } }
+    },
     "Done" : {
-      "comment" : "Prompt primary button",
+      "comment" : "Onboarding primary button",
       "localizations" : { "cs" : { "stringUnit" : { "state" : "translated", "value" : "Hotovo" } } }
     },
     "Close" : {

@@ -22,6 +22,8 @@ final class PanelCoordinator {
     private var lastContent = PanelContent.hidden
     private var lockedTarget: PresentationTarget?
     private var lockedSetting: PromptPresentation?
+    /// The menu bar anchor a prompt, notice or error opened with (see `PanelDecision.anchor`).
+    private var lockedAnchor: CGRect?
 
     init(
         model: AppModel, actions: AppActions, statusAnchor: @escaping @MainActor () -> CGRect?,
@@ -43,6 +45,7 @@ final class PanelCoordinator {
             MainActor.assumeIsolated {
                 // New display layout: place an open panel again.
                 self?.lockedTarget = nil
+                self?.lockedAnchor = nil
                 self?.render()
             }
         }
@@ -71,6 +74,7 @@ final class PanelCoordinator {
             promptAvailable: model.isPromptAvailable, noticeVisible: model.notice.isVisible,
             errorVisible: model.panelError.isVisible && !isPopoverShown(), target: idleTarget,
             scheduledCount: model.scheduled.count, hovering: hovering)
+        let previousContent = lastContent
         let target = presentationTarget(
             for: content, setting: setting, idleTarget: idleTarget, screens: screens)
         lastContent = content
@@ -103,9 +107,13 @@ final class PanelCoordinator {
             panel.contentView = hostingView
             hosting = hostingView
         }
-        guard let frame = frame(for: content, target: target, fitting: hostingView.fittingSize) else {
+        guard
+            let frame = frame(
+                for: content, previous: previousContent, target: target, fitting: hostingView.fittingSize)
+        else {
             lastContent = .hidden
             lockedTarget = nil
+            lockedAnchor = nil
             hide()
             return
         }
@@ -119,6 +127,7 @@ final class PanelCoordinator {
     ) -> PresentationTarget {
         if content == .idle || content == .idleExpanded || content == .hidden {
             lockedTarget = nil
+            lockedAnchor = nil
             return idleTarget
         }
         let target = PanelDecision.target(
@@ -129,16 +138,22 @@ final class PanelCoordinator {
         return target
     }
 
-    private func frame(for content: PanelContent, target: PresentationTarget, fitting: CGSize) -> CGRect? {
+    private func frame(
+        for content: PanelContent, previous: PanelContent, target: PresentationTarget, fitting: CGSize
+    ) -> CGRect? {
         let size = CGSize(width: TK.Size.notchPanelWidth, height: max(fitting.height, 32))
         switch target {
         case .notch(let screen):
+            lockedAnchor = nil
             guard let notch = screen.notchRect else { return nil }
             if content == .idle { return NotchGeometry.idleFrame(notch: notch) }
             return NotchGeometry.panelFrame(notch: notch, screenFrame: screen.frame, size: size)
         case .menuBar:
             let screens = ScreenDescriptor.current()
-            let anchor = statusAnchor() ?? fallbackAnchor(screens)
+            let anchor = PanelDecision.anchor(
+                previous: previous, next: content, locked: lockedAnchor,
+                current: statusAnchor() ?? fallbackAnchor(screens))
+            lockedAnchor = anchor
             let screen = screens.first { $0.frame.contains(CGPoint(x: anchor.midX, y: anchor.midY)) } ?? screens.first
             guard let screen else { return nil }
             return NotchGeometry.menuBarPanelFrame(anchor: anchor, visibleFrame: screen.visibleFrame, size: size)

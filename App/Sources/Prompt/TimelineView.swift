@@ -126,7 +126,7 @@ struct TimelineView: View {
 
     private var accessibilityValue: String {
         guard case .duration(let seconds) = model.selected, let date = model.deletionDate(from: now) else {
-            return String(localized: "Keep it")
+            return String(localized: "Keep")
         }
         let time = TimeLabels.deletion(at: date, now: now)
         return String(localized: "Delete in \(DurationLabel.long(seconds)), at \(time)")

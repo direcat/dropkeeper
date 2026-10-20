@@ -77,6 +77,14 @@ enum PanelDecision {
         }
     }
 
+    /// The menu bar anchor for `next`: the one the open panel started with while `keepsTarget` holds, otherwise the
+    /// `current` one. The status item moves when other menu bar items come and go, and the open panel must not
+    /// follow it (it would slide away from under the pointer).
+    static func anchor(previous: PanelContent, next: PanelContent, locked: CGRect?, current: CGRect) -> CGRect {
+        guard keepsTarget(previous: previous, next: next), let locked else { return current }
+        return locked
+    }
+
     private static func isOpenContent(_ content: PanelContent) -> Bool {
         content == .prompt || content == .notice || content == .error
     }

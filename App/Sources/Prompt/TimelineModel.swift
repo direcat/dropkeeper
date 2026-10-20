@@ -35,3 +35,13 @@ struct TimelineModel: Equatable {
         return now.addingTimeInterval(duration)
     }
 }
+
+extension TimelineModel {
+    /// The prompt's primary button: what confirming the selected stop does.
+    var confirmLabel: String {
+        switch selected {
+        case .duration(let seconds): String(localized: "Delete in \(DurationLabel.short(seconds))")
+        case .keep: String(localized: "Keep")
+        }
+    }
+}

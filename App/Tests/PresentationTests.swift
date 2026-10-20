@@ -120,6 +120,18 @@ private func with(_ screen: ScreenDescriptor, primary: Bool? = nil, pointer: Boo
             == .menuBar)
 }
 
+@Test func openPanelKeepsItsMenuBarAnchorWhileTheStatusItemMoves() {
+    let opened = CGRect(x: 1501, y: 0, width: 24, height: 24)
+    let shifted = CGRect(x: 1543, y: 0, width: 24, height: 24)
+    // Hover re-renders the same prompt after other menu bar items moved the status item.
+    #expect(PanelDecision.anchor(previous: .prompt, next: .prompt, locked: opened, current: shifted) == opened)
+    #expect(PanelDecision.anchor(previous: .prompt, next: .notice, locked: opened, current: shifted) == opened)
+    // First render, or the panel was hidden or idle: take the current anchor.
+    #expect(PanelDecision.anchor(previous: .hidden, next: .prompt, locked: opened, current: shifted) == shifted)
+    #expect(PanelDecision.anchor(previous: .idle, next: .prompt, locked: opened, current: shifted) == shifted)
+    #expect(PanelDecision.anchor(previous: .prompt, next: .prompt, locked: nil, current: shifted) == shifted)
+}
+
 @Test func menuBarSettingAlwaysUsesMenuBar() {
     #expect(PresentationResolver.resolve(.menuBar, screens: [builtIn]) == .menuBar)
 }

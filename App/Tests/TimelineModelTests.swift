@@ -38,3 +38,12 @@ private let stops: [TimeInterval] = [1800, 3600, 86_400, 864_000]
     model.select(4)
     #expect(model.deletionDate(from: now) == nil)
 }
+
+@Test func confirmLabelFollowsTheSelectedStop() {
+    var model = TimelineModel(durations: stops, defaultChoice: .expireAfter(3600))
+    #expect(model.confirmLabel == "Delete in 1 h")
+    model.select(0)
+    #expect(model.confirmLabel == "Delete in 30 min")
+    model.select(4)
+    #expect(model.confirmLabel == "Keep")
+}
