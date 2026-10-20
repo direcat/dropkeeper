@@ -21,6 +21,7 @@ All notable changes to DropKeeper are documented here. The format follows [Keep 
 
 ### Fixed
 - The prompt no longer jumps sideways when the pointer enters it in menu bar mode (it stays under the icon it opened at, so a click on the file name lands on it).
+- Return in a new prompt confirms the selected time again; it no longer opens the file because the file name took keyboard focus.
 
 ## [0.1.0] - YYYY-MM-DD
 

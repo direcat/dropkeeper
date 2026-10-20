@@ -105,7 +105,8 @@ struct FileNameLink: View {
                 .truncationMode(.middle)
         }
         .buttonStyle(.plain)
-        .focusEffectDisabled(false)
+        // Mouse-only: keyboard focus and Return stay with the prompt's default action (VoiceOver can still open it).
+        .focusable(false)
         .pointerStyle(.link)
         .onHover { hovering = $0 }
         .accessibilityLabel(Text("Open \(name)"))
