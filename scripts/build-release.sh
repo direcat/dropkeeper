@@ -27,7 +27,7 @@ if [ -n "${CODESIGN_IDENTITY:-}" ]; then
   codesign --force --deep --keychain "${CODESIGN_KEYCHAIN:?CODESIGN_KEYCHAIN must be set with CODESIGN_IDENTITY}" \
     --sign "$CODESIGN_IDENTITY" "$APP"
   if [ -n "${CODESIGN_CERT_SHA1:-}" ]; then
-    codesign -d -r- "$APP" 2>&1 | grep -qi "certificate root = H\"$CODESIGN_CERT_SHA1\"" \
+    codesign -d -r- "$APP" 2>&1 | grep -qiE "certificate (root|leaf) = H\"$CODESIGN_CERT_SHA1\"" \
       || { echo "build-release: designated requirement does not pin certificate $CODESIGN_CERT_SHA1" >&2; exit 1; }
   fi
 else
