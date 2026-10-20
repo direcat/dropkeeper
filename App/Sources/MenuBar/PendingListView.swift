@@ -47,10 +47,11 @@ struct PendingListView: View {
                         .keyboardShortcut("q", modifiers: .command)
                 }
                 .buttonStyle(.plain)
-                .font(.system(size: TK.TextSize.body))
+                .font(.system(size: TK.TextSize.title))
                 .foregroundStyle(TK.Notch.textSecondary)
+                // Same insets and height as the file rows above.
                 .padding(.horizontal, TK.Space.m)
-                .padding(.vertical, TK.Space.s)
+                .frame(height: TK.Size.listRow)
             }
         }
         .frame(width: TK.Size.notchPanelWidth)
