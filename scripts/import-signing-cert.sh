@@ -11,6 +11,7 @@ IDENTITY="DropKeeper Release (direcat)"
 CERT_SHA1=8d2bb959bc89da9dedea88c234b88f9ea92b5d16
 KEYCHAIN="$RUNNER_TEMP/signing.keychain-db"
 P12="$RUNNER_TEMP/signing.p12"
+trap 'rm -f "$P12"' EXIT
 KEYCHAIN_PASSWORD=$(openssl rand -hex 24)
 printf '%s' "$DROPKEEPER_SIGNING_P12" | base64 --decode > "$P12"
 security create-keychain -p "$KEYCHAIN_PASSWORD" "$KEYCHAIN"
@@ -18,7 +19,6 @@ security set-keychain-settings -lut 3600 "$KEYCHAIN"
 security unlock-keychain -p "$KEYCHAIN_PASSWORD" "$KEYCHAIN"
 security import "$P12" -k "$KEYCHAIN" -P "$DROPKEEPER_SIGNING_P12_PASSWORD" -T /usr/bin/codesign
 security set-key-partition-list -S apple-tool:,apple:,codesign: -s -k "$KEYCHAIN_PASSWORD" "$KEYCHAIN" > /dev/null
-rm -f "$P12"
 # The self-signed certificate is not trusted, so check for it by hash rather than with -v.
 security find-identity -p codesigning "$KEYCHAIN" | grep -qi "$CERT_SHA1" \
   || { echo "import-signing-cert: the imported certificate is not $CERT_SHA1" >&2; exit 1; }
