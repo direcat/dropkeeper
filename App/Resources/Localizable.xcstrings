@@ -164,8 +164,8 @@
     "Every new download gets an expiry. Pick 30 minutes, a day, or keep it. When time is up, DropKeeper moves the file to the Trash." : {
       "localizations" : { "cs" : { "stringUnit" : { "state" : "translated", "value" : "Každé nové stažení dostane dobu platnosti. Vyberte 30 minut, den, nebo ho ponechte. Až čas vyprší, DropKeeper soubor přesune do Koše." } } }
     },
-    "100 % offline — no analytics, no tracking, nothing leaves your Mac." : {
-      "localizations" : { "cs" : { "stringUnit" : { "state" : "translated", "value" : "100% offline – žádná analytika, žádné sledování, nic neopustí váš Mac." } } }
+    "100 % offline, no analytics, no tracking, nothing leaves your computer." : {
+      "localizations" : { "cs" : { "stringUnit" : { "state" : "translated", "value" : "100% offline, žádná analytika, žádné sledování, nic neopustí váš počítač." } } }
     },
     "Allow access to Downloads" : {
       "localizations" : { "cs" : { "stringUnit" : { "state" : "translated", "value" : "Povolit přístup ke složce Stažené" } } }

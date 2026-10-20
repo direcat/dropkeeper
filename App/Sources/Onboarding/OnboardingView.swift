@@ -39,7 +39,7 @@ struct OnboardingView: View {
             )
             .multilineTextAlignment(.center)
             .fixedSize(horizontal: false, vertical: true)
-            Label("100 % offline — no analytics, no tracking, nothing leaves your Mac.", systemImage: "lock")
+            Label("100 % offline, no analytics, no tracking, nothing leaves your computer.", systemImage: "lock")
                 .font(.system(size: TK.TextSize.formCallout))
                 .foregroundStyle(.secondary)
             switch step {
