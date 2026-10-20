@@ -1,6 +1,8 @@
 # Local working notes (not part of the repository)
 docs/
 .remember/
+HANDOVER.md
+CLAUDE.local.md
 
 # macOS
 .DS_Store
