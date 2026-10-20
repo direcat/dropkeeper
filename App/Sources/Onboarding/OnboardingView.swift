@@ -42,6 +42,8 @@ struct OnboardingView: View {
             Label("100 % offline, no analytics, no tracking, nothing leaves your computer.", systemImage: "lock")
                 .font(.system(size: TK.TextSize.formCallout))
                 .foregroundStyle(.secondary)
+                .multilineTextAlignment(.center)
+                .fixedSize(horizontal: false, vertical: true)
             switch step {
             case .needsAccess:
                 Button("Allow access to Downloads") { Task { await allowAccess() } }

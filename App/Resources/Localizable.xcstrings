@@ -363,9 +363,9 @@
     "Downloads is watched" : {
       "localizations" : {
         "cs" : { "stringUnit" : { "state" : "translated", "value" : "Složka Stažené je sledovaná" } },
-        "de" : { "stringUnit" : { "state" : "translated", "value" : "Downloads wird überwacht" } },
-        "es" : { "stringUnit" : { "state" : "translated", "value" : "Descargas se está vigilando" } },
-        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Téléchargements est surveillé" } }
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Der Ordner „Downloads“ wird überwacht" } },
+        "es" : { "stringUnit" : { "state" : "translated", "value" : "Se vigila la carpeta Descargas" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Le dossier Téléchargements est surveillé" } }
       }
     },
     "DropKeeper has no access to Downloads. Allow it in System Settings → Privacy & Security → Files and Folders." : {
