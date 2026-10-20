@@ -30,7 +30,7 @@ struct PromptView: View {
             }
             TimelineView(model: $timeline, now: now)
             HStack {
-                Button("Ignore", action: onKeep)
+                Button("Keep", action: onKeep)
                     .buttonStyle(PromptButtonStyle(primary: false))
                     .focusEffectDisabled(false)
                 Spacer()

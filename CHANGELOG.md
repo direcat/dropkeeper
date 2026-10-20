@@ -10,7 +10,7 @@ All notable changes to DropKeeper are documented here. The format follows [Keep 
 ### Changed
 - Larger text in the prompt, notice, list, Settings and onboarding.
 - Bigger timeout slider: larger dots, a halo around the selected one and thicker track lines.
-- Clearer prompt buttons: "Ignore" instead of "Keep it", and the main button says what it does ("Delete in 1 h" or "Keep") instead of "Done".
+- Clearer prompt buttons: "Keep" instead of "Keep it", and the main button says what it does ("Delete in 1 h" or "Keep") instead of "Done".
 
 ### Fixed
 - The prompt no longer jumps sideways when the pointer enters it in menu bar mode (it stays under the icon it opened at, so a click on the file name lands on it).
