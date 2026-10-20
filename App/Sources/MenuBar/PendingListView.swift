@@ -67,7 +67,7 @@ private struct PendingRow: View {
 
     var body: some View {
         HStack(spacing: TK.Space.m) {
-            FileGlyph(kind: file.kind, size: 24)
+            FinderIcon(path: file.path, kind: file.kind, size: 28)
             FileNameLink(name: file.displayName, font: .system(size: TK.TextSize.title)) {
                 FileOpener.open(FinderReveal.target(for: file.path))
             }
