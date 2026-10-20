@@ -19,7 +19,7 @@ private func render(_ view: some View) -> CGImage? {
     let view = PromptView(
         file: file, stackCount: 3,
         timeline: .constant(TimelineModel(durations: Settings().timelineStops, defaultChoice: .keep)),
-        applyToAll: .constant(false), now: base, onDone: {}, onKeep: {}, onClose: {})
+        applyToAll: .constant(false), now: base, onDone: {}, onKeep: {}, onClose: {}, onOpen: {})
     let image = try #require(render(view))
     #expect(image.width >= 420)
 }

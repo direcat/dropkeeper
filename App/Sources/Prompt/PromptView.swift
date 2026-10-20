@@ -11,6 +11,8 @@ struct PromptView: View {
     let onDone: () -> Void
     let onKeep: () -> Void
     let onClose: () -> Void
+    let onOpen: () -> Void
+    @State private var nameHovering = false
     @FocusState private var focused: Bool
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
@@ -20,7 +22,7 @@ struct PromptView: View {
             if stackCount > 1 {
                 Toggle(isOn: $applyToAll) {
                     Text("Apply to all \(stackCount) new files")
-                        .font(.system(size: 11))
+                        .font(.system(size: TK.TextSize.small))
                         .foregroundStyle(TK.Notch.textSecondary)
                 }
                 .toggleStyle(.checkbox)
@@ -60,20 +62,16 @@ struct PromptView: View {
         HStack(spacing: TK.Space.m) {
             FileGlyph(kind: file.kind)
             VStack(alignment: .leading, spacing: 2) {
-                Text(file.displayName)
-                    .font(.system(size: 13, weight: .semibold))
-                    .foregroundStyle(TK.Notch.textPrimary)
-                    .lineLimit(1)
-                    .truncationMode(.middle)
+                fileName
                 Text(metadata)
-                    .font(.system(size: 11))
+                    .font(.system(size: TK.TextSize.small))
                     .foregroundStyle(TK.Notch.textSecondary)
             }
             Spacer(minLength: TK.Space.s)
             Button(action: onClose) {
                 Image(systemName: "xmark")
-                    .font(.system(size: 11, weight: .regular))
-                    .frame(width: 24, height: 24)
+                    .font(.system(size: TK.TextSize.small, weight: .regular))
+                    .frame(width: 28, height: 28)
             }
             .buttonStyle(.plain)
             .keyboardShortcut(.cancelAction)
@@ -81,6 +79,23 @@ struct PromptView: View {
             .foregroundStyle(TK.Notch.textSecondary)
             .accessibilityLabel(Text("Close"))
         }
+    }
+
+    /// The name opens the file in its default app; it underlines on hover like a link.
+    private var fileName: some View {
+        Button(action: onOpen) {
+            Text(file.displayName)
+                .font(.system(size: TK.TextSize.title, weight: .semibold))
+                .underline(nameHovering)
+                .foregroundStyle(nameHovering ? TK.Notch.accentText : TK.Notch.textPrimary)
+                .lineLimit(1)
+                .truncationMode(.middle)
+        }
+        .buttonStyle(.plain)
+        .focusEffectDisabled(false)
+        .pointerStyle(.link)
+        .onHover { nameHovering = $0 }
+        .accessibilityLabel(Text("Open \(file.displayName)"))
     }
 
     private var metadata: String {
@@ -95,7 +110,7 @@ struct PromptButtonStyle: ButtonStyle {
 
     func makeBody(configuration: Configuration) -> some View {
         configuration.label
-            .font(.system(size: 13, weight: .medium))
+            .font(.system(size: TK.TextSize.title, weight: .medium))
             .padding(.horizontal, TK.Space.m)
             .padding(.vertical, 6)
             .foregroundStyle(primary ? TK.Notch.onAccent : TK.Notch.textPrimary)
@@ -118,7 +133,7 @@ struct PromptButtonStyle: ButtonStyle {
         firstSeen: now, expiresAt: nil, trashPath: nil, failureCount: 0, updatedAt: now)
     PromptView(
         file: file, stackCount: 3, timeline: $timeline, applyToAll: $applyToAll, now: now,
-        onDone: {}, onKeep: {}, onClose: {}
+        onDone: {}, onKeep: {}, onClose: {}, onOpen: {}
     )
     .background(TK.Notch.surface)
 }

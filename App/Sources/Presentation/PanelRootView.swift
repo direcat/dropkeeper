@@ -42,7 +42,8 @@ struct PanelRootView: View {
                     applyToAll: $model.applyToAll, now: model.now,
                     onDone: { Task { await model.decide(for: file.id) } },
                     onKeep: { Task { await model.keepPrompted(for: file.id) } },
-                    onClose: { model.dismissPrompt() })
+                    onClose: { model.dismissPrompt() },
+                    onOpen: { FileOpener.open(FinderReveal.target(for: file.path)) })
             }
         case .notice:
             NoticeView(

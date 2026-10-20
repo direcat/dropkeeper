@@ -28,3 +28,14 @@ enum FinderReveal {
         }
     }
 }
+
+/// Opens a tracked path in its default app, with `FinderReveal`'s fallback: the folder when the file is gone.
+enum FileOpener {
+    @MainActor
+    static func open(_ target: FinderReveal.Target) {
+        switch target {
+        case .file(let path), .folder(let path): NSWorkspace.shared.open(URL(fileURLWithPath: path))
+        case .unavailable: break
+        }
+    }
+}

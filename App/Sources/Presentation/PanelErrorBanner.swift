@@ -14,7 +14,7 @@ struct PanelErrorBanner: View {
                 .fixedSize(horizontal: false, vertical: true)
             Spacer(minLength: 0)
         }
-        .font(.system(size: 12))
+        .font(.system(size: TK.TextSize.body))
         .foregroundStyle(TK.Notch.textPrimary)
         .padding(.horizontal, TK.Space.m)
         .padding(.vertical, TK.Space.s)

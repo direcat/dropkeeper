@@ -16,13 +16,13 @@ struct NoticeView: View {
             FileGlyph(kind: files.first?.kind ?? .other)
             VStack(alignment: .leading, spacing: 2) {
                 Text(Self.title(for: files))
-                    .font(.system(size: 13, weight: .semibold))
+                    .font(.system(size: TK.TextSize.title, weight: .semibold))
                     .strikethrough()
                     .foregroundStyle(TK.Notch.textSecondary)
                     .lineLimit(1)
                     .truncationMode(.middle)
                 (canUndo ? Text("Moved to Trash") : Text("Deleted"))
-                    .font(.system(size: 11))
+                    .font(.system(size: TK.TextSize.small))
                     .foregroundStyle(TK.Notch.textPrimary)
             }
             Spacer()
@@ -34,7 +34,7 @@ struct NoticeView: View {
                         .contentShape(Rectangle())
                 }
                 .buttonStyle(.plain)
-                .font(.system(size: 13, weight: .medium))
+                .font(.system(size: TK.TextSize.title, weight: .medium))
                 .foregroundStyle(TK.Notch.accentText)
                 // Keep the visible text aligned with the panel padding despite the larger hit area.
                 .padding(.trailing, -TK.Space.s)

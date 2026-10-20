@@ -24,7 +24,7 @@ struct PendingListView: View {
             }
             if rows.isEmpty {
                 Text("No files scheduled")
-                    .font(.system(size: 13))
+                    .font(.system(size: TK.TextSize.title))
                     .foregroundStyle(TK.Notch.textSecondary)
                     .frame(maxWidth: .infinity, minHeight: TK.Size.listRow)
             } else {
@@ -47,7 +47,7 @@ struct PendingListView: View {
                         .keyboardShortcut("q", modifiers: .command)
                 }
                 .buttonStyle(.plain)
-                .font(.system(size: 12))
+                .font(.system(size: TK.TextSize.body))
                 .foregroundStyle(TK.Notch.textSecondary)
                 .padding(.horizontal, TK.Space.m)
                 .padding(.vertical, TK.Space.s)
@@ -69,7 +69,7 @@ private struct PendingRow: View {
         HStack(spacing: TK.Space.m) {
             FileGlyph(kind: file.kind, size: 24)
             Text(file.displayName)
-                .font(.system(size: 13))
+                .font(.system(size: TK.TextSize.title))
                 .foregroundStyle(TK.Notch.textPrimary)
                 .lineLimit(1)
                 .truncationMode(.middle)
@@ -90,13 +90,13 @@ private struct PendingRow: View {
     private var status: some View {
         switch file.state {
         case .pending:
-            Text("Waiting").font(.system(size: 12)).foregroundStyle(TK.Notch.textSecondary)
+            Text("Waiting").font(.system(size: TK.TextSize.body)).foregroundStyle(TK.Notch.textSecondary)
         case .failed:
-            Text("Couldn't move").font(.system(size: 12)).foregroundStyle(TK.Notch.textSecondary)
+            Text("Couldn't move").font(.system(size: TK.TextSize.body)).foregroundStyle(TK.Notch.textSecondary)
         default:
             if let expiresAt = file.expiresAt {
                 Text(TimeLabels.remaining(until: expiresAt, now: model.now))
-                    .font(.system(size: 12))
+                    .font(.system(size: TK.TextSize.body))
                     .monospacedDigit()
                     .foregroundStyle(
                         expiresAt.timeIntervalSince(model.now) < 600 ? TK.Notch.accentText : TK.Notch.textSecondary)

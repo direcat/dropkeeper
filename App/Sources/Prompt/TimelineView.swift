@@ -8,14 +8,15 @@ struct TimelineView: View {
 
     private let keepGap: CGFloat = TK.Space.m
     /// Horizontal inset of the first and last dot inside the track.
-    private let trackInset: CGFloat = 20
+    private let trackInset: CGFloat = 26
     /// Vertical centers of the three rows: deletion time, dots, stop labels.
-    private let labelRowY: CGFloat = 8
-    private let dotRowY: CGFloat = 28
-    private let stopLabelRowY: CGFloat = 48
-    private let labelRowHeight: CGFloat = 16
-    private let dotHitSize: CGFloat = 28
-    private let totalHeight: CGFloat = 58
+    /// The dot row leaves room for the selected dot's halo (28 pt across) below the label row.
+    private let labelRowY: CGFloat = 10
+    private let dotRowY: CGFloat = 38
+    private let stopLabelRowY: CGFloat = 66
+    private let labelRowHeight: CGFloat = 20
+    private let dotHitSize: CGFloat = 36
+    private let totalHeight: CGFloat = 78
 
     var body: some View {
         GeometryReader { geometry in
@@ -28,7 +29,7 @@ struct TimelineView: View {
                 ForEach(model.stops.indices, id: \.self) { index in
                     dot(index).position(x: stopX[index], y: dotRowY)
                     Text(label(for: model.stops[index]))
-                        .font(.system(size: 11, weight: .medium))
+                        .font(.system(size: TK.TextSize.small, weight: .medium))
                         .monospacedDigit()
                         .foregroundStyle(index == model.selectedIndex ? TK.Notch.textPrimary : TK.Notch.textSecondary)
                         .fixedSize()
@@ -72,13 +73,13 @@ struct TimelineView: View {
             path.move(to: CGPoint(x: stopX[0], y: dotRowY))
             path.addLine(to: CGPoint(x: stopX[lastDuration], y: dotRowY))
         }
-        .stroke(TK.Notch.hairline, lineWidth: 1)
+        .stroke(TK.Notch.hairline, lineWidth: TK.Size.timelineTrackWidth)
         if case .duration = model.selected {
             Path { path in
                 path.move(to: CGPoint(x: stopX[0], y: dotRowY))
                 path.addLine(to: CGPoint(x: stopX[model.selectedIndex], y: dotRowY))
             }
-            .stroke(TK.Notch.accent, lineWidth: 1)
+            .stroke(TK.Notch.accent, lineWidth: TK.Size.timelineTrackWidth)
         }
     }
 
@@ -88,6 +89,13 @@ struct TimelineView: View {
         return Circle()
             .fill(model.isHighlighted(index) ? TK.Notch.accent : TK.Notch.hairline)
             .frame(width: size, height: size)
+            // Halo around the selected dot, so it stands out from the highlighted ones before it.
+            .overlay {
+                Circle()
+                    .strokeBorder(TK.Notch.accent, lineWidth: TK.Size.timelineHaloWidth)
+                    .padding(-(TK.Size.timelineHaloGap + TK.Size.timelineHaloWidth))
+                    .opacity(selected ? 0.4 : 0)
+            }
             .frame(width: dotHitSize, height: dotHitSize)
             .contentShape(Rectangle())
             .onTapGesture { select(index) }
@@ -97,13 +105,13 @@ struct TimelineView: View {
     private var selectedLabel: some View {
         if let date = model.deletionDate(from: now) {
             Text(TimeLabels.deletion(at: date, now: now))
-                .font(.system(size: 12, weight: .semibold))
+                .font(.system(size: TK.TextSize.title, weight: .semibold))
                 .monospacedDigit()
                 .foregroundStyle(TK.Notch.accentText)
                 .fixedSize()
         } else {
             Text("Kept")
-                .font(.system(size: 12, weight: .semibold))
+                .font(.system(size: TK.TextSize.title, weight: .semibold))
                 .foregroundStyle(TK.Notch.textSecondary)
                 .fixedSize()
         }

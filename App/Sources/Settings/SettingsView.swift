@@ -58,7 +58,9 @@ struct SettingsView: View {
             about
         }
         .formStyle(.grouped)
-        .frame(width: 520, height: 640)
+        .font(.system(size: TK.TextSize.formBody))
+        .controlSize(.large)
+        .frame(width: 600, height: 640)
         .onAppear { draft = model.settings }
         .onChange(of: model.settings) { _, new in draft = new }
         .onChange(of: draft) { _, new in
@@ -97,7 +99,7 @@ struct SettingsView: View {
                 Text("In the notch").tag(PromptPresentation.notch)
             }
             Text("Automatically shows new downloads in the notch when the pointer is on the laptop screen.")
-                .font(.caption)
+                .font(.system(size: TK.TextSize.formCaption))
                 .foregroundStyle(.secondary)
             Toggle(isOn: $draft.quietMode) {
                 Text("Quiet mode")
@@ -115,9 +117,13 @@ struct SettingsView: View {
                     VStack(alignment: .leading) {
                         Text(verbatim: (folder.path as NSString).abbreviatingWithTildeInPath)
                         if folder.status == .noAccess {
-                            Text("DropKeeper has no access to this folder.").font(.caption).foregroundStyle(.secondary)
+                            Text("DropKeeper has no access to this folder.")
+                                .font(.system(size: TK.TextSize.formCaption))
+                                .foregroundStyle(.secondary)
                         } else if folder.status == .unavailable {
-                            Text("This folder is not available.").font(.caption).foregroundStyle(.secondary)
+                            Text("This folder is not available.")
+                                .font(.system(size: TK.TextSize.formCaption))
+                                .foregroundStyle(.secondary)
                         }
                     }
                     Spacer()

@@ -59,12 +59,26 @@ enum TK {
         static let notchBottom: CGFloat = 20
         static let fileGlyph: CGFloat = 8
     }
+    /// Text sizes in points. The panel tokens are the original 11/12/13 pt plus 2; the form tokens serve the
+    /// Settings and Onboarding windows (system body is 13 pt there, captions 10 and 12).
+    enum TextSize {
+        static let small: CGFloat = 13
+        static let body: CGFloat = 14
+        static let title: CGFloat = 15
+        static let formBody: CGFloat = 15
+        static let formCallout: CGFloat = 14
+        static let formCaption: CGFloat = 12
+    }
     enum Size {
         static let notchPanelWidth: CGFloat = 420
-        static let fileGlyph: CGFloat = 36
-        static let listRow: CGFloat = 44
-        static let timelineDot: CGFloat = 8
-        static let timelineDotSelected: CGFloat = 12
+        static let fileGlyph: CGFloat = 40
+        static let listRow: CGFloat = 48
+        static let timelineDot: CGFloat = 10
+        static let timelineDotSelected: CGFloat = 18
+        /// Ring around the selected dot: the gap between dot and ring, and the ring's line width.
+        static let timelineHaloGap: CGFloat = 3
+        static let timelineHaloWidth: CGFloat = 2
+        static let timelineTrackWidth: CGFloat = 2
     }
     enum Motion {
         static let open = Animation.spring(response: 0.35, dampingFraction: 0.82)

@@ -4,6 +4,13 @@ All notable changes to DropKeeper are documented here. The format follows [Keep 
 
 ## [Unreleased]
 
+### Added
+- The file name in the new-download prompt opens the file in its default app (the folder if the file is gone).
+
+### Changed
+- Larger text in the prompt, notice, list, Settings and onboarding.
+- Bigger timeout slider: larger dots, a halo around the selected one and thicker track lines.
+
 ## [0.1.0] - YYYY-MM-DD
 
 ### Added

@@ -187,6 +187,10 @@
       "comment" : "Prompt close button (VoiceOver)",
       "localizations" : { "cs" : { "stringUnit" : { "state" : "translated", "value" : "Zavřít" } } }
     },
+    "Open %@" : {
+      "comment" : "VoiceOver label of the file name in the prompt, which opens the file, e.g. Open report.pdf",
+      "localizations" : { "cs" : { "stringUnit" : { "state" : "translated", "value" : "Otevřít %@" } } }
+    },
     "%lld files" : {
       "comment" : "Notice title when several files were deleted at once",
       "localizations" : {

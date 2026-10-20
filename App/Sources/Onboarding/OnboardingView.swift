@@ -40,7 +40,7 @@ struct OnboardingView: View {
             .multilineTextAlignment(.center)
             .fixedSize(horizontal: false, vertical: true)
             Label("100 % offline — no analytics, no tracking, nothing leaves your Mac.", systemImage: "lock")
-                .font(.callout)
+                .font(.system(size: TK.TextSize.formCallout))
                 .foregroundStyle(.secondary)
             switch step {
             case .needsAccess:
@@ -80,7 +80,9 @@ struct OnboardingView: View {
             .keyboardShortcut(.defaultAction)
         }
         .padding(TK.Space.xl)
-        .frame(width: 480)
+        .font(.system(size: TK.TextSize.formBody))
+        .controlSize(.large)
+        .frame(width: 560)
         .onAppear { launchAtLogin = model.settings.launchAtLogin }
         .alert(
             "Couldn't watch Downloads",
