@@ -482,9 +482,9 @@
       "comment" : "Settings: app version and build number, e.g. Version 0.1.0 (68)",
       "localizations" : { "cs" : { "stringUnit" : { "state" : "translated", "value" : "Verze %1$@ (%2$@)" } } }
     },
-    "Free and open source (MIT). 100 % offline — no analytics, no tracking, nothing leaves your Mac." : {
+    "Free and open source (MIT). 100 % offline, no analytics, no tracking, nothing leaves your computer." : {
       "comment" : "Settings: about text",
-      "localizations" : { "cs" : { "stringUnit" : { "state" : "translated", "value" : "Zdarma a open source (MIT). 100% offline – žádná analytika, žádné sledování, nic neopustí váš Mac." } } }
+      "localizations" : { "cs" : { "stringUnit" : { "state" : "translated", "value" : "Zdarma a open source (MIT). 100% offline, žádná analytika, žádné sledování, nic neopustí váš počítač." } } }
     },
     "Inspired by TempCat." : {
       "comment" : "Settings: credit to the app that inspired DropKeeper",

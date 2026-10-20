@@ -251,7 +251,7 @@ struct SettingsView: View {
                 Text("Version \(Self.version) (\(Self.build))")
                     .foregroundStyle(.secondary)
             }
-            Text("Free and open source (MIT). 100 % offline — no analytics, no tracking, nothing leaves your Mac.")
+            Text("Free and open source (MIT). 100 % offline, no analytics, no tracking, nothing leaves your computer.")
             Text("Inspired by TempCat.").foregroundStyle(.secondary)
             Link("github.com/direcat/dropkeeper", destination: URL(string: "https://github.com/direcat/dropkeeper")!)
         }
