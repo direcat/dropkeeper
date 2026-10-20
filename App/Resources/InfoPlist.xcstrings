@@ -1,0 +1,22 @@
+{
+  "sourceLanguage" : "en",
+  "strings" : {
+    "NSDesktopFolderUsageDescription" : {
+      "comment" : "Privacy prompt when a watched folder is on the Desktop",
+      "localizations" : { "cs" : { "stringUnit" : { "state" : "translated", "value" : "DropKeeper v této složce sleduje nové soubory, aby mohl prošlé přesunout do Koše." } } }
+    },
+    "NSDocumentsFolderUsageDescription" : {
+      "comment" : "Privacy prompt when a watched folder is in Documents",
+      "localizations" : { "cs" : { "stringUnit" : { "state" : "translated", "value" : "DropKeeper v této složce sleduje nové soubory, aby mohl prošlé přesunout do Koše." } } }
+    },
+    "NSDownloadsFolderUsageDescription" : {
+      "comment" : "Privacy prompt for the Downloads folder",
+      "localizations" : { "cs" : { "stringUnit" : { "state" : "translated", "value" : "DropKeeper v této složce sleduje nová stažení, aby mohl prošlá přesunout do Koše." } } }
+    },
+    "NSHumanReadableCopyright" : {
+      "comment" : "Copyright line in the app's Info.plist",
+      "localizations" : { "cs" : { "stringUnit" : { "state" : "translated", "value" : "© 2026 přispěvatelé DropKeeperu. Licence MIT." } } }
+    }
+  },
+  "version" : "1.0"
+}

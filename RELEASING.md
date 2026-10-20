@@ -10,7 +10,7 @@
 ## Every release
 
 1. Go through [QA-CHECKLIST.md](QA-CHECKLIST.md) on real hardware.
-2. In `CHANGELOG.md`, move the `Unreleased` entries into a new `## [x.y.z] - YYYY-MM-DD` section (the 0.1.0 section already exists with the placeholder). Replace the `YYYY-MM-DD` placeholder with today's date.
+2. In `CHANGELOG.md`, move the `Unreleased` entries into a new `## [x.y.z] - YYYY-MM-DD` section (the first release section already exists with the placeholder). Replace the `YYYY-MM-DD` placeholder with today's date.
 3. Set `MARKETING_VERSION` in `project.yml` to `x.y.z` and commit: `chore: release x.y.z`.
 4. Tag and push: `git tag vx.y.z && git push origin master vx.y.z`.
    - The first CI run after pushing is the real compile check against the CI Xcode (Xcode 26.6 on `macos-26`); local development uses a newer Xcode.

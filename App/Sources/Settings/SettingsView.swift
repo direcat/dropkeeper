@@ -257,15 +257,13 @@ struct SettingsView: View {
     }
 
     private static let version = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "–"
-    /// The build number tells local builds of the same version apart.
-    private static let build = Bundle.main.infoDictionary?["CFBundleVersion"] as? String ?? "–"
 
     private var about: some View {
         Section("About") {
             HStack(alignment: .center, spacing: TK.Space.l) {
                 Image("Lockup").resizable().scaledToFit().frame(height: 28)
                 Spacer()
-                Text("Version \(Self.version) (\(Self.build))")
+                Text("Version \(Self.version)")
                     .foregroundStyle(.secondary)
             }
             Text("Free and open source (MIT). 100 % offline, no analytics, no tracking, nothing leaves your computer.")

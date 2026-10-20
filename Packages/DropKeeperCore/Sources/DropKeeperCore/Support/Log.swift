@@ -1,7 +1,7 @@
 import os
 
 public enum DropKeeperCoreInfo {
-    public static let version = "0.1.0"
+    public static let version = "1.0.0"
 }
 
 enum Log {

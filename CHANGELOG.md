@@ -4,34 +4,17 @@ All notable changes to DropKeeper are documented here. The format follows [Keep 
 
 ## [Unreleased]
 
-### Added
-- The file name in the new-download prompt and in the list opens the file in its default app (the folder if the file is gone); the list menu also has Open, and Show prompt for a waiting file.
-- The prompt, the list and the "Moved to Trash" notice show the same file icon as Finder, including Quick Look thumbnails for images and documents.
-
-### Changed
-- Larger text in the prompt, notice, list, Settings and onboarding.
-- The list footer (Settings, Quit DropKeeper) uses the same text size and row height as the file rows; "Settings" has no ellipsis there.
-- Bigger timeout slider: larger dots, a halo around the selected one and thicker track lines.
-- Clearer prompt buttons: "Keep" instead of "Keep it", and the main button says what it does ("Delete in 1 h" or "Keep") instead of "Done".
-- Settings: "Default action" (was "If you don't choose") now comes before "Apply default action after" (was "Apply default after").
-- Settings: "Watch folders" (was "Folders"); "Behavior" is split into "Timeline" (times numbered #1, #2… instead of Stop 1, Stop 2…) and "Expiry".
-- Settings: remove buttons use a trash icon with a tooltip instead of a minus.
-- Settings shows the build number next to the version, e.g. "Version 0.1.0 (68)".
-- Settings and onboarding say "nothing leaves your computer".
-
-### Fixed
-- The prompt no longer jumps sideways when the pointer enters it in menu bar mode (it stays under the icon it opened at, so a click on the file name lands on it).
-- Return in a new prompt confirms the selected time again; it no longer opens the file because the file name took keyboard focus.
-
-## [0.1.0] - YYYY-MM-DD
+## [1.0.0] - YYYY-MM-DD
 
 ### Added
-- Expiry for every new download in watched folders: 30 min, 1 h, 1 day, 10 days or keep (stops configurable).
-- Prompt under the menu bar icon, optionally from the notch (Automatic follows the pointer).
-- Menu bar icon with scheduled count, last-10-seconds countdown and a list with Keep, Change time, Show in Finder, Retry.
+- Expiry for every new download in watched folders: 30 min, 1 h, 1 day, 10 days or keep (times configurable).
+- Prompt under the menu bar icon, optionally from the notch (Automatic follows the pointer), with a timeline to pick the time and buttons that say what they do ("Delete in 1 h", "Keep").
+- Menu bar icon with scheduled count, last-10-seconds countdown and a list with Open, Keep, Change time, Show in Finder, Retry and, for a waiting file, Show prompt.
+- Click a file name in the prompt or the list to open the file in its default app.
+- Finder file icons and Quick Look thumbnails in the prompt, the list and the notice.
 - "Moved to Trash" notice with Undo; optional permanent delete with confirmation.
 - Tracks renames and moves inside watched folders; files moved out are kept; files present before install are never touched.
 - Survives sleep, relaunch and a lost database (expiry stored on the file).
-- Optional "Temporary" Finder tag, ignored extensions, quiet mode, grace period with a default choice, history retention.
-- Several watched folders, launch at login, English and Czech.
+- Optional "Temporary" Finder tag, ignored extensions, quiet mode, a default action applied after a grace period, history retention.
+- Several watched folders, launch at login, English and Czech (including the system privacy prompts).
 - 100 % offline: no networking code, enforced in CI.

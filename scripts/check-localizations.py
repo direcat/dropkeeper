@@ -1,10 +1,11 @@
 #!/usr/bin/env python3
-"""Fail if any string in the app's String Catalog lacks a translated Czech value."""
+"""Fail if any string in the app's String Catalogs lacks a translated Czech value."""
 import json
 import pathlib
 import sys
 
-CATALOG = pathlib.Path(__file__).resolve().parent.parent / "App/Resources/Localizable.xcstrings"
+RESOURCES = pathlib.Path(__file__).resolve().parent.parent / "App/Resources"
+CATALOGS = [RESOURCES / "Localizable.xcstrings", RESOURCES / "InfoPlist.xcstrings"]
 
 
 def czech_units(entry):
@@ -18,7 +19,9 @@ def czech_units(entry):
 
 
 def main():
-    strings = json.loads(CATALOG.read_text(encoding="utf-8")).get("strings", {})
+    strings = {}
+    for catalog in CATALOGS:
+        strings.update(json.loads(catalog.read_text(encoding="utf-8")).get("strings", {}))
     missing = []
     for key, entry in sorted(strings.items()):
         if entry.get("shouldTranslate") is False or entry.get("extractionState") == "stale":
