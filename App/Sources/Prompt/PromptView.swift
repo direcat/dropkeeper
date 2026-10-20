@@ -12,7 +12,6 @@ struct PromptView: View {
     let onKeep: () -> Void
     let onClose: () -> Void
     let onOpen: () -> Void
-    @State private var nameHovering = false
     @FocusState private var focused: Bool
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
@@ -62,7 +61,8 @@ struct PromptView: View {
         HStack(spacing: TK.Space.m) {
             FileGlyph(kind: file.kind)
             VStack(alignment: .leading, spacing: 2) {
-                fileName
+                FileNameLink(
+                    name: file.displayName, font: .system(size: TK.TextSize.title, weight: .semibold), action: onOpen)
                 Text(metadata)
                     .font(.system(size: TK.TextSize.small))
                     .foregroundStyle(TK.Notch.textSecondary)
@@ -81,27 +81,34 @@ struct PromptView: View {
         }
     }
 
-    /// The name opens the file in its default app; it underlines on hover like a link.
-    private var fileName: some View {
-        Button(action: onOpen) {
-            Text(file.displayName)
-                .font(.system(size: TK.TextSize.title, weight: .semibold))
-                .underline(nameHovering)
-                .foregroundStyle(nameHovering ? TK.Notch.accentText : TK.Notch.textPrimary)
+    private var metadata: String {
+        let size = file.sizeBytes.map { ByteCountFormatter.string(fromByteCount: $0, countStyle: .file) }
+        let stack = stackCount > 1 ? String(localized: "\(stackCount) new files") : nil
+        return [size, stack].compactMap(\.self).joined(separator: " · ")
+    }
+}
+
+/// A file name that opens the file in its default app; it underlines on hover like a link.
+struct FileNameLink: View {
+    let name: String
+    let font: Font
+    let action: () -> Void
+    @State private var hovering = false
+
+    var body: some View {
+        Button(action: action) {
+            Text(name)
+                .font(font)
+                .underline(hovering)
+                .foregroundStyle(hovering ? TK.Notch.accentText : TK.Notch.textPrimary)
                 .lineLimit(1)
                 .truncationMode(.middle)
         }
         .buttonStyle(.plain)
         .focusEffectDisabled(false)
         .pointerStyle(.link)
-        .onHover { nameHovering = $0 }
-        .accessibilityLabel(Text("Open \(file.displayName)"))
-    }
-
-    private var metadata: String {
-        let size = file.sizeBytes.map { ByteCountFormatter.string(fromByteCount: $0, countStyle: .file) }
-        let stack = stackCount > 1 ? String(localized: "\(stackCount) new files") : nil
-        return [size, stack].compactMap(\.self).joined(separator: " · ")
+        .onHover { hovering = $0 }
+        .accessibilityLabel(Text("Open \(name)"))
     }
 }
 

@@ -68,11 +68,9 @@ private struct PendingRow: View {
     var body: some View {
         HStack(spacing: TK.Space.m) {
             FileGlyph(kind: file.kind, size: 24)
-            Text(file.displayName)
-                .font(.system(size: TK.TextSize.title))
-                .foregroundStyle(TK.Notch.textPrimary)
-                .lineLimit(1)
-                .truncationMode(.middle)
+            FileNameLink(name: file.displayName, font: .system(size: TK.TextSize.title)) {
+                FileOpener.open(FinderReveal.target(for: file.path))
+            }
             Spacer(minLength: TK.Space.s)
             status
             menu
@@ -121,6 +119,7 @@ private struct PendingRow: View {
         if file.state == .failed {
             Button("Retry") { Task { await model.retry([file.id]) } }
         }
+        Button("Open") { FileOpener.open(FinderReveal.target(for: file.path)) }
         Button("Keep") { Task { await model.keep([file.id]) } }
         Menu("Change time") {
             ForEach(model.settings.timelineStops, id: \.self) { seconds in

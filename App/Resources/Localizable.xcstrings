@@ -192,8 +192,12 @@
       "localizations" : { "cs" : { "stringUnit" : { "state" : "translated", "value" : "Zavřít" } } }
     },
     "Open %@" : {
-      "comment" : "VoiceOver label of the file name in the prompt, which opens the file, e.g. Open report.pdf",
+      "comment" : "VoiceOver label of a file name (prompt, list) that opens the file, e.g. Open report.pdf",
       "localizations" : { "cs" : { "stringUnit" : { "state" : "translated", "value" : "Otevřít %@" } } }
+    },
+    "Open" : {
+      "comment" : "List row action: open the file in its default app",
+      "localizations" : { "cs" : { "stringUnit" : { "state" : "translated", "value" : "Otevřít" } } }
     },
     "%lld files" : {
       "comment" : "Notice title when several files were deleted at once",
