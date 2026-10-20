@@ -6,7 +6,7 @@ All notable changes to DropKeeper are documented here. The format follows [Keep 
 
 ### Added
 - The file name in the new-download prompt and in the list opens the file in its default app (the folder if the file is gone); the list menu also has Open, and Show prompt for a waiting file.
-- The prompt, the list and the "Moved to Trash" notice show the same file icon as Finder.
+- The prompt, the list and the "Moved to Trash" notice show the same file icon as Finder, including Quick Look thumbnails for images and documents.
 
 ### Changed
 - Larger text in the prompt, notice, list, Settings and onboarding.
