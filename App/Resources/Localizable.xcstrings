@@ -357,13 +357,13 @@
       "comment" : "Settings button that adds a timeline stop",
       "localizations" : { "cs" : { "stringUnit" : { "state" : "translated", "value" : "Přidat bod" } } }
     },
-    "Apply default after" : {
-      "comment" : "Settings picker: grace period before the default choice applies",
-      "localizations" : { "cs" : { "stringUnit" : { "state" : "translated", "value" : "Výchozí volba po" } } }
+    "Apply default action after" : {
+      "comment" : "Settings picker: grace period before the default action applies",
+      "localizations" : { "cs" : { "stringUnit" : { "state" : "translated", "value" : "Použít výchozí akci po" } } }
     },
-    "If you don't choose" : {
+    "Default action" : {
       "comment" : "Settings picker: what happens when the user makes no choice",
-      "localizations" : { "cs" : { "stringUnit" : { "state" : "translated", "value" : "Když nevyberete" } } }
+      "localizations" : { "cs" : { "stringUnit" : { "state" : "translated", "value" : "Výchozí akce" } } }
     },
     "Delete after %@" : {
       "comment" : "Settings option: default choice, e.g. Delete after 1 hour",

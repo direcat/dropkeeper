@@ -167,11 +167,8 @@ struct SettingsView: View {
                 if let stop = StopPresets.stopToAdd(to: draft.timelineStops) { draft.timelineStops.append(stop) }
             }
             .disabled(draft.timelineStops.count >= 5 || StopPresets.stopToAdd(to: draft.timelineStops) == nil)
-            Picker("Apply default after", selection: $draft.gracePeriod) {
-                ForEach(Settings.gracePeriodOptions, id: \.self) { Text(DurationLabel.long($0)).tag($0) }
-            }
             Picker(
-                "If you don't choose",
+                "Default action",
                 selection: Binding(
                     get: { DefaultChoiceTag.tag(for: draft.defaultChoice, stops: draft.timelineStops) },
                     set: { draft.defaultChoice = DefaultChoiceTag.choice(for: $0, stops: draft.timelineStops) })
@@ -180,6 +177,9 @@ struct SettingsView: View {
                 ForEach(draft.timelineStops.indices, id: \.self) { index in
                     Text("Delete after \(DurationLabel.long(draft.timelineStops[index]))").tag(index)
                 }
+            }
+            Picker("Apply default action after", selection: $draft.gracePeriod) {
+                ForEach(Settings.gracePeriodOptions, id: \.self) { Text(DurationLabel.long($0)).tag($0) }
             }
             Picker(
                 "Expired files",
