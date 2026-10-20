@@ -20,7 +20,19 @@ xcodebuild build -project DropKeeper.xcodeproj -scheme DropKeeper -configuration
   MARKETING_VERSION="$VERSION" CURRENT_PROJECT_VERSION="$BUILD" -quiet
 
 APP="$DERIVED/Build/Products/Release/DropKeeper.app"
-codesign --force --deep --sign - "$APP"
+# Release CI signs with the project's self-signed certificate (scripts/import-signing-cert.sh), so the designated
+# requirement stays the same across versions and macOS keeps the folder permissions after an update.
+# Local builds without it are signed ad hoc.
+if [ -n "${CODESIGN_IDENTITY:-}" ]; then
+  codesign --force --deep --keychain "${CODESIGN_KEYCHAIN:?CODESIGN_KEYCHAIN must be set with CODESIGN_IDENTITY}" \
+    --sign "$CODESIGN_IDENTITY" "$APP"
+  if [ -n "${CODESIGN_CERT_SHA1:-}" ]; then
+    codesign -d -r- "$APP" 2>&1 | grep -qi "certificate root = H\"$CODESIGN_CERT_SHA1\"" \
+      || { echo "build-release: designated requirement does not pin certificate $CODESIGN_CERT_SHA1" >&2; exit 1; }
+  fi
+else
+  codesign --force --deep --sign - "$APP"
+fi
 codesign --verify --strict --verbose=1 "$APP"
 
 ARCHS=$(lipo -archs "$APP/Contents/MacOS/DropKeeper")

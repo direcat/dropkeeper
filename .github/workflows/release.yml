@@ -31,6 +31,11 @@ jobs:
           swift test --package-path Packages/DropKeeperCore
           xcodegen generate
           xcodebuild test -project DropKeeper.xcodeproj -scheme DropKeeper -destination 'platform=macOS,arch=arm64' -quiet
+      - name: Import signing certificate
+        env:
+          DROPKEEPER_SIGNING_P12: ${{ secrets.DROPKEEPER_SIGNING_P12 }}
+          DROPKEEPER_SIGNING_P12_PASSWORD: ${{ secrets.DROPKEEPER_SIGNING_P12_PASSWORD }}
+        run: scripts/import-signing-cert.sh
       - name: Build
         run: scripts/build-release.sh "$VERSION" "$GITHUB_RUN_NUMBER"
       - name: Binary offline check
@@ -49,3 +54,6 @@ jobs:
           HOMEBREW_TAP_DEPLOY_KEY: ${{ secrets.HOMEBREW_TAP_DEPLOY_KEY }}
         run: |
           scripts/update-tap.sh "$VERSION" "$(cat "build/release/DropKeeper-${VERSION}.zip.sha256")"
+      - name: Remove signing keychain
+        if: always()
+        run: security delete-keychain "$RUNNER_TEMP/signing.keychain-db" 2>/dev/null || true

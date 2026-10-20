@@ -6,7 +6,12 @@
 2. Create a deploy key for the tap (it never expires and can only write to the tap):
    `ssh-keygen -t ed25519 -N "" -f tap_deploy`, then `gh repo deploy-key add tap_deploy.pub -R direcat/homebrew-tap --allow-write --title "dropkeeper release"`.
 3. Store the private key as the Actions secret `HOMEBREW_TAP_DEPLOY_KEY`: `gh secret set HOMEBREW_TAP_DEPLOY_KEY -R direcat/dropkeeper < tap_deploy`. Keep a copy in your password manager, then delete both local files.
-4. In `direcat/dropkeeper` → Settings → General → Social preview, upload `assets/social/dropkeeper-social-preview.png`.
+4. Signing certificate (free, self-signed). Releases are signed with it so the designated requirement (`identifier "net.direcat.dropkeeper" and certificate root = H"…"`) stays the same across versions and macOS keeps the Downloads permission after an update. It does not replace notarization.
+   - Create it once: `openssl req -x509 -newkey rsa:3072 -sha256 -days 7300 -nodes -keyout key.pem -out cert.pem -subj "/CN=DropKeeper Release (direcat)/O=direcat" -addext "keyUsage=critical,digitalSignature" -addext "extendedKeyUsage=critical,codeSigning" -addext "basicConstraints=critical,CA:false"`, then `openssl pkcs12 -export -legacy -inkey key.pem -in cert.pem -name "DropKeeper Release (direcat)" -out dropkeeper-release.p12`.
+   - Secrets: `base64 -i dropkeeper-release.p12 | gh secret set DROPKEEPER_SIGNING_P12 -R direcat/dropkeeper` and `gh secret set DROPKEEPER_SIGNING_P12_PASSWORD -R direcat/dropkeeper`.
+   - Put its SHA-1 (`openssl x509 -in cert.pem -noout -fingerprint -sha1`, lower case without colons) into `CERT_SHA1` in `scripts/import-signing-cert.sh`.
+   - Keep the `.p12` and its password in a password manager and delete the local files. A new certificate means every user is asked for folder access once more, so don't replace it lightly.
+5. In `direcat/dropkeeper` → Settings → General → Social preview, upload `assets/social/dropkeeper-social-preview.png`.
 
 ## Every release
 
