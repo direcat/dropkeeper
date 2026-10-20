@@ -28,12 +28,14 @@ enum PanelFailure {
     case update
     case undo
     case retry
+    case delete
 
     var message: String {
         switch self {
         case .update: String(localized: "Couldn't update the file. Please try again.")
         case .undo: String(localized: "Couldn't put the file back from the Trash.")
         case .retry: String(localized: "Couldn't move the file to the Trash. Please try again later.")
+        case .delete: String(localized: "Couldn't delete the file. Please try again.")
         }
     }
 }

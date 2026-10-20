@@ -883,7 +883,7 @@
       }
     },
     "Move to Trash" : {
-      "comment" : "Settings option: expired files go to the Trash",
+      "comment" : "Settings option: expired files go to the Trash; also the Delete action of the pending list",
       "localizations" : {
         "cs" : { "stringUnit" : { "state" : "translated", "value" : "Přesunout do Koše" } },
         "de" : { "stringUnit" : { "state" : "translated", "value" : "In den Papierkorb legen" } },
@@ -907,6 +907,42 @@
         "de" : { "stringUnit" : { "state" : "translated", "value" : "Geplante Dateien mit dem Finder-Tag „Temporary“ markieren" } },
         "es" : { "stringUnit" : { "state" : "translated", "value" : "Marcar los archivos programados con la etiqueta «Temporary» del Finder" } },
         "fr" : { "stringUnit" : { "state" : "translated", "value" : "Marquer les fichiers planifiés avec le marqueur Finder « Temporary »" } }
+      }
+    },
+    "Delete Permanently…" : {
+      "comment" : "Pending list action: delete the file right away without the Trash (asks first)",
+      "localizations" : {
+        "cs" : { "stringUnit" : { "state" : "translated", "value" : "Trvale smazat…" } },
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Endgültig löschen …" } },
+        "es" : { "stringUnit" : { "state" : "translated", "value" : "Eliminar permanentemente…" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Supprimer définitivement…" } }
+      }
+    },
+    "Delete %@ permanently?" : {
+      "comment" : "Confirmation title before deleting one file permanently from the list; %@ is the file name",
+      "localizations" : {
+        "cs" : { "stringUnit" : { "state" : "translated", "value" : "Smazat „%@“ trvale?" } },
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "„%@“ endgültig löschen?" } },
+        "es" : { "stringUnit" : { "state" : "translated", "value" : "¿Eliminar «%@» permanentemente?" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Supprimer « %@ » définitivement ?" } }
+      }
+    },
+    "This can't be undone." : {
+      "comment" : "Confirmation message before deleting one file permanently",
+      "localizations" : {
+        "cs" : { "stringUnit" : { "state" : "translated", "value" : "Nejde to vrátit." } },
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Das kann nicht rückgängig gemacht werden." } },
+        "es" : { "stringUnit" : { "state" : "translated", "value" : "No se puede deshacer." } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Cette action est irréversible." } }
+      }
+    },
+    "Couldn't delete the file. Please try again." : {
+      "comment" : "Panel error after a failed Delete from the pending list",
+      "localizations" : {
+        "cs" : { "stringUnit" : { "state" : "translated", "value" : "Soubor se nepodařilo smazat. Zkuste to prosím znovu." } },
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Die Datei konnte nicht gelöscht werden. Bitte erneut versuchen." } },
+        "es" : { "stringUnit" : { "state" : "translated", "value" : "No se pudo eliminar el archivo. Inténtalo de nuevo." } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Impossible de supprimer le fichier. Veuillez réessayer." } }
       }
     },
     "Delete files permanently?" : {

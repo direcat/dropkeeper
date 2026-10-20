@@ -65,6 +65,112 @@ import Testing
         #expect(try harness.store.file(id: id)?.state == .trashed)
     }
 
+    @Test func deleteNowTrashesPendingFileAndNotifies() async throws {
+        let harness = try EngineHarness()
+        try await harness.startWithDownloads()
+        let path = await harness.drop("a.pdf")
+        let id = try harness.files()[0].id
+        try await harness.engine.deleteNow(ids: [id])
+        #expect(!harness.fs.exists(path))
+        #expect(harness.fs.trashedPaths == [path])
+        let file = try #require(try harness.store.file(id: id))
+        #expect(file.state == .trashed)
+        #expect(file.trashPath != nil)
+        let note = await harness.nextNotification {
+            if case .trashed = $0 { true } else { false }
+        }
+        guard case .trashed(let files) = note else {
+            Issue.record("expected trashed")
+            return
+        }
+        #expect(files.map(\.id) == [id])
+        try await harness.engine.undoTrash(ids: [id])
+        #expect(harness.fs.exists(path))
+    }
+
+    @Test func deleteNowTrashesScheduledAndFailedFiles() async throws {
+        let harness = try EngineHarness()
+        try await harness.startWithDownloads()
+        let scheduledPath = await harness.drop("a.pdf")
+        let failedPath = await harness.drop("b.pdf")
+        let ids = try harness.files().map(\.id)
+        try await harness.engine.schedule(ids: [ids[0]], duration: 3600)
+        var failed = try #require(try harness.store.file(id: ids[1]))
+        failed.state = .failed
+        failed.expiresAt = nil
+        try harness.store.update(failed)
+        try await harness.engine.deleteNow(ids: ids)
+        #expect(!harness.fs.exists(scheduledPath))
+        #expect(!harness.fs.exists(failedPath))
+        #expect(try harness.files([.trashed]).count == 2)
+    }
+
+    @Test func deleteNowRemovesPermanentlyInPermanentMode() async throws {
+        let harness = try EngineHarness()
+        try await harness.startWithDownloads()
+        var settings = await harness.engine.currentSettings
+        settings.deleteMode = .permanent
+        try await harness.engine.updateSettings(settings)
+        let path = await harness.drop("a.pdf")
+        let id = try harness.files()[0].id
+        try await harness.engine.deleteNow(ids: [id])
+        #expect(!harness.fs.exists(path))
+        #expect(harness.fs.removedPaths == [path])
+        #expect(harness.fs.trashedPaths.isEmpty)
+        let file = try #require(try harness.store.file(id: id))
+        #expect(file.state == .trashed)
+        #expect(file.trashPath == nil)
+        let note = await harness.nextNotification {
+            if case .trashed = $0 { true } else { false }
+        }
+        guard case .trashed(let files) = note else {
+            Issue.record("expected trashed")
+            return
+        }
+        #expect(files.map(\.id) == [id])
+    }
+
+    @Test func deleteNowOnMissingFileMarksItGoneWithoutNotice() async throws {
+        let harness = try EngineHarness()
+        try await harness.startWithDownloads()
+        let path = await harness.drop("a.pdf")
+        let id = try harness.files()[0].id
+        harness.fs.delete(path)
+        try await harness.engine.deleteNow(ids: [id])
+        #expect(try harness.store.file(id: id)?.state == .gone)
+        #expect(harness.fs.trashedPaths.isEmpty)
+        let note = await harness.nextNotification(timeout: .milliseconds(200)) {
+            if case .trashed = $0 { true } else { false }
+        }
+        #expect(note == nil)
+    }
+
+    @Test func deleteNowReportsFailureAndLeavesRecordUntouched() async throws {
+        let harness = try EngineHarness()
+        try await harness.startWithDownloads()
+        let path = await harness.drop("a.pdf")
+        let id = try harness.files()[0].id
+        harness.fs.failingTrashCount = 1
+        await #expect(throws: EngineError.partialFailure(failedIds: [id])) {
+            try await harness.engine.deleteNow(ids: [id])
+        }
+        #expect(harness.fs.exists(path))
+        let file = try #require(try harness.store.file(id: id))
+        #expect(file.state == .pending)
+        #expect(file.failureCount == 0)
+    }
+
+    @Test func deleteNowIgnoresKeptFiles() async throws {
+        let harness = try EngineHarness()
+        try await harness.startWithDownloads()
+        let path = await harness.drop("a.pdf")
+        let id = try harness.files()[0].id
+        try await harness.engine.keep(ids: [id])
+        try await harness.engine.deleteNow(ids: [id])
+        #expect(harness.fs.exists(path))
+        #expect(try harness.store.file(id: id)?.state == .kept)
+    }
+
     @Test func removingFolderKeepsItsActiveFiles() async throws {
         let harness = try EngineHarness()
         let folder = try await harness.startWithDownloads()

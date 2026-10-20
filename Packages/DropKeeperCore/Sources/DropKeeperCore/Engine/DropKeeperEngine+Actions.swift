@@ -1,5 +1,10 @@
 import Foundation
 
+/// One `deleteNow` disposal attempt did not succeed; `forEach` reports the id.
+private enum DeleteNowError: Error {
+    case notDisposed
+}
+
 extension DropKeeperEngine {
     // MARK: User actions
 
@@ -58,6 +63,32 @@ extension DropKeeperEngine {
             file.failureCount = 0
             file.updatedAt = now
             try store.update(file)
+        }
+    }
+
+    /// Disposes of active and failed items right away, honouring the delete mode, like an expiry would:
+    /// the same notice (with Undo) is emitted. A missing file is recorded as `gone`. A disposal that fails is
+    /// not retried and leaves the record untouched. Every id is processed; failures are reported together
+    /// afterwards.
+    public func deleteNow(ids: [FileID]) throws {
+        let now = env.time.now()
+        var trashed: [TrackedFile] = []
+        defer {
+            if !trashed.isEmpty { notify.yield(.trashed(trashed)) }
+            rescheduleTimer()
+        }
+        try forEach(ids) { id in
+            guard var file = try store.file(id: id), file.state.isActive || file.state == .failed else { return }
+            let outcome = reconciler.reconcile(&file, folders: folders, now: now)
+            if outcome == .kept || outcome == .gone {
+                persist(file, outcome: outcome)
+                return
+            }
+            guard trasher.dispose(&file, mode: settings.deleteMode, now: now) == .disposed else {
+                throw DeleteNowError.notDisposed
+            }
+            try store.update(file)
+            trashed.append(file)
         }
     }
 

@@ -284,6 +284,9 @@ final class AppModel {
 
     func retry(_ ids: [FileID]) async { await perform(.retry) { try await $0.retry(ids: ids) } }
 
+    /// Disposes of the files now, like an expiry (Trash or permanent, per Settings); the notice offers Undo.
+    func deleteNow(_ ids: [FileID]) async { await perform(.delete) { try await $0.deleteNow(ids: ids) } }
+
     // MARK: Folders & settings
 
     @discardableResult

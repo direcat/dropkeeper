@@ -134,5 +134,34 @@ private struct PendingRow: View {
         }
         Button("Show in Finder") { FinderReveal.reveal(reveal) }
             .disabled(reveal == .unavailable)
+        Divider()
+        Button(role: .destructive) {
+            Task { await deleteNow() }
+        } label: {
+            Text(model.settings.deleteMode == .trash ? "Move to Trash" : "Delete Permanently…")
+        }
+        .disabled(reveal == .unavailable)
+    }
+
+    /// Permanent deletion asks first; the Trash can be undone from the notice.
+    private func deleteNow() async {
+        if model.settings.deleteMode == .permanent, !DeleteConfirmation.confirm(name: file.displayName) { return }
+        await model.deleteNow([file.id])
+    }
+}
+
+/// Confirmation before a file is deleted permanently from the list.
+private enum DeleteConfirmation {
+    @MainActor
+    static func confirm(name: String) -> Bool {
+        let alert = NSAlert()
+        alert.messageText = String(localized: "Delete \(name) permanently?")
+        alert.informativeText = String(localized: "This can't be undone.")
+        alert.alertStyle = .warning
+        let delete = alert.addButton(withTitle: String(localized: "Delete permanently"))
+        delete.hasDestructiveAction = true
+        alert.addButton(withTitle: String(localized: "Cancel"))
+        NSApp.activate()
+        return alert.runModal() == .alertFirstButtonReturn
     }
 }

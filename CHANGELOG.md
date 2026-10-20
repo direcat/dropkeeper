@@ -4,6 +4,9 @@ All notable changes to DropKeeper are documented here. The format follows [Keep 
 
 ## [Unreleased]
 
+### Added
+- A "Move to Trash" action in the file list (a "Delete Permanently…" one, with confirmation, in permanent-delete mode) that removes a file right away, following the Expired files setting; the Trash version shows the usual notice with Undo.
+
 ## [1.0.1] - 2026-10-20
 
 ### Fixed
