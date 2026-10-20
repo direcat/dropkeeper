@@ -478,9 +478,9 @@
       "comment" : "Settings section title",
       "localizations" : { "cs" : { "stringUnit" : { "state" : "translated", "value" : "O aplikaci" } } }
     },
-    "Version %@" : {
-      "comment" : "Settings: app version, e.g. Version 0.1.0",
-      "localizations" : { "cs" : { "stringUnit" : { "state" : "translated", "value" : "Verze %@" } } }
+    "Version %@ (%@)" : {
+      "comment" : "Settings: app version and build number, e.g. Version 0.1.0 (68)",
+      "localizations" : { "cs" : { "stringUnit" : { "state" : "translated", "value" : "Verze %1$@ (%2$@)" } } }
     },
     "Free and open source (MIT). 100 % offline — no analytics, no tracking, nothing leaves your Mac." : {
       "comment" : "Settings: about text",
