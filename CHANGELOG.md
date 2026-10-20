@@ -14,6 +14,7 @@ All notable changes to DropKeeper are documented here. The format follows [Keep 
 - Clearer prompt buttons: "Keep" instead of "Keep it", and the main button says what it does ("Delete in 1 h" or "Keep") instead of "Done".
 - Settings: "Default action" (was "If you don't choose") now comes before "Apply default action after" (was "Apply default after").
 - Settings: "Watch folders" (was "Folders"); "Behavior" is split into "Timeline" (times numbered #1, #2… instead of Stop 1, Stop 2…) and "Expiry".
+- Settings: remove buttons use a trash icon with a tooltip instead of a minus.
 - Settings shows the build number next to the version, e.g. "Version 0.1.0 (68)".
 - Settings and onboarding say "nothing leaves your computer".
 

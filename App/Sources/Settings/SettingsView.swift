@@ -135,9 +135,10 @@ struct SettingsView: View {
                     Button {
                         if let id = folder.id { Task { await model.removeFolder(id: id) } }
                     } label: {
-                        Image(systemName: "minus.circle")
+                        Image(systemName: "trash")
                     }
                     .buttonStyle(.borderless)
+                    .help(Text("Remove folder"))
                     .accessibilityLabel(Text("Remove folder"))
                 }
             }
@@ -159,10 +160,11 @@ struct SettingsView: View {
                     Button {
                         draft.timelineStops.remove(at: index)
                     } label: {
-                        Image(systemName: "minus.circle")
+                        Image(systemName: "trash")
                     }
                     .buttonStyle(.borderless)
                     .disabled(draft.timelineStops.count <= 2)
+                    .help(Text("Remove time"))
                     .accessibilityLabel(Text("Remove time"))
                 }
             }
@@ -219,9 +221,10 @@ struct SettingsView: View {
                     Button {
                         draft.ignoredExtensions.removeAll { $0 == ext }
                     } label: {
-                        Image(systemName: "minus.circle")
+                        Image(systemName: "trash")
                     }
                     .buttonStyle(.borderless)
+                    .help(Text("Remove extension"))
                     .accessibilityLabel(Text("Remove extension"))
                 }
             }
