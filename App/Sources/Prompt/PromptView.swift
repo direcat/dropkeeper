@@ -59,7 +59,7 @@ struct PromptView: View {
 
     private var header: some View {
         HStack(spacing: TK.Space.m) {
-            FileGlyph(kind: file.kind)
+            FinderIcon(path: file.path, kind: file.kind)
             VStack(alignment: .leading, spacing: 2) {
                 FileNameLink(
                     name: file.displayName, font: .system(size: TK.TextSize.title, weight: .semibold), action: onOpen)
