@@ -56,7 +56,10 @@ h1, h2, h3 { font-family: var(--cond); font-weight: 600; line-height: 1.05; lett
 .top a:hover { color: #fff; text-decoration: underline; text-underline-offset: 4px; }
 .brand { display: inline-block; padding: 0 !important; }
 .brand img { height: 28px; width: auto; }
-.hero-copy { padding: clamp(48px, 8vw, 104px) 0 clamp(36px, 5vw, 56px); max-width: 860px; }
+/* centered over the screen below it */
+.hero-copy { padding: clamp(48px, 8vw, 104px) 0 clamp(36px, 5vw, 56px); max-width: 940px; margin-inline: auto; text-align: center; }
+.hero-copy .lede { margin-inline: auto; }
+.hero-copy .cta { justify-content: center; }
 .hero h1 { font-size: clamp(3rem, 8.4vw, 6.4rem); font-weight: 500; line-height: .98; letter-spacing: -0.015em; }
 .lede { font-size: clamp(1.1rem, 2vw, 1.3rem); color: var(--p200); max-width: 38em; margin: 26px 0 0; }
 .cta { display: flex; flex-wrap: wrap; gap: 14px 18px; align-items: center; margin-top: 34px; }
