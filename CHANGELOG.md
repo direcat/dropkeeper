@@ -4,7 +4,7 @@ All notable changes to DropKeeper are documented here. The format follows [Keep 
 
 ## [Unreleased]
 
-## [1.0.0] - YYYY-MM-DD
+## [1.0.0] - 2026-10-20
 
 ### Added
 - Expiry for every new download in watched folders: 30 min, 1 h, 1 day, 10 days or keep (times configurable).
