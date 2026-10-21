@@ -5,6 +5,9 @@ on:
     branches: [master]
   pull_request:
 
+permissions:
+  contents: read
+
 jobs:
   core:
     runs-on: macos-26
