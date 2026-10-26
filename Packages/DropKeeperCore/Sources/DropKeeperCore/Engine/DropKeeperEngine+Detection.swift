@@ -113,13 +113,13 @@ extension DropKeeperEngine {
             if let rule {
                 // The rule waits for the duplicate check; a duplicate stays pending for the user to decide.
                 file.duplicateOf = duplicateName(for: path, stat: stat, folder: folder)
-                guard insert(file) else { continue }
+                // Scheduled before the insert: one write, so the record is never observable as pending.
                 if file.duplicateOf == nil {
                     actions.schedule(
                         &file, duration: rule.duration, now: now, tagEnabled: settings.finderTagEnabled)
-                    update(file)
-                    applications.append(RuleApplication(file: file, ruleName: rule.name))
                 }
+                guard insert(file) else { continue }
+                if file.state == .scheduled { applications.append(RuleApplication(file: file, ruleName: rule.name)) }
             } else {
                 // Insert first so the prompt can appear right away; the duplicate hint follows.
                 guard insert(file) else { continue }

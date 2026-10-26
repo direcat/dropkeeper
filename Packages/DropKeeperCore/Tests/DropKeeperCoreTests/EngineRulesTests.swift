@@ -45,6 +45,23 @@ import Testing
         #expect(applications.map(\.id) == [file.id])
     }
 
+    @Test func ruleMatchIsNeverStoredAsPending() async throws {
+        let harness = try await harness(rules: [imagesRule()])
+        let observation = harness.engine.fileUpdates(in: [.pending])
+        let sawPending = Task { () -> Bool in
+            var seen = false
+            do {
+                for try await files in observation where !files.isEmpty { seen = true }
+            } catch {}
+            return seen
+        }
+        await harness.drop("a.png")
+        try await Task.sleep(for: .milliseconds(200))
+        sawPending.cancel()
+        #expect(await sawPending.value == false)
+        #expect(try harness.files().map(\.state) == [.scheduled])
+    }
+
     @Test func duplicateBeatsRule() async throws {
         let harness = try await harness(rules: [imagesRule()])
         harness.fs.createFile(

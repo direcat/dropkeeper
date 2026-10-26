@@ -33,11 +33,16 @@ public struct Rule: Codable, Sendable, Equatable, Identifiable {
     }
 
     /// The suggested rules, shipped disabled so nothing is scheduled until the user opts in.
+    /// Order matters (first match wins): Screenshots comes before Images so it is not shadowed for PNGs.
     public static func defaults(home: String) -> [Rule] {
         [
             Rule(
                 id: UUID(uuidString: "6F1D0A10-0001-4C5E-9A10-D40F7E000001")!, name: "Installers",
                 match: .category(.installers), duration: 86_400, isEnabled: false),
+            Rule(
+                id: UUID(uuidString: "6F1D0A10-0005-4C5E-9A10-D40F7E000005")!, name: "Screenshots on Desktop",
+                match: .category(.screenshots), folderPath: home + "/Desktop", duration: 86_400,
+                isEnabled: false),
             Rule(
                 id: UUID(uuidString: "6F1D0A10-0002-4C5E-9A10-D40F7E000002")!, name: "Images",
                 match: .category(.images), duration: 3600, isEnabled: false),
@@ -47,10 +52,6 @@ public struct Rule: Codable, Sendable, Equatable, Identifiable {
             Rule(
                 id: UUID(uuidString: "6F1D0A10-0004-4C5E-9A10-D40F7E000004")!, name: "Invitations & contacts",
                 match: .category(.invitationsAndContacts), duration: 1800, isEnabled: false),
-            Rule(
-                id: UUID(uuidString: "6F1D0A10-0005-4C5E-9A10-D40F7E000005")!, name: "Screenshots on Desktop",
-                match: .category(.screenshots), folderPath: home + "/Desktop", duration: 86_400,
-                isEnabled: false),
         ]
     }
 }

@@ -143,11 +143,11 @@ import Testing
     let rules = Settings().rules
     #expect(
         rules.map(\.name) == [
-            "Installers", "Images", "Archives", "Invitations & contacts", "Screenshots on Desktop",
+            "Installers", "Screenshots on Desktop", "Images", "Archives", "Invitations & contacts",
         ])
     #expect(rules.allSatisfy { !$0.isEnabled })
-    #expect(rules.map(\.duration) == [86_400, 3600, 86_400, 1800, 86_400])
-    #expect(rules[4].folderPath == NSHomeDirectory() + "/Desktop")
+    #expect(rules.map(\.duration) == [86_400, 86_400, 3600, 86_400, 1800])
+    #expect(rules[1].folderPath == NSHomeDirectory() + "/Desktop")
     #expect(Set(rules.map(\.id)).count == 5)
     for rule in rules {
         #expect(!rule.name.lowercased().contains("torrent"))
