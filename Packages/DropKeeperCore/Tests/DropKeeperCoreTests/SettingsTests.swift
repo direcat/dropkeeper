@@ -138,3 +138,40 @@ import Testing
     settings.reminderLeadTime = 900
     #expect(settings.normalized().reminderLeadTime == 900)
 }
+
+@Test func defaultRulesShipDisabled() {
+    let rules = Settings().rules
+    #expect(
+        rules.map(\.name) == [
+            "Installers", "Images", "Archives", "Invitations & contacts", "Screenshots on Desktop",
+        ])
+    #expect(rules.allSatisfy { !$0.isEnabled })
+    #expect(rules.map(\.duration) == [86_400, 3600, 86_400, 1800, 86_400])
+    #expect(rules[4].folderPath == NSHomeDirectory() + "/Desktop")
+    #expect(Set(rules.map(\.id)).count == 5)
+    for rule in rules {
+        #expect(!rule.name.lowercased().contains("torrent"))
+        if case .pattern(let pattern) = rule.match { #expect(!pattern.lowercased().contains("torrent")) }
+    }
+}
+
+@Test func legacyBlobGetsDefaultRulesAndDuplicateDetection() throws {
+    let decoded = try JSONDecoder().decode(Settings.self, from: Data(#"{"quietMode":true}"#.utf8))
+    #expect(decoded.quietMode)
+    #expect(decoded.rules == Settings().rules)
+    #expect(decoded.duplicateDetection)
+}
+
+@Test func rulesRoundTripAndNormalize() throws {
+    var settings = Settings()
+    settings.rules = [
+        Rule(name: "Calendar", match: .pattern(" ICS "), duration: 10),
+        Rule(name: "Long", match: .category(.images), duration: 1e9),
+    ]
+    let decoded = try JSONDecoder().decode(Settings.self, from: JSONEncoder().encode(settings))
+    #expect(decoded.rules == settings.rules)
+    let normalized = settings.normalized().rules
+    #expect(normalized[0].match == .pattern("*.ics"))
+    #expect(normalized[0].duration == Settings.minStop)
+    #expect(normalized[1].duration == Settings.maxStop)
+}

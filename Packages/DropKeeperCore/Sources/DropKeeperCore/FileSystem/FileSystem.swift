@@ -33,6 +33,7 @@ public protocol FileSystem: Sendable {
     func stat(_ path: String) -> FileStat?
     func contentsOfDirectory(_ path: String) throws -> [String]
     func readXattr(_ name: String, at path: String) -> String?
+    func hasXattr(_ name: String, at path: String) -> Bool
     func writeXattr(_ name: String, value: String, at path: String) throws
     func removeXattr(_ name: String, at path: String) throws
     func setTag(_ tag: String, present: Bool, at path: String) throws

@@ -96,21 +96,64 @@ extension DropKeeperEngine {
 
     func pollTracker(now: Date) {
         guard !tracker.isEmpty else { return }
+        var applications: [RuleApplication] = []
         for (path, stat) in tracker.poll(now: now, fs: env.fs) {
             guard let folder = folder(containing: path),
                 DownloadDetector.isCandidate(
                     path: path, folderPath: folder.path, ignoredPatterns: settings.ignoredPatterns),
                 trackedRecord(at: path, stat: stat) == nil
             else { continue }
-            let file = TrackedFile.new(path: path, stat: stat, folderId: folder.id, now: now)
+            var file = TrackedFile.new(path: path, stat: stat, folderId: folder.id, now: now)
             // A duplicate may carry the original's expiry xattr and tag; markPending overwrites the id.
             actions.clearMarks(at: path)
             actions.markPending(file)
-            do {
-                try store.insert(file)
-            } catch {
-                Log.engine.error("Could not insert record: \(error.localizedDescription)")
+            let rule = RuleMatcher.firstMatch(
+                name: (path as NSString).lastPathComponent, path: path, folderPath: folder.path,
+                rules: settings.rules, fs: env.fs)
+            if let rule {
+                // The rule waits for the duplicate check; a duplicate stays pending for the user to decide.
+                file.duplicateOf = duplicateName(for: path, stat: stat, folder: folder)
+                guard insert(file) else { continue }
+                if file.duplicateOf == nil {
+                    actions.schedule(
+                        &file, duration: rule.duration, now: now, tagEnabled: settings.finderTagEnabled)
+                    update(file)
+                    applications.append(RuleApplication(file: file, ruleName: rule.name))
+                }
+            } else {
+                // Insert first so the prompt can appear right away; the duplicate hint follows.
+                guard insert(file) else { continue }
+                if let name = duplicateName(for: path, stat: stat, folder: folder) {
+                    file.duplicateOf = name
+                    update(file)
+                }
             }
+        }
+        if !applications.isEmpty { notify.yield(.ruleApplied(applications)) }
+    }
+
+    private func duplicateName(for path: String, stat: FileStat, folder: WatchedFolder) -> String? {
+        guard settings.duplicateDetection else { return nil }
+        return DuplicateFinder.find(
+            path: path, size: stat.size, folderPath: folder.path, ignoredPatterns: settings.ignoredPatterns,
+            fs: env.fs)
+    }
+
+    private func insert(_ file: TrackedFile) -> Bool {
+        do {
+            try store.insert(file)
+            return true
+        } catch {
+            Log.engine.error("Could not insert record: \(error.localizedDescription)")
+            return false
+        }
+    }
+
+    private func update(_ file: TrackedFile) {
+        do {
+            try store.update(file)
+        } catch {
+            Log.engine.error("Could not update record: \(error.localizedDescription)")
         }
     }
 }

@@ -55,13 +55,15 @@ public struct Settings: Codable, Sendable, Equatable {
     public var historyRetention = HistoryRetention.oneYear
     public var reminderEnabled = true
     public var reminderLeadTime: TimeInterval = 300
+    public var rules = Rule.defaults(home: NSHomeDirectory())
+    public var duplicateDetection = true
 
     public init() {}
 
     enum CodingKeys: String, CodingKey {
         case launchAtLogin, promptPresentation, quietMode, timelineStops, gracePeriod, defaultChoice,
             deleteMode, finderTagEnabled, ignoredPatterns, historyRetention,
-            reminderEnabled, reminderLeadTime
+            reminderEnabled, reminderLeadTime, rules, duplicateDetection
     }
 
     /// Pre-1.1 key, decode-only: migrated into `ignoredPatterns` when that key is absent.
@@ -98,6 +100,9 @@ public struct Settings: Codable, Sendable, Equatable {
             try container.decodeIfPresent(Bool.self, forKey: .reminderEnabled) ?? defaults.reminderEnabled
         reminderLeadTime =
             try container.decodeIfPresent(TimeInterval.self, forKey: .reminderLeadTime) ?? defaults.reminderLeadTime
+        rules = try container.decodeIfPresent([Rule].self, forKey: .rules) ?? defaults.rules
+        duplicateDetection =
+            try container.decodeIfPresent(Bool.self, forKey: .duplicateDetection) ?? defaults.duplicateDetection
     }
 
     /// The action to apply by default. `.lastChosen` follows `lastChoice` while it is still available
@@ -132,6 +137,14 @@ public struct Settings: Codable, Sendable, Equatable {
             ignoredPatterns
             .compactMap(IgnorePattern.normalize)
             .filter { seen.insert($0).inserted }
+        result.rules = rules.map { rule in
+            var rule = rule
+            rule.duration = min(max(rule.duration, Self.minStop), Self.maxStop)
+            if case .pattern(let pattern) = rule.match {
+                rule.match = .pattern(IgnorePattern.normalize(pattern) ?? pattern)
+            }
+            return rule
+        }
         return result
     }
 }

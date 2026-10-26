@@ -128,6 +128,10 @@ final class FakeFileSystem: FileSystem {
         state.withLock { $0.entries[path]?.xattrs[name] }
     }
 
+    func hasXattr(_ name: String, at path: String) -> Bool {
+        state.withLock { $0.entries[path]?.xattrs[name] != nil }
+    }
+
     func writeXattr(_ name: String, value: String, at path: String) throws {
         try state.withLock { state in
             guard state.entries[path] != nil else { throw FileSystemError.notFound(path) }

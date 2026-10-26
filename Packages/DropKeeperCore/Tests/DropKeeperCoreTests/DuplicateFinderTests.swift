@@ -53,4 +53,10 @@ struct DuplicateFinderTests {
         fs.createFile(folder + "/c.dat", content: bytes, added: nil)
         #expect(find("c.dat") == "a.dat")
     }
+
+    @Test func partialDownloadNamesNeverCount() {
+        fs.createFile(folder + "/old.tmp", content: bytes, added: nil)
+        fs.createFile(folder + "/new.dat", content: bytes, added: nil)
+        #expect(find("new.dat") == nil)
+    }
 }

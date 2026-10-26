@@ -40,6 +40,10 @@ public final class LiveFileSystem: FileSystem {
         return String(bytes: buffer, encoding: .utf8)
     }
 
+    public func hasXattr(_ name: String, at path: String) -> Bool {
+        getxattr(path, name, nil, 0, 0, XATTR_NOFOLLOW) >= 0
+    }
+
     public func writeXattr(_ name: String, value: String, at path: String) throws {
         let bytes = Array(value.utf8)
         if setxattr(path, name, bytes, bytes.count, 0, XATTR_NOFOLLOW) != 0 {

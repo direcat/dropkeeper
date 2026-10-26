@@ -43,6 +43,7 @@ public enum EngineNotification: Sendable, Equatable {
     case trashed([TrackedFile])
     case failed(TrackedFile)
     case foldersChanged
+    case ruleApplied([RuleApplication])
 }
 
 public enum EngineError: Error, Equatable {
