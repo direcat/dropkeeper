@@ -377,6 +377,10 @@ private struct DataTab: View {
 private struct AboutTab: View {
     private static let version = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "–"
 
+    private var promise: some View {
+        Text("Free and open source (MIT). 100 % offline, no analytics, no tracking, nothing leaves your computer.")
+    }
+
     var body: some View {
         Form {
             Section("About") {
@@ -386,9 +390,7 @@ private struct AboutTab: View {
                     Text("Version \(Self.version)")
                         .foregroundStyle(.secondary)
                 }
-                Text(
-                    "Free and open source (MIT). 100 % offline, no analytics, no tracking, nothing leaves your computer."
-                )
+                promise
                 Link(
                     "direcat.github.io/dropkeeper", destination: URL(string: "https://direcat.github.io/dropkeeper/")!)
             }
