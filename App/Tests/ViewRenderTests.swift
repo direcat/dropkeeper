@@ -107,3 +107,31 @@ private func render(_ view: some View) -> CGImage? {
     controller.selectedTabViewItemIndex = 5
     #expect(defaults.integer(forKey: SettingsTabViewController.selectedTabKey) == 5)
 }
+
+/// The window opens at its fixed size and centered on its screen, on first open and again after a close.
+@MainActor
+@Test func settingsWindowOpensCentered() throws {
+    let suite = "DropKeeperAppTests.\(UUID().uuidString)"
+    let defaults = try #require(UserDefaults(suiteName: suite))
+    defer { defaults.removePersistentDomain(forName: suite) }
+    let model = AppModel(defaults: defaults, applyLoginItem: { _ in })
+    let controller = SettingsWindowController(model: model, defaults: defaults)
+
+    func expectCentered() throws {
+        let window = try #require(controller.settingsWindow)
+        let visible = try #require(window.screen?.visibleFrame)
+        let content = window.contentRect(forFrameRect: window.frame).size
+        #expect(abs(content.width - TK.Size.settingsWindow.width) <= 1)
+        #expect(abs(content.height - TK.Size.settingsWindow.height) <= 1)
+        #expect(abs(window.frame.midX - visible.midX) <= 1)
+        // AppKit's `center()` sits slightly above the true middle, so vertically only require it within the screen.
+        #expect(visible.contains(window.frame) && window.frame.midY >= visible.midY - 1)
+    }
+
+    controller.show()
+    try expectCentered()
+    controller.settingsWindow?.close()
+    controller.show()
+    try expectCentered()
+    controller.settingsWindow?.close()
+}

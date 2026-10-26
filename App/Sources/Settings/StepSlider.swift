@@ -43,6 +43,8 @@ struct StepSlider<Value: Hashable>: View {
                     in: 0...Double(max(values.count - 1, 1)), step: 1
                 )
                 .labelsHidden()
+                .accessibilityLabel(Text(title))
+                .accessibilityValue(Text(values.isEmpty ? "" : label(values[index])))
                 Text(values.isEmpty ? "" : label(values[index]))
                     .monospacedDigit()
                     .frame(minWidth: TK.Size.stepSliderLabel, alignment: .trailing)

@@ -56,20 +56,23 @@ final class SettingsWindowController {
         self.defaults = defaults
     }
 
+    /// The window, once opened (internal for tests).
+    var settingsWindow: NSWindow? { window }
+
     func show() {
         if let window, !window.isVisible {
             // A fresh view per opening, so a reopened window shows no leftover state (e.g. the cleared-records count).
             window.contentViewController = makeTabs()
-        }
-        if window == nil {
+            placeOnOpen(window)
+        } else if window == nil {
             let window = NSWindow(contentViewController: makeTabs())
             window.title = String(localized: "DropKeeper Settings")
             window.styleMask = [.titled, .closable]
             window.toolbarStyle = .preference
             window.isReleasedWhenClosed = false
             self.window = window
+            placeOnOpen(window)
         }
-        window?.center()
         // An error from elsewhere (e.g. the prompt) would otherwise pop up out of context in Settings.
         model.clearError()
         // Becoming active refreshes the folders (AppDelegate); only an already active app needs it here.
@@ -77,6 +80,13 @@ final class SettingsWindowController {
         NSApp.activate()
         window?.makeKeyAndOrderFront(nil)
         if wasActive { Task { await model.refreshFolders() } }
+    }
+
+    /// Sized before centering: the tab controller only applies its children's size once they appear, which would
+    /// grow the window from its left edge after `center()`. A window that is already visible stays where it is.
+    private func placeOnOpen(_ window: NSWindow) {
+        window.setContentSize(TK.Size.settingsWindow)
+        window.center()
     }
 
     private func makeTabs() -> NSTabViewController {
