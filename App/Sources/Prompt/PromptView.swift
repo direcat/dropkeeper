@@ -132,7 +132,7 @@ struct PromptButtonStyle: ButtonStyle {
 
 #Preview {
     @Previewable @State var timeline = TimelineModel(
-        durations: Settings().timelineStops, defaultChoice: .expireAfter(3600))
+        durations: Settings().timelineStops, preselect: .expireAfter(3600))
     @Previewable @State var applyToAll = false
     let now = Date()
     let file = TrackedFile(

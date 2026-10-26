@@ -62,6 +62,68 @@ private final class LoginItemRecorder {
         await model.stop()
     }
 
+    /// A started model with one watched folder; `drop` creates a file and waits for its prompt.
+    private func startedModel(root: URL, defaults: UserDefaults) async throws -> (AppModel, URL) {
+        let folder = root.appendingPathComponent("Downloads", isDirectory: true)
+        try FileManager.default.createDirectory(at: folder, withIntermediateDirectories: false)
+        let model = AppModel(defaults: defaults, applyLoginItem: { _ in })
+        await model.start(
+            with: try EngineBootstrap.make(
+                databaseURL: root.appendingPathComponent("db/dropkeeper.sqlite"), defaults: defaults))
+        #expect(await model.addFolder(folder))
+        try await Task.sleep(for: .milliseconds(300))
+        return (model, folder)
+    }
+
+    private func drop(_ name: String, in folder: URL, model: AppModel) async throws -> FileID {
+        FileManager.default.createFile(atPath: folder.appendingPathComponent(name).path, contents: Data("x".utf8))
+        try await waitUntil { model.queue.current?.displayName == name }
+        return try #require(model.queue.current?.id)
+    }
+
+    @Test func promptDecisionRecordsLastChoice() async throws {
+        let root = try tempDir()
+        defer { try? FileManager.default.removeItem(at: root) }
+        let suite = "DropKeeperAppTests.\(UUID().uuidString)"
+        let defaults = try #require(UserDefaults(suiteName: suite))
+        defer { defaults.removePersistentDomain(forName: suite) }
+        let (model, folder) = try await startedModel(root: root, defaults: defaults)
+
+        var settings = model.settings
+        settings.defaultChoice = .lastChosen
+        await model.update(settings)
+        #expect(model.timeline.selected == .keep)  // nothing chosen yet
+
+        let first = try await drop("one.pdf", in: folder, model: model)
+        model.timeline.select(try #require(model.timeline.stops.firstIndex(of: .duration(86_400))))
+        await model.decide(for: first)
+        #expect(model.resolvedChoice == .expireAfter(86_400))
+
+        _ = try await drop("two.pdf", in: folder, model: model)
+        #expect(model.timeline.selected == .duration(86_400))
+        await model.stop()
+    }
+
+    @Test func listScheduleDoesNotRecord() async throws {
+        let root = try tempDir()
+        defer { try? FileManager.default.removeItem(at: root) }
+        let suite = "DropKeeperAppTests.\(UUID().uuidString)"
+        let defaults = try #require(UserDefaults(suiteName: suite))
+        defer { defaults.removePersistentDomain(forName: suite) }
+        let (model, folder) = try await startedModel(root: root, defaults: defaults)
+
+        var settings = model.settings
+        settings.defaultChoice = .lastChosen
+        await model.update(settings)
+
+        let id = try await drop("one.pdf", in: folder, model: model)
+        await model.schedule([id], duration: 86_400)
+        _ = try await drop("two.pdf", in: folder, model: model)
+        #expect(model.resolvedChoice == .keep)
+        #expect(model.timeline.selected == .keep)
+        await model.stop()
+    }
+
     @Test func loginItemIsAppliedOnFirstLaunchAndOnChangeOnly() async throws {
         let root = try tempDir()
         defer { try? FileManager.default.removeItem(at: root) }

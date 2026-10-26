@@ -18,7 +18,7 @@ private func render(_ view: some View) -> CGImage? {
     let file = scheduledFile(expiresIn: 0, id: "Quarterly report final v2.pdf")
     let view = PromptView(
         file: file, stackCount: 3,
-        timeline: .constant(TimelineModel(durations: Settings().timelineStops, defaultChoice: .keep)),
+        timeline: .constant(TimelineModel(durations: Settings().timelineStops, preselect: .keep)),
         applyToAll: .constant(false), now: base, onDone: {}, onKeep: {}, onClose: {}, onOpen: {})
     let image = try #require(render(view))
     #expect(image.width >= 420)
@@ -38,7 +38,7 @@ private func render(_ view: some View) -> CGImage? {
 }
 
 @Test func timelineHighlightsOnlyStopsUpToASelectedDuration() {
-    var model = TimelineModel(durations: [1800, 3600, 86_400], defaultChoice: .expireAfter(3600))
+    var model = TimelineModel(durations: [1800, 3600, 86_400], preselect: .expireAfter(3600))
     #expect((0..<4).map(model.isHighlighted) == [true, true, false, false])
     model.select(3)
     #expect((0..<4).map(model.isHighlighted) == [false, false, false, true])

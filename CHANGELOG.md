@@ -4,6 +4,9 @@ All notable changes to DropKeeper are documented here. The format follows [Keep 
 
 ## [Unreleased]
 
+### Changed
+- With the default action set to Keep, the prompt now preselects Keep, so Return keeps the file (before, it scheduled 1 h).
+
 ## [1.0.2] - 2026-10-20
 
 ### Added

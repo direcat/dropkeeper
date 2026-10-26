@@ -6,20 +6,20 @@ import Testing
 
 private let stops: [TimeInterval] = [1800, 3600, 86_400, 864_000]
 
-@Test func preselectsSecondStopOrDefaultChoice() {
-    #expect(TimelineModel(durations: stops, defaultChoice: .keep).selected == .duration(3600))
-    #expect(TimelineModel(durations: stops, defaultChoice: .expireAfter(86_400)).selected == .duration(86_400))
-    #expect(TimelineModel(durations: stops, defaultChoice: .expireAfter(999)).selected == .duration(3600))
+@Test func preselectsWhatTheGracePeriodWouldApply() {
+    #expect(TimelineModel(durations: stops, preselect: .keep).selected == .keep)
+    #expect(TimelineModel(durations: stops, preselect: .expireAfter(86_400)).selected == .duration(86_400))
+    #expect(TimelineModel(durations: stops, preselect: .expireAfter(999)).selected == .keep)
 }
 
 @Test func keepIsTheLastStop() {
-    let model = TimelineModel(durations: stops, defaultChoice: .keep)
+    let model = TimelineModel(durations: stops, preselect: .keep)
     #expect(model.stops.count == 5)
     #expect(model.stops.last == .keep)
 }
 
 @Test func arrowsMoveAndClamp() {
-    var model = TimelineModel(durations: stops, defaultChoice: .keep)
+    var model = TimelineModel(durations: stops, preselect: .expireAfter(3600))
     model.moveLeft()
     model.moveLeft()
     #expect(model.selectedIndex == 0)
@@ -33,14 +33,14 @@ private let stops: [TimeInterval] = [1800, 3600, 86_400, 864_000]
 
 @Test func deletionDate() {
     let now = Date(timeIntervalSince1970: 1_800_000_000)
-    var model = TimelineModel(durations: stops, defaultChoice: .keep)
+    var model = TimelineModel(durations: stops, preselect: .expireAfter(3600))
     #expect(model.deletionDate(from: now) == now.addingTimeInterval(3600))
     model.select(4)
     #expect(model.deletionDate(from: now) == nil)
 }
 
 @Test func confirmLabelFollowsTheSelectedStop() {
-    var model = TimelineModel(durations: stops, defaultChoice: .expireAfter(3600))
+    var model = TimelineModel(durations: stops, preselect: .expireAfter(3600))
     #expect(model.confirmLabel == "Delete in 1 h")
     model.select(0)
     #expect(model.confirmLabel == "Delete in 30 min")

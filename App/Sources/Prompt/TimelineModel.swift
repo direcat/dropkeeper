@@ -11,12 +11,13 @@ struct TimelineModel: Equatable {
     let stops: [Stop]
     private(set) var selectedIndex: Int
 
-    init(durations: [TimeInterval], defaultChoice: DefaultChoice) {
+    /// `preselect` is what the grace period would apply; a duration that is not a stop falls back to Keep.
+    init(durations: [TimeInterval], preselect: ResolvedChoice) {
         stops = durations.map(Stop.duration) + [.keep]
-        if case .expireAfter(let duration) = defaultChoice, let index = durations.firstIndex(of: duration) {
+        if case .expireAfter(let duration) = preselect, let index = durations.firstIndex(of: duration) {
             selectedIndex = index
         } else {
-            selectedIndex = min(1, max(0, durations.count - 1))
+            selectedIndex = durations.count
         }
     }
 

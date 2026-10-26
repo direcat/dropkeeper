@@ -17,7 +17,9 @@ final class AppModel {
     private(set) var lastError: String?
     private(set) var panelError = PanelError()
     private(set) var needsOnboarding = false
-    var timeline = TimelineModel(durations: Settings().timelineStops, defaultChoice: .keep)
+    /// What the grace period would apply now; the prompt preselects it.
+    private(set) var resolvedChoice = ResolvedChoice.keep
+    var timeline = TimelineModel(durations: Settings().timelineStops, preselect: .keep)
     var applyToAll = false
     /// Set when the user asks to review pending files (e.g. from the list) while Quiet mode is on.
     var promptRequested = false
@@ -158,11 +160,12 @@ final class AppModel {
         guard let engine else { return }
         settings = await engine.currentSettings
         folders = await engine.watchedFolders
+        resolvedChoice = await engine.resolvedDefaultChoice
         EngineBootstrap.rememberFolders(folders, defaults: defaults)
     }
 
     private func resetPromptState() {
-        timeline = TimelineModel(durations: settings.timelineStops, defaultChoice: settings.defaultChoice)
+        timeline = TimelineModel(durations: settings.timelineStops, preselect: resolvedChoice)
         applyToAll = false
     }
 
@@ -224,11 +227,13 @@ final class AppModel {
         defer { isDeciding = false }
         let succeeded: Bool
         switch timeline.selected {
-        case .keep: succeeded = await perform(.update) { try await $0.keep(ids: ids) }
+        case .keep: succeeded = await perform(.update) { try await $0.keep(ids: ids, recordChoice: true) }
         case .duration(let duration):
-            succeeded = await perform(.update) { try await $0.schedule(ids: ids, duration: duration) }
+            succeeded = await perform(.update) {
+                try await $0.schedule(ids: ids, duration: duration, recordChoice: true)
+            }
         }
-        if succeeded { finishDecision(ids) }
+        if succeeded { await finishDecision(ids) }
     }
 
     func keepPrompted(for id: FileID) async {
@@ -237,11 +242,14 @@ final class AppModel {
         guard !ids.isEmpty else { return }
         isDeciding = true
         defer { isDeciding = false }
-        if await perform(.update, { try await $0.keep(ids: ids) }) { finishDecision(ids) }
+        if await perform(.update, { try await $0.keep(ids: ids, recordChoice: true) }) {
+            await finishDecision(ids)
+        }
     }
 
     /// Moves the prompt on right away instead of waiting for the file observation to catch up.
-    private func finishDecision(_ ids: [FileID]) {
+    private func finishDecision(_ ids: [FileID]) async {
+        await refreshState()  // the recorded choice may change the next preselection
         queue.dismiss(ids: ids)
         if queue.current == nil { promptRequested = false }
         resetPromptState()
@@ -316,7 +324,7 @@ final class AppModel {
         await refreshState()
         promptVisibilityChanged()  // e.g. Quiet mode turned on while the prompt was open
         if loginChanged { applyLoginItem(settings.launchAtLogin) }
-        let fresh = TimelineModel(durations: settings.timelineStops, defaultChoice: settings.defaultChoice)
+        let fresh = TimelineModel(durations: settings.timelineStops, preselect: resolvedChoice)
         if timeline.stops != fresh.stops { resetPromptState() }
     }
 
