@@ -47,3 +47,9 @@ private let stops: [TimeInterval] = [1800, 3600, 86_400, 864_000]
     model.select(4)
     #expect(model.confirmLabel == "Keep")
 }
+
+@Test func nearestStopForRuleDuration() {
+    #expect(TimelineModel.nearestStop(atLeast: 3600, in: stops) == 3600)
+    #expect(TimelineModel.nearestStop(atLeast: 7200, in: stops) == 86_400)
+    #expect(TimelineModel.nearestStop(atLeast: 2_000_000, in: stops) == 864_000)
+}

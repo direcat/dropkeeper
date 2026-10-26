@@ -258,4 +258,57 @@ private final class LoginItemRecorder {
         #expect(!model.isPromptAvailable)  // the new download doesn't bypass Quiet mode
         await model.stop()
     }
+
+    /// Change from a rule notice reopens the prompt for the scheduled file, Quiet mode or not, preselecting its
+    /// timer (never Keep).
+    @Test func changeOpensPromptEvenInQuietMode() async throws {
+        let root = try tempDir()
+        defer { try? FileManager.default.removeItem(at: root) }
+        let suite = "DropKeeperAppTests.\(UUID().uuidString)"
+        let defaults = try #require(UserDefaults(suiteName: suite))
+        defer { defaults.removePersistentDomain(forName: suite) }
+        let model = AppModel(defaults: defaults, applyLoginItem: { _ in })
+        #expect(
+            await model.start(
+                with: try EngineBootstrap.make(
+                    databaseURL: root.appendingPathComponent("db/dropkeeper.sqlite"), defaults: defaults)))
+        var settings = model.settings
+        settings.quietMode = true
+        await model.update(settings)
+        try await Task.sleep(for: .milliseconds(300))
+
+        var file = scheduledFile(expiresIn: 7200, id: "s")
+        file.scheduleDuration = 7200
+        model.apply([file])
+        await model.handle(.ruleApplied([RuleApplication(file: file, ruleName: "Rule")]))
+        #expect(!model.isPromptAvailable)
+        model.changeRuleNotice()
+        #expect(model.queue.isRevisiting)
+        #expect(model.queue.current?.id == "s")
+        #expect(model.isPromptAvailable)
+        #expect(!model.ruleNotice.isVisible)
+        #expect(
+            model.timeline.selected
+                == .duration(TimelineModel.nearestStop(atLeast: 7200, in: model.settings.timelineStops)))
+        await model.stop()
+    }
+
+    @Test func deleteDuplicateDisposesNewFile() async throws {
+        let root = try tempDir()
+        defer { try? FileManager.default.removeItem(at: root) }
+        let suite = "DropKeeperAppTests.\(UUID().uuidString)"
+        let defaults = try #require(UserDefaults(suiteName: suite))
+        defer { defaults.removePersistentDomain(forName: suite) }
+        let started = try await startedModel(root: root, defaults: defaults)
+        let (model, folder) = (started.model, started.folder)
+        var settings = model.settings
+        settings.deleteMode = .permanent
+        await model.update(settings)
+
+        let id = try await drop("copy.pdf", in: folder, model: model)
+        await model.deleteDuplicate(for: id, confirm: { _ in true })
+        #expect(model.queue.current == nil)
+        #expect(!FileManager.default.fileExists(atPath: folder.appendingPathComponent("copy.pdf").path))
+        await model.stop()
+    }
 }

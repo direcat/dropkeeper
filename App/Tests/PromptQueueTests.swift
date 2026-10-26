@@ -15,9 +15,9 @@ private func pending(_ id: String, seen offset: TimeInterval = 0) -> TrackedFile
 
 @Test func reviewFocusSeveralDownloadsFormOneStableStack() {
     var queue = PromptQueue()
-    queue.update(pending: [pending("a")])
+    queue.update(pending: [pending("a")], scheduled: [])
     #expect(queue.current?.id == "a")
-    queue.update(pending: [pending("a"), pending("b", seen: 1), pending("c", seen: 2)])
+    queue.update(pending: [pending("a"), pending("b", seen: 1), pending("c", seen: 2)], scheduled: [])
     #expect(queue.current?.id == "a")  // the visible file does not jump
     #expect(queue.items.map(\.id) == ["a", "b", "c"])
     #expect(queue.targets(applyToAll: true) == ["a", "b", "c"])
@@ -26,58 +26,59 @@ private func pending(_ id: String, seen offset: TimeInterval = 0) -> TrackedFile
 
 @Test func reviewFocusDismissedFileIsNotPromptedAgain() {
     var queue = PromptQueue()
-    queue.update(pending: [pending("a"), pending("b", seen: 1)])
+    queue.update(pending: [pending("a"), pending("b", seen: 1)], scheduled: [])
     queue.dismiss(applyToAll: false)
     #expect(queue.current?.id == "b")
-    queue.update(pending: [pending("a"), pending("b", seen: 1), pending("c", seen: 2)])
+    queue.update(pending: [pending("a"), pending("b", seen: 1), pending("c", seen: 2)], scheduled: [])
     #expect(queue.items.map(\.id) == ["b", "c"])
     queue.dismiss(applyToAll: true)
     #expect(queue.current == nil)
-    queue.update(pending: [pending("a"), pending("b", seen: 1), pending("c", seen: 2), pending("d", seen: 3)])
+    queue.update(
+        pending: [pending("a"), pending("b", seen: 1), pending("c", seen: 2), pending("d", seen: 3)], scheduled: [])
     #expect(queue.items.map(\.id) == ["d"])
 }
 
 @Test func dismissalsAreForgottenOnceNoLongerPending() {
     var queue = PromptQueue()
-    queue.update(pending: [pending("a")])
+    queue.update(pending: [pending("a")], scheduled: [])
     queue.dismiss(applyToAll: false)
-    queue.update(pending: [])
-    queue.update(pending: [pending("a")])  // e.g. same id pending again after a restore
+    queue.update(pending: [], scheduled: [])
+    queue.update(pending: [pending("a")], scheduled: [])  // e.g. same id pending again after a restore
     #expect(queue.current?.id == "a")
 }
 
 @Test func decidedFilesLeaveTheQueue() {
     var queue = PromptQueue()
-    queue.update(pending: [pending("a"), pending("b", seen: 1)])
-    queue.update(pending: [pending("b", seen: 1)])
+    queue.update(pending: [pending("a"), pending("b", seen: 1)], scheduled: [])
+    queue.update(pending: [pending("b", seen: 1)], scheduled: [])
     #expect(queue.current?.id == "b")
 }
 
 @Test func dismissingDecidedIdsMovesToTheNextFile() {
     var queue = PromptQueue()
-    queue.update(pending: [pending("a"), pending("b", seen: 1)])
+    queue.update(pending: [pending("a"), pending("b", seen: 1)], scheduled: [])
     queue.dismiss(ids: ["a"])
     #expect(queue.current?.id == "b")
-    queue.update(pending: [pending("b", seen: 1)])
+    queue.update(pending: [pending("b", seen: 1)], scheduled: [])
     #expect(queue.items.map(\.id) == ["b"])
 }
 
 @Test func closedFileCanBeReopenedFromTheList() {
     var queue = PromptQueue()
     let files = [pending("a"), pending("b", seen: 1)]
-    queue.update(pending: files)
+    queue.update(pending: files, scheduled: [])
     queue.dismiss(applyToAll: false)
     #expect(queue.current?.id == "b")
     queue.restore(ids: ["a"], pending: files)
     #expect(queue.items.map(\.id) == ["a", "b"])
-    queue.update(pending: files + [pending("c", seen: 2)])
+    queue.update(pending: files + [pending("c", seen: 2)], scheduled: [])
     #expect(queue.items.map(\.id) == ["a", "b", "c"])  // stays reopened
 }
 
 @Test func restoringAWaitingFileMovesItToTheFront() {
     var queue = PromptQueue()
     let files = [pending("a"), pending("b", seen: 1), pending("c", seen: 2)]
-    queue.update(pending: files)
+    queue.update(pending: files, scheduled: [])
     queue.restore(ids: ["c"], pending: files)
     #expect(queue.items.map(\.id) == ["c", "a", "b"])
     queue.restore(ids: ["gone"], pending: files)  // no longer pending: nothing to show for it
@@ -86,9 +87,48 @@ private func pending(_ id: String, seen offset: TimeInterval = 0) -> TrackedFile
 
 @Test func targetsOnlyForTheDisplayedFile() {
     var queue = PromptQueue()
-    queue.update(pending: [pending("a"), pending("b", seen: 1)])
+    queue.update(pending: [pending("a"), pending("b", seen: 1)], scheduled: [])
     #expect(queue.targets(for: "a", applyToAll: false) == ["a"])
     #expect(queue.targets(for: "a", applyToAll: true) == ["a", "b"])
     #expect(queue.targets(for: "b", applyToAll: false).isEmpty)  // the prompt moved on meanwhile
     #expect(queue.targets(for: "b", applyToAll: true).isEmpty)
+}
+
+private func scheduled(_ id: String) -> TrackedFile {
+    var file = pending(id)
+    file.state = .scheduled
+    file.expiresAt = base.addingTimeInterval(3600)
+    return file
+}
+
+@Test func revisitGoesFirstAndNeverAppliesToAll() {
+    var queue = PromptQueue()
+    queue.update(pending: [pending("a"), pending("b", seen: 1)], scheduled: [scheduled("s")])
+    queue.revisit([scheduled("s")])
+    #expect(queue.isRevisiting)
+    #expect(queue.current?.id == "s")
+    #expect(queue.targets(applyToAll: true) == ["s"])
+    #expect(queue.targets(for: "s", applyToAll: true) == ["s"])
+    #expect(queue.items.map(\.id) == ["a", "b"])
+}
+
+@Test func escOnRevisitKeepsOthers() {
+    var queue = PromptQueue()
+    queue.update(pending: [pending("a")], scheduled: [scheduled("s")])
+    queue.revisit([scheduled("s")])
+    queue.dismiss(applyToAll: true)
+    #expect(!queue.isRevisiting)
+    #expect(queue.current?.id == "a")
+    #expect(queue.items.map(\.id) == ["a"])
+}
+
+@Test func revisitDropsWhenNoLongerScheduled() {
+    var queue = PromptQueue()
+    queue.update(pending: [pending("a")], scheduled: [scheduled("s"), scheduled("t")])
+    queue.revisit([scheduled("s"), scheduled("t")])
+    queue.update(pending: [pending("a")], scheduled: [scheduled("t")])
+    #expect(queue.current?.id == "t")
+    queue.update(pending: [pending("a")], scheduled: [])
+    #expect(!queue.isRevisiting)
+    #expect(queue.current?.id == "a")
 }

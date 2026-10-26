@@ -38,6 +38,12 @@ struct TimelineModel: Equatable {
 }
 
 extension TimelineModel {
+    /// The stop a revisited rule timer maps to: the same duration, else the nearest longer one, else the longest.
+    /// Never Keep, so Return on a "Change" prompt can't silently keep the file.
+    static func nearestStop(atLeast duration: TimeInterval, in durations: [TimeInterval]) -> TimeInterval {
+        durations.filter { $0 >= duration }.min() ?? durations.max() ?? duration
+    }
+
     /// The prompt's primary button: what confirming the selected stop does.
     var confirmLabel: String {
         switch selected {

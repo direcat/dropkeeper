@@ -53,7 +53,10 @@ final class AppModel {
     /// Any bar above (or instead of) the prompt: a trash notice, a rule notice or a reminder. Quiet mode doesn't
     /// hold these back, only the prompt.
     var isNoticeVisible: Bool { notice.isVisible || ruleNotice.isVisible || !reminders.due.isEmpty }
-    var isPromptAvailable: Bool { queue.current != nil && (!settings.quietMode || promptRequested) }
+    /// A revisit comes from the user's click on a notice, so Quiet mode doesn't hold it back.
+    var isPromptAvailable: Bool {
+        queue.current != nil && (!settings.quietMode || promptRequested || queue.isRevisiting)
+    }
 
     // MARK: Lifecycle
 
@@ -139,7 +142,7 @@ final class AppModel {
         pending = files.filter { $0.state == .pending }
         scheduled = files.filter { $0.state == .scheduled }
         failed = files.filter { $0.state == .failed }
-        queue.update(pending: pending)
+        queue.update(pending: pending, scheduled: scheduled)
         if queue.current?.id != previous { resetPromptState() }
         if queue.current == nil { promptRequested = false }
         scheduleClock()
@@ -169,8 +172,14 @@ final class AppModel {
     }
 
     private func resetPromptState() {
-        timeline = TimelineModel(durations: settings.timelineStops, preselect: resolvedChoice)
+        timeline = TimelineModel(durations: settings.timelineStops, preselect: promptPreselection)
         applyToAll = false
+    }
+
+    /// A revisit starts on the file's current timer (never Keep); a new file on what the grace period would apply.
+    private var promptPreselection: ResolvedChoice {
+        guard queue.isRevisiting, let duration = queue.current?.timerLength else { return resolvedChoice }
+        return .expireAfter(TimelineModel.nearestStop(atLeast: duration, in: settings.timelineStops))
     }
 
     private func scheduleClock() {
@@ -215,9 +224,15 @@ final class AppModel {
         scheduleRuleNoticeExpiry()  // resume moved `expiresAt`
     }
 
-    /// Opens the rule that moved the file so the user can change it (the action itself comes with the rules UI).
+    /// Reopens the prompt for the files the rule scheduled (those still scheduled) and dismisses the notice.
     func changeRuleNotice() {
-        // Intentionally empty until the rules UI exists.
+        let ids = Set(ruleNotice.items.map(\.id))
+        let files = scheduled.filter { ids.contains($0.id) }
+        ruleNotice.clear()
+        ruleNoticeTask?.cancel()
+        guard !files.isEmpty else { return }
+        queue.revisit(files)
+        resetPromptState()
     }
 
     private func scheduleRuleNoticeExpiry() {
@@ -272,6 +287,19 @@ final class AppModel {
         defer { isDeciding = false }
         if await perform(.update, { try await $0.keep(ids: ids, recordChoice: true) }) {
             await finishDecision(ids)
+        }
+    }
+
+    /// The prompt's Delete duplicate: disposes of the new file like an expiry (permanent mode asks first).
+    func deleteDuplicate(
+        for id: FileID, confirm: (String) -> Bool = { DeleteConfirmation.confirm(name: $0) }
+    ) async {
+        guard !isDeciding, let file = queue.current, file.id == id else { return }
+        if settings.deleteMode == .permanent, !confirm(file.displayName) { return }
+        isDeciding = true
+        defer { isDeciding = false }
+        if await perform(.delete, { try await $0.deleteNow(ids: [id]) }) {
+            await finishDecision([id])
         }
     }
 

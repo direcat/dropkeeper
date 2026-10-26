@@ -5,6 +5,7 @@ import SwiftUI
 struct PromptView: View {
     let file: TrackedFile
     let stackCount: Int
+    let duplicateOf: String?
     @Binding var timeline: TimelineModel
     @Binding var applyToAll: Bool
     let now: Date
@@ -12,12 +13,16 @@ struct PromptView: View {
     let onKeep: () -> Void
     let onClose: () -> Void
     let onOpen: () -> Void
+    let onDeleteDuplicate: () -> Void
     @FocusState private var focused: Bool
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
     var body: some View {
         VStack(alignment: .leading, spacing: TK.Space.l) {
             header
+            if let duplicateOf {
+                duplicateRow(of: duplicateOf)
+            }
             if stackCount > 1 {
                 Toggle(isOn: $applyToAll) {
                     Text("Apply to all \(stackCount) new files")
@@ -81,6 +86,30 @@ struct PromptView: View {
         }
     }
 
+    private func duplicateRow(of name: String) -> some View {
+        HStack(spacing: TK.Space.m) {
+            Text("Same as \(name)")
+                .font(.system(size: TK.TextSize.small))
+                .foregroundStyle(TK.Notch.textSecondary)
+                .lineLimit(1)
+                .truncationMode(.middle)
+            Spacer(minLength: TK.Space.s)
+            Button(action: onDeleteDuplicate) {
+                Text("Delete duplicate")
+                    .padding(.horizontal, TK.Space.s)
+                    .padding(.vertical, TK.Space.xs)
+                    .contentShape(Rectangle())
+            }
+            .buttonStyle(.plain)
+            // Mouse-only, like the notice bars: keyboard focus and Return stay with the prompt.
+            .focusable(false)
+            .font(.system(size: TK.TextSize.small, weight: .medium))
+            .foregroundStyle(TK.Notch.accentText)
+            // Keep the visible text aligned with the panel padding despite the larger hit area.
+            .padding(.trailing, -TK.Space.s)
+        }
+    }
+
     private var metadata: String {
         let size = file.sizeBytes.map { ByteCountFormatter.string(fromByteCount: $0, countStyle: .file) }
         let stack = stackCount > 1 ? String(localized: "\(stackCount) new files") : nil
@@ -140,8 +169,9 @@ struct PromptButtonStyle: ButtonStyle {
         displayName: "Quarterly report final v2.pdf", kind: .document, sizeBytes: 2_400_000, state: .pending,
         firstSeen: now, expiresAt: nil, trashPath: nil, failureCount: 0, updatedAt: now)
     PromptView(
-        file: file, stackCount: 3, timeline: $timeline, applyToAll: $applyToAll, now: now,
-        onDone: {}, onKeep: {}, onClose: {}, onOpen: {}
+        file: file, stackCount: 3, duplicateOf: "Quarterly report final.pdf", timeline: $timeline,
+        applyToAll: $applyToAll, now: now,
+        onDone: {}, onKeep: {}, onClose: {}, onOpen: {}, onDeleteDuplicate: {}
     )
     .background(TK.Notch.surface)
 }

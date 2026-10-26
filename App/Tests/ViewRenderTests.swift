@@ -17,11 +17,27 @@ private func render(_ view: some View) -> CGImage? {
 @Test func promptRendersAtDesignWidth() throws {
     let file = scheduledFile(expiresIn: 0, id: "Quarterly report final v2.pdf")
     let view = PromptView(
-        file: file, stackCount: 3,
+        file: file, stackCount: 3, duplicateOf: nil,
         timeline: .constant(TimelineModel(durations: Settings().timelineStops, preselect: .keep)),
-        applyToAll: .constant(false), now: base, onDone: {}, onKeep: {}, onClose: {}, onOpen: {})
+        applyToAll: .constant(false), now: base, onDone: {}, onKeep: {}, onClose: {}, onOpen: {},
+        onDeleteDuplicate: {})
     let image = try #require(render(view))
     #expect(image.width >= 420)
+}
+
+@MainActor
+@Test func promptWithDuplicateRendersTheHint() throws {
+    let file = scheduledFile(expiresIn: 0, id: "report (1).pdf")
+    let make = { (duplicateOf: String?) in
+        PromptView(
+            file: file, stackCount: 1, duplicateOf: duplicateOf,
+            timeline: .constant(TimelineModel(durations: Settings().timelineStops, preselect: .keep)),
+            applyToAll: .constant(false), now: base, onDone: {}, onKeep: {}, onClose: {}, onOpen: {},
+            onDeleteDuplicate: {})
+    }
+    let plain = try #require(render(make(nil)))
+    let flagged = try #require(render(make("report.pdf")))
+    #expect(flagged.height > plain.height)  // the hint and the Delete duplicate button add a row
 }
 
 @MainActor

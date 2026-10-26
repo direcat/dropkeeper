@@ -1,6 +1,24 @@
 {
   "sourceLanguage" : "en",
   "strings" : {
+    "Same as %@" : {
+      "comment" : "Prompt hint: the new file is identical to this existing file",
+      "localizations" : {
+        "cs" : { "stringUnit" : { "state" : "translated", "value" : "Stejný jako %@" } },
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Identisch mit %@" } },
+        "es" : { "stringUnit" : { "state" : "translated", "value" : "Igual que %@" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Identique à %@" } }
+      }
+    },
+    "Delete duplicate" : {
+      "comment" : "Prompt button: delete the new file that duplicates an existing one",
+      "localizations" : {
+        "cs" : { "stringUnit" : { "state" : "translated", "value" : "Smazat duplikát" } },
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Duplikat löschen" } },
+        "es" : { "stringUnit" : { "state" : "translated", "value" : "Eliminar duplicado" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Supprimer le doublon" } }
+      }
+    },
     "Extend by %@" : {
       "comment" : "Reminder bar button: push the deadline back by the timer length, e.g. Extend by 30 min",
       "localizations" : {

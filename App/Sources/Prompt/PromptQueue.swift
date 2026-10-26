@@ -1,32 +1,45 @@
 import DropKeeperCore
 
 /// Pending files waiting for a decision, oldest first, minus the ones the user closed the prompt for.
+/// Scheduled files reopened from a rule notice (`revisiting`) go in front of them, one at a time.
 struct PromptQueue: Equatable {
     private(set) var items: [TrackedFile] = []
+    private(set) var revisiting: [TrackedFile] = []
     private var dismissed: Set<FileID> = []
 
-    var current: TrackedFile? { items.first }
+    var current: TrackedFile? { revisiting.first ?? items.first }
+    var isRevisiting: Bool { !revisiting.isEmpty }
 
-    mutating func update(pending: [TrackedFile]) {
+    /// `scheduled` refreshes the revisited records and drops the ones that are no longer scheduled.
+    mutating func update(pending: [TrackedFile], scheduled: [TrackedFile]) {
+        let scheduledById = Dictionary(scheduled.map { ($0.id, $0) }, uniquingKeysWith: { first, _ in first })
+        revisiting = revisiting.compactMap { scheduledById[$0.id] }
         let pendingIds = Set(pending.map(\.id))
         dismissed.formIntersection(pendingIds)
         let visible = pending.filter { !dismissed.contains($0.id) }
         // Keep the current file first so the prompt does not jump when new files arrive.
-        if let current, let kept = visible.first(where: { $0.id == current.id }) {
-            items = [kept] + visible.filter { $0.id != current.id }
+        if let first = items.first, let kept = visible.first(where: { $0.id == first.id }) {
+            items = [kept] + visible.filter { $0.id != first.id }
         } else {
             items = visible
         }
     }
 
-    /// Closes the prompt for the current file (or the whole stack) without deciding.
+    /// Shows these scheduled files first, to change their timer. They stay scheduled until a decision is made.
+    mutating func revisit(_ files: [TrackedFile]) {
+        revisiting = files
+    }
+
+    /// Closes the prompt for the current file (or the whole stack) without deciding. Closing a revisit leaves
+    /// the rule's expiry and the pending files alone.
     mutating func dismiss(applyToAll: Bool) {
         dismiss(ids: targets(applyToAll: applyToAll))
     }
 
     /// Hides these files until they leave the pending list (e.g. right after a successful decision).
     mutating func dismiss(ids: [FileID]) {
-        dismissed.formUnion(ids)
+        dismissed.formUnion(ids.filter { id in !revisiting.contains { $0.id == id } })
+        revisiting.removeAll { ids.contains($0.id) }
         items.removeAll { ids.contains($0.id) }
     }
 
@@ -37,9 +50,10 @@ struct PromptQueue: Equatable {
         let visible = pending.filter { !dismissed.contains($0.id) }
         let restored = visible.filter { ids.contains($0.id) }
         guard !restored.isEmpty else {
-            update(pending: pending)
+            update(pending: pending, scheduled: revisiting)
             return
         }
+        revisiting = []  // the user picked a file: it goes first
         items = restored + visible.filter { !ids.contains($0.id) }
     }
 
@@ -50,6 +64,6 @@ struct PromptQueue: Equatable {
     }
 
     func targets(applyToAll: Bool) -> [FileID] {
-        applyToAll ? items.map(\.id) : current.map { [$0.id] } ?? []
+        applyToAll && !isRevisiting ? items.map(\.id) : current.map { [$0.id] } ?? []
     }
 }

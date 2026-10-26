@@ -42,12 +42,14 @@ struct PanelRootView: View {
                     Rectangle().fill(TK.Notch.hairline).frame(height: 1)
                 }
                 PromptView(
-                    file: file, stackCount: model.queue.items.count, timeline: $model.timeline,
+                    file: file, stackCount: model.queue.isRevisiting ? 1 : model.queue.items.count,
+                    duplicateOf: file.duplicateOf, timeline: $model.timeline,
                     applyToAll: $model.applyToAll, now: model.now,
                     onDone: { Task { await model.decide(for: file.id) } },
                     onKeep: { Task { await model.keepPrompted(for: file.id) } },
                     onClose: { model.dismissPrompt() },
-                    onOpen: { FileOpener.open(FinderReveal.target(for: file.path)) })
+                    onOpen: { FileOpener.open(FinderReveal.target(for: file.path)) },
+                    onDeleteDuplicate: { Task { await model.deleteDuplicate(for: file.id) } })
             }
         case .notice:
             NoticeStackView(model: model, holdsNotice: true)
