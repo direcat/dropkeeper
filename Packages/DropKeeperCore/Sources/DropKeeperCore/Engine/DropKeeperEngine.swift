@@ -77,7 +77,14 @@ public actor DropKeeperEngine {
     /// When each folder (by id) stopped being `.ok` during this session; bounds its rescan on return.
     var unavailableSince: [Int64: Date] = [:]
     /// Off-actor duplicate comparisons in flight, by path; also keeps a file from being detected twice meanwhile.
-    var duplicateChecks: [String: Task<Void, Never>] = [:]
+    var duplicateChecks: [String: DuplicateCheck] = [:]
+
+    struct DuplicateCheck {
+        let task: Task<Void, Never>
+        let file: TrackedFile
+        /// A rule-matched file has no record until its check ends.
+        let awaitsInsert: Bool
+    }
 
     var store: FileStore { env.store }
     var actions: ItemActions { ItemActions(fs: env.fs) }
@@ -145,7 +152,10 @@ public actor DropKeeperEngine {
         rescheduleTimer()
     }
 
-    public func stop() {
+    /// Stops the engine. Running duplicate checks finish first (bounded by `drainTimeout`), so a file whose
+    /// rule outcome is still pending is not lost.
+    public func stop(drainTimeout: Duration = .seconds(2)) async {
+        if isRunning { await drainDuplicateChecks(timeout: drainTimeout) }
         writeHeartbeat()
         isRunning = false
         eventTask?.cancel()
