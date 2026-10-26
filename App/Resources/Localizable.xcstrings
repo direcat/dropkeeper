@@ -24,7 +24,7 @@
       "localizations" : {
         "cs" : { "stringUnit" : { "state" : "translated", "value" : "Prodloužit o %@" } },
         "de" : { "stringUnit" : { "state" : "translated", "value" : "Um %@ verlängern" } },
-        "es" : { "stringUnit" : { "state" : "translated", "value" : "Ampliar %@" } },
+        "es" : { "stringUnit" : { "state" : "translated", "value" : "Prolongar %@" } },
         "fr" : { "stringUnit" : { "state" : "translated", "value" : "Prolonger de %@" } }
       }
     },
@@ -33,7 +33,7 @@
       "localizations" : {
         "cs" : { "stringUnit" : { "state" : "translated", "value" : "Prodloužit" } },
         "de" : { "stringUnit" : { "state" : "translated", "value" : "Verlängern" } },
-        "es" : { "stringUnit" : { "state" : "translated", "value" : "Ampliar" } },
+        "es" : { "stringUnit" : { "state" : "translated", "value" : "Prolongar" } },
         "fr" : { "stringUnit" : { "state" : "translated", "value" : "Prolonger" } }
       }
     },
@@ -44,6 +44,15 @@
         "de" : { "stringUnit" : { "state" : "translated", "value" : "Jetzt löschen" } },
         "es" : { "stringUnit" : { "state" : "translated", "value" : "Eliminar ahora" } },
         "fr" : { "stringUnit" : { "state" : "translated", "value" : "Supprimer maintenant" } }
+      }
+    },
+    "Delete now…" : {
+      "comment" : "Reminder bar button in permanent-delete mode: opens a confirmation before deleting the files",
+      "localizations" : {
+        "cs" : { "stringUnit" : { "state" : "translated", "value" : "Smazat hned…" } },
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Jetzt löschen…" } },
+        "es" : { "stringUnit" : { "state" : "translated", "value" : "Eliminar ahora…" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Supprimer maintenant…" } }
       }
     },
     "Deleted in %@" : {
@@ -62,6 +71,15 @@
         "de" : { "stringUnit" : { "state" : "translated", "value" : "%@ — Löschung in %@ (%@)" } },
         "es" : { "stringUnit" : { "state" : "translated", "value" : "%@ — se eliminará en %@ (%@)" } },
         "fr" : { "stringUnit" : { "state" : "translated", "value" : "%@ — suppression dans %@ (%@)" } }
+      }
+    },
+    "%lld files — scheduled by rules" : {
+      "comment" : "Rule notice when files from different rules were scheduled together: file count",
+      "localizations" : {
+        "cs" : { "stringUnit" : { "state" : "translated", "value" : "%lld souborů — naplánováno pravidly" } },
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "%lld Dateien — von Regeln geplant" } },
+        "es" : { "stringUnit" : { "state" : "translated", "value" : "%lld archivos — programados por reglas" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "%lld fichiers — planifiés par des règles" } }
       }
     },
     "Change" : {
@@ -1342,12 +1360,12 @@
         "fr" : { "stringUnit" : { "state" : "translated", "value" : "Rappeler avant la suppression" } }
       }
     },
-    "Remind" : {
+    "Remind before" : {
       "comment" : "Settings slider: how long before deletion the reminder comes",
       "localizations" : {
         "cs" : { "stringUnit" : { "state" : "translated", "value" : "Připomenout předem" } },
-        "de" : { "stringUnit" : { "state" : "translated", "value" : "Erinnern vor" } },
-        "es" : { "stringUnit" : { "state" : "translated", "value" : "Recordar con" } },
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Vorher erinnern" } },
+        "es" : { "stringUnit" : { "state" : "translated", "value" : "Recordar con antelación" } },
         "fr" : { "stringUnit" : { "state" : "translated", "value" : "Rappeler avant" } }
       }
     },

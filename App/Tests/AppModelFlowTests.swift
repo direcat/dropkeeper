@@ -43,6 +43,24 @@ private func pendingFile(_ id: String) -> TrackedFile {
         #expect(model.queue.current?.id == "a")
     }
 
+    /// A duplicate that matched a rule waits for the user but keeps the rule's duration as its starting point.
+    @Test func ruleMatchedDuplicatePreselectsTheRuleDuration() {
+        let fixture = Fixture()
+        defer { fixture.cleanUp() }
+        let model = fixture.model
+        var duplicate = pendingFile("dup")
+        duplicate.duplicateOf = "original.pdf"
+        duplicate.scheduleDuration = 3000  // between two stops: the nearest one at least as long
+        model.apply([duplicate])
+        #expect(model.timeline.selected == .duration(3600))
+        #expect(model.promptPreselection == .expireAfter(3600))
+        // Without a duplicate flag the default (Keep) still applies.
+        var plain = pendingFile("plain")
+        plain.scheduleDuration = 3000
+        model.apply([plain])
+        #expect(model.promptPreselection == .keep)
+    }
+
     @Test func reviewOfAFileThatIsNoLongerPendingRequestsNothing() {
         let fixture = Fixture()
         defer { fixture.cleanUp() }
@@ -108,7 +126,8 @@ private func pendingFile(_ id: String) -> TrackedFile {
         model.applyToAll = true
         let selected = model.timeline.selected
         await model.handle(.trashed([scheduledFile(expiresIn: 0, id: "old.pdf")]))
-        await model.handle(.ruleApplied([RuleApplication(file: scheduledFile(expiresIn: 60), ruleName: "Rule")]))
+        await model.handle(
+            .ruleApplied([RuleApplication(file: scheduledFile(expiresIn: 60), ruleId: UUID(), ruleName: "Rule")]))
         #expect(model.isNoticeVisible)
         #expect(model.isPromptAvailable)
         #expect(model.queue.current?.id == "a")

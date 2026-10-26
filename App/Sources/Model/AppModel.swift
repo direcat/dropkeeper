@@ -176,10 +176,16 @@ final class AppModel {
         applyToAll = false
     }
 
-    /// A revisit starts on the file's current timer (never Keep); a new file on what the grace period would apply.
-    private var promptPreselection: ResolvedChoice {
-        guard queue.isRevisiting, let duration = queue.current?.timerLength else { return resolvedChoice }
-        return .expireAfter(TimelineModel.nearestStop(atLeast: duration, in: settings.timelineStops))
+    /// A revisit starts on the file's current timer (never Keep); a duplicate that matched a rule on that rule's
+    /// duration; any other new file on what the grace period would apply.
+    var promptPreselection: ResolvedChoice {
+        if queue.isRevisiting, let duration = queue.current?.timerLength {
+            return .expireAfter(TimelineModel.nearestStop(atLeast: duration, in: settings.timelineStops))
+        }
+        if let file = queue.current, file.duplicateOf != nil, let duration = file.scheduleDuration {
+            return .expireAfter(TimelineModel.nearestStop(atLeast: duration, in: settings.timelineStops))
+        }
+        return resolvedChoice
     }
 
     private func scheduleClock() {

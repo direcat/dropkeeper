@@ -38,12 +38,13 @@ struct NoticeStackView: View {
                     onExtend: { Task { await model.extendReminders() } },
                     onKeep: { Task { await model.keepReminders() } },
                     onDelete: { Task { await model.deleteReminders() } },
+                    deleteAsksConfirmation: model.settings.deleteMode == .permanent,
                     onDismiss: { model.dismissReminders() })
             }
             if !shown.rules.isEmpty {
                 if !shown.reminders.isEmpty { separator }
                 RuleNoticeView(
-                    applications: shown.rules, onChange: { model.changeRuleNotice() },
+                    applications: shown.rules, rules: model.settings.rules, onChange: { model.changeRuleNotice() },
                     onHover: { inside in
                         if inside { model.pauseRuleNotice() } else { model.resumeRuleNotice() }
                     })

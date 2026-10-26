@@ -270,7 +270,7 @@ private struct ExpiryTab: View {
                 label: { DurationLabel.long($0) })
             Toggle("Remind before deleting", isOn: $store.draft.reminderEnabled)
             StepSlider(
-                "Remind", values: Settings.reminderLeadTimeOptions, selection: $store.draft.reminderLeadTime,
+                "Remind before", values: Settings.reminderLeadTimeOptions, selection: $store.draft.reminderLeadTime,
                 label: { DurationLabel.long($0) }
             )
             .disabled(!store.draft.reminderEnabled)

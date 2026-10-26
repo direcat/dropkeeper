@@ -4,6 +4,7 @@ import SwiftUI
 /// "A rule scheduled this file" notice with Change. Hovering it pauses its countdown so there is time to click.
 struct RuleNoticeView: View {
     let applications: [RuleApplication]
+    let rules: [Rule]
     let onChange: () -> Void
     let onHover: (Bool) -> Void
 
@@ -37,10 +38,22 @@ struct RuleNoticeView: View {
         .accessibilityElement(children: .combine)
     }
 
-    /// "report.dmg — deleted in 1 day (Installers)"; for several files the first rule's name.
+    /// "report.dmg — deleted in 1 day (Installers)"; several files from one rule use that rule, files from
+    /// different rules just say they were scheduled by rules.
     private var line: String {
         guard let first = applications.first else { return "" }
+        if Set(applications.map(\.ruleId)).count > 1 {
+            return String(localized: "\(applications.count) files — scheduled by rules")
+        }
         let length = first.file.timerLength ?? first.file.expiresAt.map { $0.timeIntervalSinceNow } ?? 0
-        return String(localized: "\(title) — deleted in \(DurationLabel.short(length)) (\(first.ruleName))")
+        return String(
+            localized: "\(title) — deleted in \(DurationLabel.short(length)) (\(Self.ruleName(for: first, in: rules)))")
+    }
+
+    /// The rule's current display name (default rules are translated); the name reported by the engine when the
+    /// rule has since been deleted.
+    static func ruleName(for application: RuleApplication, in rules: [Rule]) -> String {
+        guard let rule = rules.first(where: { $0.id == application.ruleId }) else { return application.ruleName }
+        return RuleSummary.displayName(for: rule)
     }
 }

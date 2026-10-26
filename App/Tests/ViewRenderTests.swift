@@ -133,5 +133,6 @@ private func render(_ view: some View) -> CGImage? {
     controller.settingsWindow?.close()
     controller.show()
     try expectCentered()
+    #expect(controller.settingsWindow?.toolbar?.items.count == 6)
     controller.settingsWindow?.close()
 }

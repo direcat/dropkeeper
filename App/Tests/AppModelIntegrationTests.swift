@@ -94,7 +94,7 @@ private final class LoginItemRecorder {
         let defaults = try #require(UserDefaults(suiteName: suite))
         defer { defaults.removePersistentDomain(forName: suite) }
         let started = try await startedModel(root: root, defaults: defaults)
-        let (model, folder, bootstrap) = (started.model, started.folder, started.bootstrap)
+        let (model, folder) = (started.model, started.folder)
 
         var settings = model.settings
         settings.defaultChoice = .lastChosen
@@ -280,7 +280,7 @@ private final class LoginItemRecorder {
         var file = scheduledFile(expiresIn: 7200, id: "s")
         file.scheduleDuration = 7200
         model.apply([file])
-        await model.handle(.ruleApplied([RuleApplication(file: file, ruleName: "Rule")]))
+        await model.handle(.ruleApplied([RuleApplication(file: file, ruleId: UUID(), ruleName: "Rule")]))
         #expect(!model.isPromptAvailable)
         model.changeRuleNotice()
         #expect(model.queue.isRevisiting)

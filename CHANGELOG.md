@@ -7,7 +7,7 @@ All notable changes to DropKeeper are documented here. The format follows [Keep 
 ### Added
 - Rules by file type, name pattern or folder: first match wins, reorderable (Move up / Move down), and a matched file skips the prompt with a short notice and a Change button. Starter rules for Installers, Screenshots on Desktop, Images, Archives and Invitations & contacts ship disabled.
 - Pre-expiry reminder (on by default, 5 minutes before): Extend by the timer length, Keep or Delete now.
-- Duplicate detection in the same folder: the prompt offers "Same as …" and Delete duplicate; can be turned off in Settings.
+- Duplicate detection in the same folder: the prompt offers "Same as …" and Delete duplicate; checked in the background, can be turned off in Settings. A duplicate that matches a rule still waits for your decision and gets the rule's time once the grace period passes.
 - Default action "Last chosen time": the next file gets the time you picked last.
 - Ignored files are now name patterns. The default set (`~$*`, `#*#`, `*~`) skips Office owner files and editor backups.
 - Reminders, rule notices and "Moved to Trash" appear as bars above the prompt, in one unified panel in the menu bar and in the notch.
