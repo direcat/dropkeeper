@@ -12,7 +12,7 @@ public enum IgnorePattern {
         let rest = String(trimmed.drop { $0 == "." })
         guard !rest.isEmpty else { return nil }
         let hasGlob = rest.contains { "*?[".contains($0) }
-        if hasGlob { return trimmed.hasPrefix(".") ? rest : trimmed }
+        if hasGlob { return trimmed }
         if trimmed.hasPrefix(".") || !rest.contains(".") { return "*.\(rest)" }
         return rest
     }

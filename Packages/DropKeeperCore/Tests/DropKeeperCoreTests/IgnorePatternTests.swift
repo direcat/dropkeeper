@@ -7,6 +7,8 @@ import Testing
     #expect(IgnorePattern.normalize(".dmg") == "*.dmg")
     #expect(IgnorePattern.normalize("~$*") == "~$*")
     #expect(IgnorePattern.normalize("Report*.PDF") == "report*.pdf")
+    #expect(IgnorePattern.normalize(".*") == ".*")  // glob input keeps its leading dot
+    #expect(IgnorePattern.normalize(".??*") == ".??*")
     #expect(IgnorePattern.normalize("  ") == nil)
 }
 
