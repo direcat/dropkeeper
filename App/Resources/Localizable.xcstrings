@@ -19,6 +19,15 @@
         "fr" : { "stringUnit" : { "state" : "translated", "value" : "Supprimer le doublon" } }
       }
     },
+    "Delete duplicate…" : {
+      "comment" : "Prompt button in permanent-delete mode: deleting the duplicate opens a confirmation first",
+      "localizations" : {
+        "cs" : { "stringUnit" : { "state" : "translated", "value" : "Smazat duplikát…" } },
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Duplikat löschen…" } },
+        "es" : { "stringUnit" : { "state" : "translated", "value" : "Eliminar duplicado…" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Supprimer le doublon…" } }
+      }
+    },
     "Extend by %@" : {
       "comment" : "Reminder bar button: push the deadline back by the timer length, e.g. Extend by 30 min",
       "localizations" : {
@@ -76,10 +85,25 @@
     "%lld files — scheduled by rules" : {
       "comment" : "Rule notice when files from different rules were scheduled together: file count",
       "localizations" : {
-        "cs" : { "stringUnit" : { "state" : "translated", "value" : "%lld souborů — naplánováno pravidly" } },
-        "de" : { "stringUnit" : { "state" : "translated", "value" : "%lld Dateien — von Regeln geplant" } },
-        "es" : { "stringUnit" : { "state" : "translated", "value" : "%lld archivos — programados por reglas" } },
-        "fr" : { "stringUnit" : { "state" : "translated", "value" : "%lld fichiers — planifiés par des règles" } }
+        "en" : { "variations" : { "plural" : {
+          "one" : { "stringUnit" : { "state" : "translated", "value" : "%lld file — scheduled by rules" } },
+          "other" : { "stringUnit" : { "state" : "translated", "value" : "%lld files — scheduled by rules" } } } } },
+        "cs" : { "variations" : { "plural" : {
+          "one" : { "stringUnit" : { "state" : "translated", "value" : "%lld soubor — naplánován pravidly" } },
+          "few" : { "stringUnit" : { "state" : "translated", "value" : "%lld soubory — naplánovány pravidly" } },
+          "many" : { "stringUnit" : { "state" : "translated", "value" : "%lld souboru — naplánováno pravidly" } },
+          "other" : { "stringUnit" : { "state" : "translated", "value" : "%lld souborů — naplánováno pravidly" } } } } },
+        "de" : { "variations" : { "plural" : {
+          "one" : { "stringUnit" : { "state" : "translated", "value" : "%lld Datei — von Regeln geplant" } },
+          "other" : { "stringUnit" : { "state" : "translated", "value" : "%lld Dateien — von Regeln geplant" } } } } },
+        "es" : { "variations" : { "plural" : {
+          "one" : { "stringUnit" : { "state" : "translated", "value" : "%lld archivo — programado por reglas" } },
+          "many" : { "stringUnit" : { "state" : "translated", "value" : "%lld archivos — programados por reglas" } },
+          "other" : { "stringUnit" : { "state" : "translated", "value" : "%lld archivos — programados por reglas" } } } } },
+        "fr" : { "variations" : { "plural" : {
+          "one" : { "stringUnit" : { "state" : "translated", "value" : "%lld fichier — planifié par des règles" } },
+          "many" : { "stringUnit" : { "state" : "translated", "value" : "%lld fichiers — planifiés par des règles" } },
+          "other" : { "stringUnit" : { "state" : "translated", "value" : "%lld fichiers — planifiés par des règles" } } } } }
       }
     },
     "Change" : {

@@ -43,7 +43,8 @@ struct PanelRootView: View {
                 }
                 PromptView(
                     file: file, stackCount: model.queue.isRevisiting ? 1 : model.queue.items.count,
-                    duplicateOf: file.duplicateOf, timeline: $model.timeline,
+                    duplicateOf: file.duplicateOf,
+                    deleteAsksConfirmation: model.settings.deleteMode == .permanent, timeline: $model.timeline,
                     applyToAll: $model.applyToAll, now: model.now,
                     onDone: { Task { await model.decide(for: file.id) } },
                     onKeep: { Task { await model.keepPrompted(for: file.id) } },

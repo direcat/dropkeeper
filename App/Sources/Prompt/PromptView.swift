@@ -6,6 +6,8 @@ struct PromptView: View {
     let file: TrackedFile
     let stackCount: Int
     let duplicateOf: String?
+    /// Permanent deletion asks for confirmation first, which the label announces with an ellipsis.
+    var deleteAsksConfirmation = false
     @Binding var timeline: TimelineModel
     @Binding var applyToAll: Bool
     let now: Date
@@ -95,7 +97,7 @@ struct PromptView: View {
                 .truncationMode(.middle)
             Spacer(minLength: TK.Space.s)
             Button(action: onDeleteDuplicate) {
-                Text("Delete duplicate")
+                (deleteAsksConfirmation ? Text("Delete duplicate…") : Text("Delete duplicate"))
                     .padding(.horizontal, TK.Space.s)
                     .padding(.vertical, TK.Space.xs)
                     .contentShape(Rectangle())
