@@ -33,6 +33,12 @@ import Testing
         return path
     }
 
+    /// Same-size, different-content sibling: a candidate that turns out not to be a duplicate.
+    private func addSibling(_ name: String, to harness: EngineHarness, content: Data) {
+        harness.fs.createFile(
+            EngineHarness.downloads + "/" + name, content: content, added: Date(timeIntervalSince1970: 0))
+    }
+
     @Test func ruleSchedulesWithoutPrompt() async throws {
         let harness = try await harness(rules: [imagesRule()])
         await harness.drop("a.png")
@@ -67,9 +73,13 @@ import Testing
         harness.fs.createFile(
             EngineHarness.downloads + "/a.png", content: content, added: Date(timeIntervalSince1970: 0))
         await dropContent("b.png", in: harness)
+        // Rule-matched: nothing is observable until the comparison ends.
+        #expect(try harness.files().isEmpty)
+        await harness.settleDuplicateChecks()
         let file = try #require(try harness.files().first)
         #expect(file.state == .pending)
         #expect(file.duplicateOf == "a.png")
+        #expect(file.scheduleDuration == 3600)
         let note = await harness.nextNotification(timeout: .milliseconds(200)) {
             if case .ruleApplied = $0 { true } else { false }
         }
@@ -91,6 +101,9 @@ import Testing
         harness.fs.createFile(
             EngineHarness.downloads + "/report.pdf", content: content, added: Date(timeIntervalSince1970: 0))
         await dropContent("report (1).pdf", in: harness)
+        // The prompt record exists right away; the hint follows the comparison.
+        #expect(try harness.files().map(\.duplicateOf) == [nil])
+        await harness.settleDuplicateChecks()
         let file = try #require(try harness.files().first)
         #expect(file.state == .pending)
         #expect(file.duplicateOf == "report.pdf")
@@ -110,5 +123,57 @@ import Testing
         let harness = try await harness(rules: [imagesRule(folder: EngineHarness.desktop)])
         await harness.drop("a.png")
         #expect(try harness.files().map(\.state) == [.pending])
+    }
+
+    @Test func duplicateKeepsTheRuleAfterTheGracePeriod() async throws {
+        let harness = try await harness(rules: [imagesRule()])
+        harness.fs.createFile(
+            EngineHarness.downloads + "/a.png", content: content, added: Date(timeIntervalSince1970: 0))
+        await dropContent("b.png", in: harness)
+        await harness.settleDuplicateChecks()
+        let grace = await harness.engine.currentSettings.gracePeriod
+        await harness.advance(grace + 1)
+        let file = try #require(try harness.files().first)
+        #expect(file.state == .scheduled)
+        #expect(file.scheduleDuration == 3600)
+        #expect(file.expiresAt == harness.time.now().addingTimeInterval(3600))
+    }
+
+    @Test func sameSizeNonDuplicateIsScheduledByTheRuleOnce() async throws {
+        let harness = try await harness(rules: [imagesRule()])
+        addSibling("a.png", to: harness, content: Data("other byte".utf8))
+        await dropContent("b.png", in: harness)
+        #expect(try harness.files().isEmpty)
+        await harness.settleDuplicateChecks()
+        let file = try #require(try harness.files().first)
+        #expect(file.state == .scheduled)
+        #expect(file.duplicateOf == nil)
+        let note = await harness.nextNotification { if case .ruleApplied = $0 { true } else { false } }
+        guard case .ruleApplied(let applications) = try #require(note) else { return }
+        #expect(applications.map(\.id) == [file.id])
+        #expect(try harness.files().count == 1)
+    }
+
+    @Test func fileDeletedDuringTheCheckIsDropped() async throws {
+        let harness = try await harness(rules: [imagesRule()])
+        addSibling("a.png", to: harness, content: content)
+        let fs = harness.fs
+        fs.contentsEqualHook = { first, _ in fs.delete(first) }
+        await dropContent("b.png", in: harness)
+        await harness.settleDuplicateChecks()
+        #expect(try harness.files().isEmpty)
+        let note = await harness.nextNotification(timeout: .milliseconds(200)) {
+            if case .ruleApplied = $0 { true } else { false }
+        }
+        #expect(note == nil)
+    }
+
+    @Test func ruleApplicationCarriesTheRuleId() async throws {
+        let rule = imagesRule()
+        let harness = try await harness(rules: [rule])
+        await harness.drop("a.png")
+        let note = await harness.nextNotification { if case .ruleApplied = $0 { true } else { false } }
+        guard case .ruleApplied(let applications) = try #require(note) else { return }
+        #expect(applications.map(\.ruleId) == [rule.id])
     }
 }

@@ -75,6 +75,9 @@ struct EngineHarness {
         return path
     }
 
+    /// Waits for the off-actor duplicate comparisons started by the last tick.
+    func settleDuplicateChecks() async { await engine.awaitDuplicateChecks() }
+
     func advance(_ seconds: TimeInterval) async {
         time.advance(by: seconds)
         await engine.tick()

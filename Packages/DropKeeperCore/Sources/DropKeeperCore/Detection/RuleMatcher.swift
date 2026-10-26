@@ -18,7 +18,12 @@ public enum RuleMatcher {
     }
 
     private static func matches(_ category: RuleCategory, name: String, path: String, fs: any FileSystem) -> Bool {
-        if category == .screenshots { return fs.hasXattr(screenCaptureAttribute, at: path) }
+        if category == .screenshots {
+            // Screen recordings carry the same attribute; only images are screenshots.
+            let ext = (name as NSString).pathExtension
+            return fs.hasXattr(screenCaptureAttribute, at: path)
+                && UTType(filenameExtension: ext)?.conforms(to: .image) == true
+        }
         // `.tar.gz` and friends: the last extension decides.
         let ext = (name as NSString).pathExtension
         guard !ext.isEmpty, let type = UTType(filenameExtension: ext) else { return false }

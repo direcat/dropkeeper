@@ -24,6 +24,7 @@ final class FakeFileSystem: FileSystem {
         var deniedDirectories: Set<String> = []
         var trashedPaths: [String] = []
         var removedPaths: [String] = []
+        var contentsEqualHook: (@Sendable (String, String) -> Void)?
     }
 
     private let state = Mutex(State())
@@ -97,6 +98,11 @@ final class FakeFileSystem: FileSystem {
         get { state.withLock { $0.deniedDirectories } }
         set { state.withLock { $0.deniedDirectories = newValue } }
     }
+    /// Runs at the start of every `contentsEqual`, outside the lock, on the calling thread.
+    var contentsEqualHook: (@Sendable (String, String) -> Void)? {
+        get { state.withLock { $0.contentsEqualHook } }
+        set { state.withLock { $0.contentsEqualHook = newValue } }
+    }
     var trashedPaths: [String] { state.withLock { $0.trashedPaths } }
     var removedPaths: [String] { state.withLock { $0.removedPaths } }
 
@@ -109,6 +115,13 @@ final class FakeFileSystem: FileSystem {
                     inode: $0.inode, volumeId: $0.volume, size: $0.size, isDirectory: $0.isDirectory,
                     creationDate: $0.added, addedDate: $0.added)
             }
+        }
+    }
+
+    func fileSize(_ path: String) -> Int64? {
+        state.withLock { state in
+            guard let entry = state.entries[path], !entry.isDirectory else { return nil }
+            return entry.size
         }
     }
 
@@ -191,7 +204,8 @@ final class FakeFileSystem: FileSystem {
     }
 
     func contentsEqual(_ first: String, _ second: String) -> Bool {
-        state.withLock { state in
+        contentsEqualHook?(first, second)
+        return state.withLock { state in
             guard let left = state.entries[first]?.content,
                 let right = state.entries[second]?.content
             else { return false }

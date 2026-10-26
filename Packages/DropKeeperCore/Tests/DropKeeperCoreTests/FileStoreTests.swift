@@ -124,3 +124,52 @@ private func sampleFolder(_ path: String = "/fake/D") -> WatchedFolder {
     #expect(try store.file(id: "B")?.scheduleDuration == nil)
     #expect(try store.file(id: "B")?.duplicateOf == nil)
 }
+
+@Test func populatedV1DatabaseMigratesToV2() throws {
+    let dir = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString, isDirectory: true)
+    try FileManager.default.createDirectory(at: dir, withIntermediateDirectories: true)
+    defer { try? FileManager.default.removeItem(at: dir) }
+    let url = dir.appendingPathComponent("dropkeeper.sqlite")
+    // The schema exactly as the v1 migration creates it, plus GRDB's bookkeeping row for "v1".
+    let legacy = try DatabaseQueue(path: url.path)
+    try legacy.write { db in
+        try db.execute(
+            sql: """
+                CREATE TABLE watched_folder (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT, path TEXT NOT NULL UNIQUE, bookmark BLOB,
+                    volume_id TEXT NOT NULL, added_at DATETIME NOT NULL, baseline_event_id INTEGER NOT NULL,
+                    status TEXT NOT NULL);
+                CREATE TABLE tracked_file (
+                    id TEXT PRIMARY KEY NOT NULL, folder_id INTEGER REFERENCES watched_folder(id) ON DELETE SET NULL,
+                    path TEXT NOT NULL, inode INTEGER NOT NULL, volume_id TEXT NOT NULL, display_name TEXT NOT NULL,
+                    kind TEXT NOT NULL, size_bytes INTEGER, state TEXT NOT NULL, first_seen DATETIME NOT NULL,
+                    expires_at DATETIME, trash_path TEXT, failure_count INTEGER NOT NULL DEFAULT 0,
+                    updated_at DATETIME NOT NULL);
+                CREATE INDEX tracked_file_state_expires ON tracked_file(state, expires_at);
+                CREATE INDEX tracked_file_identity ON tracked_file(inode, volume_id);
+                CREATE INDEX tracked_file_state_updated ON tracked_file(state, updated_at);
+                CREATE INDEX tracked_file_folder ON tracked_file(folder_id);
+                CREATE INDEX tracked_file_path ON tracked_file(path);
+                CREATE TABLE setting (key TEXT PRIMARY KEY NOT NULL, value TEXT NOT NULL);
+                CREATE TABLE meta (key TEXT PRIMARY KEY NOT NULL, value TEXT NOT NULL);
+                CREATE TABLE grdb_migrations (identifier TEXT NOT NULL PRIMARY KEY);
+                INSERT INTO grdb_migrations VALUES ('v1');
+                """)
+        try db.execute(
+            sql: """
+                INSERT INTO tracked_file (id, path, inode, volume_id, display_name, kind, size_bytes, state,
+                    first_seen, failure_count, updated_at)
+                VALUES ('OLD', '/fake/D/old.pdf', 7, 'VOL-A', 'old.pdf', 'document', 10, 'pending',
+                    '2026-01-01 00:00:00.000', 0, '2026-01-01 00:00:00.000')
+                """)
+    }
+    try legacy.close()
+    let result = try FileStore.open(at: url)
+    let file = try #require(try result.store.file(id: "OLD"))
+    #expect(file.path == "/fake/D/old.pdf")
+    #expect(file.state == .pending)
+    #expect(file.sizeBytes == 10)
+    #expect(file.scheduleDuration == nil)
+    #expect(file.duplicateOf == nil)
+    #expect(!result.recoveredFromCorruption)
+}

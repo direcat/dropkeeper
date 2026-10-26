@@ -100,7 +100,8 @@ public struct Settings: Codable, Sendable, Equatable {
             try container.decodeIfPresent(Bool.self, forKey: .reminderEnabled) ?? defaults.reminderEnabled
         reminderLeadTime =
             try container.decodeIfPresent(TimeInterval.self, forKey: .reminderLeadTime) ?? defaults.reminderLeadTime
-        rules = try container.decodeIfPresent([Rule].self, forKey: .rules) ?? defaults.rules
+        // One undecodable rule is skipped; an unreadable key falls back to the defaults for that key only.
+        rules = (try? container.decodeIfPresent(LossyRules.self, forKey: .rules))?.rules ?? defaults.rules
         duplicateDetection =
             try container.decodeIfPresent(Bool.self, forKey: .duplicateDetection) ?? defaults.duplicateDetection
     }
@@ -146,5 +147,28 @@ public struct Settings: Codable, Sendable, Equatable {
             return rule
         }
         return result
+    }
+}
+
+/// Decodes a rules array element by element, dropping the ones that no longer decode (e.g. a category
+/// from a newer version) instead of failing the whole settings blob.
+private struct LossyRules: Decodable {
+    let rules: [Rule]
+
+    private struct Discard: Decodable {
+        init(from decoder: Decoder) throws {}
+    }
+
+    init(from decoder: Decoder) throws {
+        var container = try decoder.unkeyedContainer()
+        var rules: [Rule] = []
+        while !container.isAtEnd {
+            if let rule = try? container.decode(Rule.self) {
+                rules.append(rule)
+            } else {
+                _ = try container.decode(Discard.self)
+            }
+        }
+        self.rules = rules
     }
 }

@@ -31,6 +31,8 @@ public enum FileSystemError: Error, Equatable {
 /// All filesystem access used by the engine. Paths are absolute POSIX paths.
 public protocol FileSystem: Sendable {
     func stat(_ path: String) -> FileStat?
+    /// Size of a regular file via a plain `lstat`; nil for anything else (missing, directory, symlink).
+    func fileSize(_ path: String) -> Int64?
     func contentsOfDirectory(_ path: String) throws -> [String]
     func readXattr(_ name: String, at path: String) -> String?
     func hasXattr(_ name: String, at path: String) -> Bool

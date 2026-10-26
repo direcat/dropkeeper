@@ -20,6 +20,15 @@ import Testing
         #expect(fs.stat(dir.path + "/missing") == nil)
     }
 
+    @Test func fileSizeIsForRegularFilesOnly() throws {
+        let dir = try TempDir()
+        defer { dir.cleanup() }
+        let file = dir.createFile("a.txt", contents: "hello")
+        #expect(fs.fileSize(file) == 5)
+        #expect(fs.fileSize(dir.path) == nil)
+        #expect(fs.fileSize(dir.path + "/missing") == nil)
+    }
+
     @Test func xattrRoundTrip() throws {
         let dir = try TempDir()
         defer { dir.cleanup() }

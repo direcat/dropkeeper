@@ -149,10 +149,11 @@ import Testing
     #expect(rules.map(\.duration) == [86_400, 86_400, 3600, 86_400, 1800])
     #expect(rules[1].folderPath == NSHomeDirectory() + "/Desktop")
     #expect(Set(rules.map(\.id)).count == 5)
-    for rule in rules {
-        #expect(!rule.name.lowercased().contains("torrent"))
-        if case .pattern(let pattern) = rule.match { #expect(!pattern.lowercased().contains("torrent")) }
-    }
+    #expect(
+        rules.map(\.match) == [
+            .category(.installers), .category(.screenshots), .category(.images), .category(.archives),
+            .category(.invitationsAndContacts),
+        ])
 }
 
 @Test func legacyBlobGetsDefaultRulesAndDuplicateDetection() throws {
@@ -174,4 +175,22 @@ import Testing
     #expect(normalized[0].match == .pattern("*.ics"))
     #expect(normalized[0].duration == Settings.minStop)
     #expect(normalized[1].duration == Settings.maxStop)
+}
+
+@Test func undecodableRuleIsSkippedWithoutResettingOtherSettings() throws {
+    let rule = Rule(name: "Images", match: .category(.images), duration: 3600)
+    let good = try #require(String(bytes: try JSONEncoder().encode(rule), encoding: .utf8))
+    let unknown =
+        #"{"id":"6F1D0A10-0009-4C5E-9A10-D40F7E000009","name":"New","#
+        + #""match":{"category":{"_0":"hologram"}},"duration":60,"isEnabled":true}"#
+    let blob = #"{"quietMode":true,"rules":[\#(good),\#(unknown)]}"#
+    let decoded = try JSONDecoder().decode(Settings.self, from: Data(blob.utf8))
+    #expect(decoded.quietMode)
+    #expect(decoded.rules == [rule])
+}
+
+@Test func unreadableRulesKeyFallsBackToDefaultsOnly() throws {
+    let decoded = try JSONDecoder().decode(Settings.self, from: Data(#"{"quietMode":true,"rules":"oops"}"#.utf8))
+    #expect(decoded.quietMode)
+    #expect(decoded.rules == Settings().rules)
 }

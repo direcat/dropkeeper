@@ -59,4 +59,17 @@ struct DuplicateFinderTests {
         fs.createFile(folder + "/new.dat", content: bytes, added: nil)
         #expect(find("new.dat") == nil)
     }
+
+    @Test func candidatesAreSameSizeEligibleSiblingsOnly() {
+        fs.createFile(folder + "/new.dat", content: bytes, added: nil)
+        fs.createFile(folder + "/same.dat", content: Data("other byte".utf8), added: nil)
+        fs.createFile(folder + "/longer.dat", content: Data("longer content".utf8), added: nil)
+        fs.createFile(folder + "/part.tmp", content: bytes, added: nil)
+        fs.mkdir(folder + "/sub")
+        let names = DuplicateFinder.candidates(
+            path: folder + "/new.dat", size: Int64(bytes.count), folderPath: folder, ignoredPatterns: [], fs: fs)
+        #expect(names == ["same.dat"])
+        #expect(
+            DuplicateFinder.firstMatch(path: folder + "/new.dat", candidates: names, folderPath: folder, fs: fs) == nil)
+    }
 }

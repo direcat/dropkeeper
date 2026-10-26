@@ -19,6 +19,12 @@ public final class LiveFileSystem: FileSystem {
         )
     }
 
+    public func fileSize(_ path: String) -> Int64? {
+        var st = Darwin.stat()
+        guard lstat(path, &st) == 0, (st.st_mode & S_IFMT) == S_IFREG else { return nil }
+        return Int64(st.st_size)
+    }
+
     public func contentsOfDirectory(_ path: String) throws -> [String] {
         do {
             return try FileManager.default.contentsOfDirectory(atPath: path)

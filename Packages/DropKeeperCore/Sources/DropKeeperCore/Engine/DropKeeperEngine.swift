@@ -76,6 +76,8 @@ public actor DropKeeperEngine {
     var scanBound: Date?
     /// When each folder (by id) stopped being `.ok` during this session; bounds its rescan on return.
     var unavailableSince: [Int64: Date] = [:]
+    /// Off-actor duplicate comparisons in flight, by path; also keeps a file from being detected twice meanwhile.
+    var duplicateChecks: [String: Task<Void, Never>] = [:]
 
     var store: FileStore { env.store }
     var actions: ItemActions { ItemActions(fs: env.fs) }
@@ -299,6 +301,11 @@ public actor DropKeeperEngine {
     }
 
     private func applyDefaultChoice(_ file: inout TrackedFile, now: Date) {
+        // A duplicate that matched a rule kept the rule's duration while it waited for the user.
+        if let duration = file.scheduleDuration {
+            actions.schedule(&file, duration: duration, now: now, tagEnabled: settings.finderTagEnabled)
+            return
+        }
         switch settings.resolve(lastChoice: storedLastChoice()) {
         case .keep:
             actions.keep(&file, now: now)

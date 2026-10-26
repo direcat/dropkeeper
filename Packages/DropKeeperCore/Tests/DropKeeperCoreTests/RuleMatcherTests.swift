@@ -66,6 +66,18 @@ struct RuleMatcherTests {
         #expect(match("Screenshot.png", rules: rules) == "Shots")
     }
 
+    @Test func screenRecordingsAreNotScreenshots() throws {
+        let rules = [rule("Shots", .category(.screenshots))]
+        for name in ["Recording.mov", "Recording.mp4"] {
+            fs.createFile(folder + "/" + name, added: nil)
+            try fs.writeXattr("com.apple.metadata:kMDItemIsScreenCapture", value: "1", at: folder + "/" + name)
+            #expect(match(name, rules: rules) == nil, "\(name)")
+        }
+        fs.createFile(folder + "/Shot.png", added: nil)
+        try fs.writeXattr("com.apple.metadata:kMDItemIsScreenCapture", value: "1", at: folder + "/Shot.png")
+        #expect(match("Shot.png", rules: rules) == "Shots")
+    }
+
     @Test func firstEnabledMatchWins() {
         let rules = [
             rule("Off", .category(.images), enabled: false), rule("First", .category(.images)),

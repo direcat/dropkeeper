@@ -59,11 +59,13 @@ public struct Rule: Codable, Sendable, Equatable, Identifiable {
 /// A rule that scheduled a new file; reported to the UI in one batch per poll.
 public struct RuleApplication: Sendable, Equatable, Identifiable {
     public let file: TrackedFile
+    public let ruleId: UUID
     public let ruleName: String
     public var id: FileID { file.id }
 
-    public init(file: TrackedFile, ruleName: String) {
+    public init(file: TrackedFile, ruleId: UUID, ruleName: String) {
         self.file = file
+        self.ruleId = ruleId
         self.ruleName = ruleName
     }
 }

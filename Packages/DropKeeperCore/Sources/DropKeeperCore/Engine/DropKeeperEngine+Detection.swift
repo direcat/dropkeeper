@@ -101,7 +101,7 @@ extension DropKeeperEngine {
             guard let folder = folder(containing: path),
                 DownloadDetector.isCandidate(
                     path: path, folderPath: folder.path, ignoredPatterns: settings.ignoredPatterns),
-                trackedRecord(at: path, stat: stat) == nil
+                trackedRecord(at: path, stat: stat) == nil, duplicateChecks[path] == nil
             else { continue }
             var file = TrackedFile.new(path: path, stat: stat, folderId: folder.id, now: now)
             // A duplicate may carry the original's expiry xattr and tag; markPending overwrites the id.
@@ -110,33 +110,80 @@ extension DropKeeperEngine {
             let rule = RuleMatcher.firstMatch(
                 name: (path as NSString).lastPathComponent, path: path, folderPath: folder.path,
                 rules: settings.rules, fs: env.fs)
+            let candidates =
+                settings.duplicateDetection
+                ? DuplicateFinder.candidates(
+                    path: path, size: stat.size, folderPath: folder.path,
+                    ignoredPatterns: settings.ignoredPatterns, fs: env.fs)
+                : []
+            if !candidates.isEmpty {
+                startDuplicateCheck(file: file, stat: stat, rule: rule, candidates: candidates, folder: folder)
+                // Without a rule the prompt appears right away; the duplicate hint follows the check.
+                if rule == nil { _ = insert(file) }
+                continue
+            }
             if let rule {
-                // The rule waits for the duplicate check; a duplicate stays pending for the user to decide.
-                file.duplicateOf = duplicateName(for: path, stat: stat, folder: folder)
                 // Scheduled before the insert: one write, so the record is never observable as pending.
-                if file.duplicateOf == nil {
-                    actions.schedule(
-                        &file, duration: rule.duration, now: now, tagEnabled: settings.finderTagEnabled)
-                }
+                actions.schedule(&file, duration: rule.duration, now: now, tagEnabled: settings.finderTagEnabled)
                 guard insert(file) else { continue }
-                if file.state == .scheduled { applications.append(RuleApplication(file: file, ruleName: rule.name)) }
+                applications.append(RuleApplication(file: file, ruleId: rule.id, ruleName: rule.name))
             } else {
-                // Insert first so the prompt can appear right away; the duplicate hint follows.
-                guard insert(file) else { continue }
-                if let name = duplicateName(for: path, stat: stat, folder: folder) {
-                    file.duplicateOf = name
-                    update(file)
-                }
+                _ = insert(file)
             }
         }
         if !applications.isEmpty { notify.yield(.ruleApplied(applications)) }
     }
 
-    private func duplicateName(for path: String, stat: FileStat, folder: WatchedFolder) -> String? {
-        guard settings.duplicateDetection else { return nil }
-        return DuplicateFinder.find(
-            path: path, size: stat.size, folderPath: folder.path, ignoredPatterns: settings.ignoredPatterns,
-            fs: env.fs)
+    // MARK: Duplicate check
+
+    /// Compares the new file's bytes with the same-size candidates off the actor, then hops back to finish.
+    /// A rule-matched file is not inserted until the check ends, so it is never observable as pending.
+    private func startDuplicateCheck(
+        file: TrackedFile, stat: FileStat, rule: Rule?, candidates: [String], folder: WatchedFolder
+    ) {
+        let fs = env.fs
+        let path = file.path
+        let folderPath = folder.path
+        duplicateChecks[path] = Task.detached(priority: .utility) { [weak self] in
+            let name = DuplicateFinder.firstMatch(path: path, candidates: candidates, folderPath: folderPath, fs: fs)
+            await self?.finishDuplicateCheck(file: file, stat: stat, rule: rule, duplicate: name)
+        }
+    }
+
+    func finishDuplicateCheck(file: TrackedFile, stat: FileStat, rule: Rule?, duplicate: String?) {
+        duplicateChecks[file.path] = nil
+        guard isRunning else { return }
+        guard let rule else {
+            // Only a record that is still the same pending item gets the hint.
+            guard let name = duplicate, var current = try? store.file(id: file.id), current.state == .pending,
+                current.path == file.path
+            else { return }
+            current.duplicateOf = name
+            update(current)
+            return
+        }
+        // The file may have vanished or changed while the bytes were compared; normal detection sees it again.
+        guard let fresh = env.fs.stat(file.path), fresh.inode == stat.inode, fresh.volumeId == stat.volumeId,
+            fresh.size == stat.size, trackedRecord(at: file.path, stat: fresh) == nil
+        else { return }
+        let now = env.time.now()
+        var file = file
+        if let duplicate {
+            // The duplicate stays pending for the user to decide; the rule's duration applies after the grace period.
+            file.duplicateOf = duplicate
+            file.scheduleDuration = rule.duration
+        } else {
+            actions.schedule(&file, duration: rule.duration, now: now, tagEnabled: settings.finderTagEnabled)
+        }
+        guard insert(file) else { return }
+        if file.state == .scheduled {
+            notify.yield(.ruleApplied([RuleApplication(file: file, ruleId: rule.id, ruleName: rule.name)]))
+        }
+    }
+
+    /// Waits for every running duplicate check to finish (tests only).
+    func awaitDuplicateChecks() async {
+        while let task = duplicateChecks.values.first { await task.value }
     }
 
     private func insert(_ file: TrackedFile) -> Bool {
