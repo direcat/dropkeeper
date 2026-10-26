@@ -97,7 +97,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         let main = NSMenu()
         let appItem = NSMenuItem()
         let appMenu = NSMenu()
-        appMenu.addItem(withTitle: String(localized: "Settings…"), action: #selector(showSettings), keyEquivalent: ",")
+        appMenu.addItem(withTitle: String(localized: "Settings"), action: #selector(showSettings), keyEquivalent: ",")
         appMenu.addItem(.separator())
         appMenu.addItem(
             withTitle: String(localized: "Quit DropKeeper"), action: #selector(NSApplication.terminate(_:)),

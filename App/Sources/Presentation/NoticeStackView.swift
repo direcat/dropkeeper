@@ -38,7 +38,6 @@ struct NoticeStackView: View {
                     onExtend: { Task { await model.extendReminders() } },
                     onKeep: { Task { await model.keepReminders() } },
                     onDelete: { Task { await model.deleteReminders() } },
-                    deleteAsksConfirmation: model.settings.deleteMode == .permanent,
                     onDismiss: { model.dismissReminders() })
             }
             if !shown.rules.isEmpty {

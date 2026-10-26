@@ -8,8 +8,6 @@ struct ReminderBarView: View {
     let onExtend: () -> Void
     let onKeep: () -> Void
     let onDelete: () -> Void
-    /// Permanent deletion asks for confirmation first, which the label announces with an ellipsis.
-    var deleteAsksConfirmation = false
     let onDismiss: () -> Void
 
     var body: some View {
@@ -44,7 +42,7 @@ struct ReminderBarView: View {
             HStack(spacing: TK.Space.s) {
                 button(extendLabel, primary: true, action: onExtend)
                 button(Text("Keep"), primary: false, action: onKeep)
-                button(deleteLabel, primary: false, action: onDelete)
+                button(Text("Delete now"), primary: false, action: onDelete)
                 Spacer(minLength: 0)
             }
         }
@@ -57,8 +55,6 @@ struct ReminderBarView: View {
             .buttonStyle(PromptButtonStyle(primary: primary))
             .focusable(false)
     }
-
-    private var deleteLabel: Text { deleteAsksConfirmation ? Text("Delete now…") : Text("Delete now") }
 
     /// "Extend by 30 min" while every file has the same timer length (the first one's), else just "Extend".
     private var extendLabel: Text {

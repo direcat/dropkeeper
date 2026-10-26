@@ -19,15 +19,6 @@
         "fr" : { "stringUnit" : { "state" : "translated", "value" : "Supprimer le doublon" } }
       }
     },
-    "Delete duplicate…" : {
-      "comment" : "Prompt button in permanent-delete mode: deleting the duplicate opens a confirmation first",
-      "localizations" : {
-        "cs" : { "stringUnit" : { "state" : "translated", "value" : "Smazat duplikát…" } },
-        "de" : { "stringUnit" : { "state" : "translated", "value" : "Duplikat löschen…" } },
-        "es" : { "stringUnit" : { "state" : "translated", "value" : "Eliminar duplicado…" } },
-        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Supprimer le doublon…" } }
-      }
-    },
     "Extend by %@" : {
       "comment" : "Reminder bar button: push the deadline back by the timer length, e.g. Extend by 30 min",
       "localizations" : {
@@ -53,15 +44,6 @@
         "de" : { "stringUnit" : { "state" : "translated", "value" : "Jetzt löschen" } },
         "es" : { "stringUnit" : { "state" : "translated", "value" : "Eliminar ahora" } },
         "fr" : { "stringUnit" : { "state" : "translated", "value" : "Supprimer maintenant" } }
-      }
-    },
-    "Delete now…" : {
-      "comment" : "Reminder bar button in permanent-delete mode: opens a confirmation before deleting the files",
-      "localizations" : {
-        "cs" : { "stringUnit" : { "state" : "translated", "value" : "Smazat hned…" } },
-        "de" : { "stringUnit" : { "state" : "translated", "value" : "Jetzt löschen…" } },
-        "es" : { "stringUnit" : { "state" : "translated", "value" : "Eliminar ahora…" } },
-        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Supprimer maintenant…" } }
       }
     },
     "Deleted in %@" : {
@@ -654,17 +636,8 @@
         "fr" : { "stringUnit" : { "state" : "translated", "value" : "Aucun fichier planifié" } }
       }
     },
-    "Settings…" : {
-      "comment" : "App menu item that opens Settings",
-      "localizations" : {
-        "cs" : { "stringUnit" : { "state" : "translated", "value" : "Nastavení…" } },
-        "de" : { "stringUnit" : { "state" : "translated", "value" : "Einstellungen…" } },
-        "es" : { "stringUnit" : { "state" : "translated", "value" : "Ajustes…" } },
-        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Réglages…" } }
-      }
-    },
     "Settings" : {
-      "comment" : "Pending list footer button that opens Settings",
+      "comment" : "Pending list footer button and app menu item that open Settings",
       "localizations" : {
         "cs" : { "stringUnit" : { "state" : "translated", "value" : "Nastavení" } },
         "de" : { "stringUnit" : { "state" : "translated", "value" : "Einstellungen" } },
@@ -1050,13 +1023,13 @@
         "fr" : { "stringUnit" : { "state" : "translated", "value" : "Marquer les fichiers planifiés avec le marqueur Finder « Temporary »" } }
       }
     },
-    "Delete Permanently…" : {
+    "Delete Permanently" : {
       "comment" : "Pending list action: delete the file right away without the Trash (asks first)",
       "localizations" : {
-        "cs" : { "stringUnit" : { "state" : "translated", "value" : "Trvale smazat…" } },
-        "de" : { "stringUnit" : { "state" : "translated", "value" : "Endgültig löschen …" } },
-        "es" : { "stringUnit" : { "state" : "translated", "value" : "Eliminar permanentemente…" } },
-        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Supprimer définitivement…" } }
+        "cs" : { "stringUnit" : { "state" : "translated", "value" : "Trvale smazat" } },
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Endgültig löschen" } },
+        "es" : { "stringUnit" : { "state" : "translated", "value" : "Eliminar permanentemente" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Supprimer définitivement" } }
       }
     },
     "Delete “%@” permanently?" : {

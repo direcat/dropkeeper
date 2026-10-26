@@ -138,7 +138,7 @@ private struct PendingRow: View {
         Button(role: .destructive) {
             Task { await deleteNow() }
         } label: {
-            Text(model.settings.deleteMode == .trash ? "Move to Trash" : "Delete Permanently…")
+            Text(model.settings.deleteMode == .trash ? "Move to Trash" : "Delete Permanently")
         }
         .disabled(reveal == .unavailable)
     }
