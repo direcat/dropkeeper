@@ -1,52 +1,58 @@
 import DropKeeperCore
 import Foundation
 
-/// Merges "moved to Trash" notifications that arrive within the notice window into one notice.
-/// The prompt beats the notice, so a notice that runs out while the prompt is shown is held, and gets the full
-/// window once the prompt closes.
-struct NoticeCoalescer: Equatable {
-    static let window: TimeInterval = TK.Motion.deletedNoticeSeconds
+/// Merges notifications of one kind (files moved to the Trash, rules applied) that arrive within the notice window
+/// into one notice. While paused (the pointer is over the notice) the remaining time is kept and nothing expires.
+struct NoticeCoalescer<Item: Equatable & Identifiable>: Equatable where Item.ID == FileID {
+    let window: TimeInterval
 
-    private(set) var files: [TrackedFile] = []
+    private(set) var items: [Item] = []
     private(set) var expiresAt: Date?
-    private(set) var isHeld = false
+    /// The time left when the notice was paused; `nil` while it runs.
+    private var remaining: TimeInterval?
 
-    var isVisible: Bool { !files.isEmpty }
+    var isVisible: Bool { !items.isEmpty }
+    var isPaused: Bool { remaining != nil }
 
-    mutating func add(_ new: [TrackedFile], now: Date) {
-        if isHeld || expiresAt.map({ now < $0 }) == true {
-            files += new
+    init(window: TimeInterval) {
+        self.window = window
+    }
+
+    mutating func add(_ new: [Item], now: Date) {
+        if isPaused || expiresAt.map({ now < $0 }) == true {
+            items += new
         } else {
-            files = new
+            items = new
         }
-        expiresAt = now.addingTimeInterval(Self.window)
+        expiresAt = now.addingTimeInterval(window)
+        if isPaused { remaining = window }
     }
 
-    /// The prompt closed: the notice, hidden behind it until now, shows for the full window from `now`.
-    mutating func release(now: Date) {
-        guard isVisible else { return }
-        isHeld = false
-        expiresAt = now.addingTimeInterval(Self.window)
+    mutating func expireIfDue(now: Date) {
+        guard !isPaused, let expiresAt, now >= expiresAt else { return }
+        clear()
     }
 
-    mutating func expireIfDue(now: Date, promptShown: Bool = false) {
-        guard let expiresAt, now >= expiresAt else { return }
-        if promptShown {
-            isHeld = true
-        } else {
-            clear()
-        }
-    }
-
-    /// Drops these files (e.g. after a successful Undo); the rest of the notice keeps its window.
+    /// Drops these items (e.g. after a successful Undo); the rest of the notice keeps its window.
     mutating func remove(ids: [FileID]) {
-        files.removeAll { ids.contains($0.id) }
-        if files.isEmpty { clear() }
+        items.removeAll { ids.contains($0.id) }
+        if items.isEmpty { clear() }
+    }
+
+    mutating func pause(now: Date) {
+        guard isVisible, !isPaused, let expiresAt else { return }
+        remaining = max(0, expiresAt.timeIntervalSince(now))
+    }
+
+    mutating func resume(now: Date) {
+        guard let remaining else { return }
+        expiresAt = now.addingTimeInterval(remaining)
+        self.remaining = nil
     }
 
     mutating func clear() {
-        files = []
+        items = []
         expiresAt = nil
-        isHeld = false
+        remaining = nil
     }
 }

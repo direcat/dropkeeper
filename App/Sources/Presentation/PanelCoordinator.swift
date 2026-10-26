@@ -59,7 +59,7 @@ final class PanelCoordinator {
         _ = model.queue.items.count
         _ = model.queue.current?.id
         _ = model.notice.isVisible
-        _ = model.notice.files.count
+        _ = model.notice.items.count
         _ = model.panelError.message
         _ = model.scheduled.count
         _ = model.settings.promptPresentation

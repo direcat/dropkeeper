@@ -87,6 +87,7 @@ enum TK {
         static let pulse = Animation.easeInOut(duration: 0.5)
         static let reduced = Animation.easeInOut(duration: 0.15)
         static let deletedNoticeSeconds: Double = 2.5
+        static let ruleNoticeSeconds: Double = 6
         static let urgentThresholdSeconds = 10
     }
 }

@@ -47,7 +47,7 @@ struct PanelRootView: View {
             }
         case .notice:
             NoticeView(
-                files: model.notice.files, canUndo: model.settings.deleteMode == .trash,
+                files: model.notice.items, canUndo: model.settings.deleteMode == .trash,
                 onUndo: { Task { await model.undoNotice() } })
         case .idle:
             NotchIdleView(count: model.scheduled.count, urgentSeconds: model.urgentSeconds, notchWidth: notchWidth)

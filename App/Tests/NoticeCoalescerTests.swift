@@ -7,10 +7,10 @@ import Testing
 private let base = Date(timeIntervalSince1970: 1_800_000_000)
 
 @Test func reviewFocusTrashesWithinWindowAreMerged() {
-    var notice = NoticeCoalescer()
+    var notice = NoticeCoalescer<TrackedFile>(window: 2.5)
     notice.add([scheduledFile(expiresIn: 0, id: "a")], now: base)
     notice.add([scheduledFile(expiresIn: 0, id: "b")], now: base.addingTimeInterval(2))
-    #expect(notice.files.map(\.id) == ["a", "b"])
+    #expect(notice.items.map(\.id) == ["a", "b"])
     #expect(notice.expiresAt == base.addingTimeInterval(4.5))
     notice.expireIfDue(now: base.addingTimeInterval(4))
     #expect(notice.isVisible)
@@ -19,44 +19,38 @@ private let base = Date(timeIntervalSince1970: 1_800_000_000)
 }
 
 @Test func trashAfterWindowStartsANewNotice() {
-    var notice = NoticeCoalescer()
+    var notice = NoticeCoalescer<TrackedFile>(window: 2.5)
     notice.add([scheduledFile(expiresIn: 0, id: "a")], now: base)
     notice.add([scheduledFile(expiresIn: 0, id: "b")], now: base.addingTimeInterval(3))
-    #expect(notice.files.map(\.id) == ["b"])
+    #expect(notice.items.map(\.id) == ["b"])
 }
 
 @Test func clearHidesImmediately() {
-    var notice = NoticeCoalescer()
+    var notice = NoticeCoalescer<TrackedFile>(window: 2.5)
     notice.add([scheduledFile(expiresIn: 0, id: "a")], now: base)
     notice.clear()
     #expect(!notice.isVisible)
     #expect(notice.expiresAt == nil)
 }
 
-@Test func noticeWaitsWhileThePromptIsShownThenGetsTheFullWindow() {
-    var notice = NoticeCoalescer()
+@Test func pausedNoticeDoesNotExpire() {
+    var notice = NoticeCoalescer<TrackedFile>(window: 6)
     notice.add([scheduledFile(expiresIn: 0, id: "a")], now: base)
-    notice.expireIfDue(now: base.addingTimeInterval(3), promptShown: true)
+    notice.pause(now: base.addingTimeInterval(4))
+    notice.expireIfDue(now: base.addingTimeInterval(60))
     #expect(notice.isVisible)
-    // A second trash during a long prompt joins the held notice, so Undo covers both.
-    notice.add([scheduledFile(expiresIn: 0, id: "b")], now: base.addingTimeInterval(10))
-    #expect(notice.files.map(\.id) == ["a", "b"])
-    notice.release(now: base.addingTimeInterval(20))
-    #expect(notice.expiresAt == base.addingTimeInterval(22.5))
-    notice.expireIfDue(now: base.addingTimeInterval(22))
-    #expect(notice.isVisible)
-    notice.expireIfDue(now: base.addingTimeInterval(22.5))
-    #expect(!notice.isVisible)
 }
 
-@Test func releaseRestartsTheWindowEvenBeforeItRanOut() {
-    var notice = NoticeCoalescer()
+@Test func resumeKeepsRemainingTime() {
+    var notice = NoticeCoalescer<TrackedFile>(window: 6)
     notice.add([scheduledFile(expiresIn: 0, id: "a")], now: base)
-    notice.release(now: base.addingTimeInterval(1))
-    #expect(notice.expiresAt == base.addingTimeInterval(3.5))
-    var empty = NoticeCoalescer()
-    empty.release(now: base)
-    #expect(empty.expiresAt == nil)
+    notice.pause(now: base.addingTimeInterval(4))
+    notice.resume(now: base.addingTimeInterval(20))
+    #expect(notice.expiresAt == base.addingTimeInterval(22))
+    notice.expireIfDue(now: base.addingTimeInterval(21))
+    #expect(notice.isVisible)
+    notice.expireIfDue(now: base.addingTimeInterval(22))
+    #expect(!notice.isVisible)
 }
 
 @Test func panelErrorShowsForItsWindowAndTheLatestWins() {
@@ -74,11 +68,11 @@ private let base = Date(timeIntervalSince1970: 1_800_000_000)
 }
 
 @Test func removeKeepsFilesMergedInMeanwhile() {
-    var notice = NoticeCoalescer()
+    var notice = NoticeCoalescer<TrackedFile>(window: 2.5)
     notice.add([scheduledFile(expiresIn: 0, id: "a")], now: base)
     notice.add([scheduledFile(expiresIn: 0, id: "b")], now: base.addingTimeInterval(1))
     notice.remove(ids: ["a"])
-    #expect(notice.files.map(\.id) == ["b"])
+    #expect(notice.items.map(\.id) == ["b"])
     #expect(notice.expiresAt == base.addingTimeInterval(3.5))
     notice.remove(ids: ["b"])
     #expect(!notice.isVisible)

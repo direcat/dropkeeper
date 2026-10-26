@@ -12,7 +12,8 @@ final class AppModel {
     private(set) var settings = Settings()
     private(set) var folders: [WatchedFolder] = []
     private(set) var queue = PromptQueue()
-    private(set) var notice = NoticeCoalescer()
+    private(set) var notice = NoticeCoalescer<TrackedFile>(window: TK.Motion.deletedNoticeSeconds)
+    private(set) var ruleNotice = NoticeCoalescer<RuleApplication>(window: TK.Motion.ruleNoticeSeconds)
     private(set) var reminders = ReminderTracker()
     private(set) var now = Date()
     private(set) var lastError: String?
@@ -31,9 +32,8 @@ final class AppModel {
     @ObservationIgnored private var tasks: [Task<Void, Never>] = []
     @ObservationIgnored private var clockTask: Task<Void, Never>?
     @ObservationIgnored private var noticeTask: Task<Void, Never>?
+    @ObservationIgnored private var ruleNoticeTask: Task<Void, Never>?
     @ObservationIgnored private var panelErrorTask: Task<Void, Never>?
-    /// Whether the prompt was shown at the last check, to notice it closing (see `promptVisibilityChanged`).
-    @ObservationIgnored private var promptWasAvailable = false
     @ObservationIgnored private var isDeciding = false
     @ObservationIgnored private let defaults: UserDefaults
     @ObservationIgnored private let applyLoginItem: @MainActor (Bool) -> Void
@@ -66,7 +66,6 @@ final class AppModel {
         isStarted = true
         await refreshState()
         resetPromptState()
-        promptVisibilityChanged()
         needsOnboarding =
             bootstrap.isFirstLaunch || (folders.isEmpty && !defaults.bool(forKey: Self.onboardingCompletedKey))
         observeFiles(bootstrap.engine)
@@ -84,6 +83,7 @@ final class AppModel {
         tasks = []
         clockTask?.cancel()
         noticeTask?.cancel()
+        ruleNoticeTask?.cancel()
         panelErrorTask?.cancel()
         guard isStarted else { return }
         isStarted = false
@@ -139,7 +139,6 @@ final class AppModel {
         queue.update(pending: pending)
         if queue.current?.id != previous { resetPromptState() }
         if queue.current == nil { promptRequested = false }
-        promptVisibilityChanged()
         scheduleClock()
     }
 
@@ -152,8 +151,9 @@ final class AppModel {
             break  // failed files arrive through the file observation
         case .foldersChanged:
             await refreshState()
-        case .ruleApplied:
-            break  // the notice for applied rules comes with the 1.1 UI
+        case .ruleApplied(let applications):
+            ruleNotice.add(applications, now: Date())
+            scheduleRuleNoticeExpiry()
         }
     }
 
@@ -189,7 +189,6 @@ final class AppModel {
         }
     }
 
-    /// A notice that runs out while the prompt is shown is held; `promptVisibilityChanged` shows it afterwards.
     private func scheduleNoticeExpiry() {
         noticeTask?.cancel()
         guard let expiresAt = notice.expiresAt else { return }
@@ -197,18 +196,28 @@ final class AppModel {
         noticeTask = Task { [weak self] in
             try? await Task.sleep(for: .seconds(delay))
             guard !Task.isCancelled, let self else { return }
-            self.notice.expireIfDue(now: Date(), promptShown: self.isPromptAvailable)
+            self.notice.expireIfDue(now: Date())
         }
     }
 
-    /// Call after anything that can open or close the prompt. When it closed, a notice that was hidden behind it
-    /// gets its full window now.
-    private func promptVisibilityChanged() {
-        let available = isPromptAvailable
-        defer { promptWasAvailable = available }
-        guard promptWasAvailable, !available, notice.isVisible else { return }
-        notice.release(now: Date())
-        scheduleNoticeExpiry()
+    func pauseRuleNotice() {
+        ruleNotice.pause(now: Date())
+    }
+
+    func resumeRuleNotice() {
+        ruleNotice.resume(now: Date())
+        scheduleRuleNoticeExpiry()  // resume moved `expiresAt`
+    }
+
+    private func scheduleRuleNoticeExpiry() {
+        ruleNoticeTask?.cancel()
+        guard let expiresAt = ruleNotice.expiresAt else { return }
+        let delay = max(0, expiresAt.timeIntervalSinceNow)
+        ruleNoticeTask = Task { [weak self] in
+            try? await Task.sleep(for: .seconds(delay))
+            guard !Task.isCancelled, let self else { return }
+            self.ruleNotice.expireIfDue(now: Date())
+        }
     }
 
     private func showPanelError(_ failure: PanelFailure) {
@@ -261,7 +270,6 @@ final class AppModel {
         queue.dismiss(ids: ids)
         if queue.current == nil { promptRequested = false }
         resetPromptState()
-        promptVisibilityChanged()
     }
 
     /// Opens the prompt for a waiting file picked from the list, even one closed with Esc and even in Quiet
@@ -271,7 +279,6 @@ final class AppModel {
         queue.restore(ids: [id], pending: pending)
         if queue.current?.id != previous { resetPromptState() }
         promptRequested = queue.current?.id == id
-        promptVisibilityChanged()
     }
 
     /// Esc: closes the prompt without deciding. In Quiet mode it stays closed for the rest of the stack too.
@@ -279,7 +286,6 @@ final class AppModel {
         queue.dismiss(applyToAll: applyToAll)
         promptRequested = false
         resetPromptState()
-        promptVisibilityChanged()
     }
 
     // MARK: File actions
@@ -292,7 +298,7 @@ final class AppModel {
 
     /// The notice goes away only when Undo worked; after a failure it stays, so Undo can be tried again.
     func undoNotice() async {
-        let ids = notice.files.map(\.id)
+        let ids = notice.items.map(\.id)
         guard !ids.isEmpty else { return }
         if await perform(.undo, { try await $0.undoTrash(ids: ids) }) {
             // A trash merged in meanwhile keeps its notice.
@@ -331,7 +337,6 @@ final class AppModel {
         await perform { try await $0.updateSettings(newSettings) }
         await refreshState()
         scheduleClock()  // the reminder settings may have changed what is due
-        promptVisibilityChanged()  // e.g. Quiet mode turned on while the prompt was open
         if loginChanged { applyLoginItem(settings.launchAtLogin) }
         let fresh = TimelineModel(durations: settings.timelineStops, preselect: resolvedChoice)
         if timeline.stops != fresh.stops { resetPromptState() }

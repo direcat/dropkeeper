@@ -98,20 +98,6 @@ private func pendingFile(_ id: String) -> TrackedFile {
         #expect(other.panelError.isVisible)
     }
 
-    /// Prompt beats notice: a trash while the prompt is open must still get its notice and Undo afterwards.
-    @Test func noticeHiddenByThePromptShowsOnceThePromptCloses() async throws {
-        let fixture = Fixture()
-        defer { fixture.cleanUp() }
-        let model = fixture.model
-        model.apply([pendingFile("a")])
-        await model.handle(.trashed([scheduledFile(expiresIn: 0, id: "old.dmg")]))
-        try await Task.sleep(for: .seconds(NoticeCoalescer.window + 0.4))
-        #expect(model.notice.isVisible)
-        model.dismissPrompt()
-        let expiresAt = try #require(model.notice.expiresAt)
-        #expect(expiresAt.timeIntervalSinceNow > NoticeCoalescer.window - 0.5)
-    }
-
     /// Onboarding shows `lastError` when adding the folder fails, so the failure must set it.
     @Test func failedAddFolderReportsAnError() async {
         let fixture = Fixture()
