@@ -17,7 +17,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     private var panels: PanelCoordinator?
     private var statusItem: StatusItemController?
     private lazy var onboarding = OnboardingWindowController(model: model)
-    private lazy var settingsWindow = SettingsWindowController(model: model)
+    private lazy var settingsWindow = SettingsWindowController(model: model, defaults: AppDelegate.appDefaults)
     private lazy var actions = AppActions(
         openSettings: { [weak self] in
             self?.statusItem?.closePopover()

@@ -1,4 +1,4 @@
 # URL strings allowed in the release binary. None of them is fetched by the app:
 # the first is the About link (opened in the user's browser); others are strings
 # compiled in from system or dependency code (document why each is harmless).
-https://github.com/direcat/dropkeeper
+https://direcat.github.io/dropkeeper/

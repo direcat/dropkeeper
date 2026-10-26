@@ -53,3 +53,21 @@ import Testing
     #expect(StopPresets.stopToAdd(to: [1800, 7_776_000]) == 2_592_000)
     #expect(StopPresets.stopToAdd(to: StopPresets.all) == nil)
 }
+
+@Test func stepSliderSnapsUnknownValue() {
+    let options = Settings.gracePeriodOptions
+    #expect(StepSlider.index(of: 900, in: options) == 2)
+    #expect(StepSlider.index(of: 1000, in: options) == 2)
+    #expect(StepSlider.index(of: 1, in: options) == 0)
+    #expect(StepSlider.index(of: 99_999, in: options) == options.count - 1)
+    // Non-numeric values have no distance: they fall back to the first.
+    #expect(StepSlider.index(of: "x", in: ["a", "b"]) == 0)
+    #expect(StepSlider.index(of: HistoryRetention.oneYear, in: HistoryRetention.allCases) == 3)
+}
+
+@Test func tabsInSpecOrder() {
+    #expect(SettingsTab.allCases.map(\.rawValue) == ["general", "folders", "expiry", "rules", "data", "about"])
+    #expect(
+        SettingsTab.allCases.map(\.systemImage)
+            == ["gearshape", "folder", "timer", "list.bullet.rectangle", "externaldrive", "info.circle"])
+}

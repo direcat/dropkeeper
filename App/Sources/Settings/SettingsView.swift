@@ -36,77 +36,63 @@ enum DefaultChoiceTag {
     }
 }
 
-struct SettingsView: View {
+/// One Settings tab's content. Every tab is its own `Form` hosted by `SettingsWindowController`, all editing one
+/// shared `SettingsDraft`.
+struct SettingsTabView: View {
+    let tab: SettingsTab
     let model: AppModel
-    @State private var draft = Settings()
-    @State private var newExtension = ""
-    @State private var confirmPermanent = false
-    @State private var confirmClear = false
-    @State private var clearedCount: Int?
-    @State private var language = AppLanguage.shared.selection
-
-    init(model: AppModel) {
-        self.model = model
-    }
+    let store: SettingsDraft
 
     var body: some View {
-        Form {
-            general
-            folders
-            timeline
-            expiry
-            ignored
-            data
-            about
+        Group {
+            switch tab {
+            case .general: GeneralTab(store: store)
+            case .folders: FoldersTab(model: model)
+            case .expiry: ExpiryTab(store: store)
+            case .rules: RulesTab(store: store)
+            case .data: DataTab(store: store)
+            case .about: AboutTab()
+            }
         }
         .formStyle(.grouped)
         .font(.system(size: TK.TextSize.formBody))
         .controlSize(.large)
-        .frame(width: 600, height: 640)
-        .onAppear { draft = model.settings }
-        .onChange(of: model.settings) { _, new in draft = new }
-        .onChange(of: draft) { _, new in
-            guard new != model.settings else { return }
-            Task { await save(new) }
-        }
-        .alert("Delete files permanently?", isPresented: $confirmPermanent) {
-            Button("Delete permanently", role: .destructive) { draft.deleteMode = .permanent }
-            Button("Cancel", role: .cancel) {}
-        } message: {
-            Text("Expired files will be deleted right away instead of going to the Trash. This can't be undone.")
-        }
-        .alert("Clear history?", isPresented: $confirmClear) {
-            Button("Clear history", role: .destructive) {
-                Task { clearedCount = await model.clearHistory() }
-            }
-            Button("Cancel", role: .cancel) {}
-        } message: {
-            Text("Scheduled and waiting files are not affected.")
-        }
+        .frame(width: TK.Size.settingsWindow.width, height: TK.Size.settingsWindow.height)
+        .onAppear { store.sync() }
+        .onChange(of: model.settings) { _, _ in store.sync() }
         .alert(
-            "DropKeeper", isPresented: Binding(get: { model.lastError != nil }, set: { if !$0 { model.clearError() } })
+            "DropKeeper",
+            isPresented: Binding(
+                get: { model.lastError != nil && store.activeTab == tab }, set: { if !$0 { model.clearError() } })
         ) {
             Button("OK", role: .cancel) {}
         } message: {
             Text(model.lastError ?? "")
         }
     }
+}
 
-    private var general: some View {
-        Section("General") {
-            Toggle("Launch at login", isOn: $draft.launchAtLogin)
-            Picker("Show new downloads", selection: $draft.promptPresentation) {
-                Text("Under the menu bar icon").tag(PromptPresentation.menuBar)
-                Text("Automatically").tag(PromptPresentation.automatic)
-                Text("In the notch").tag(PromptPresentation.notch)
-            }
-            Text("Automatically shows new downloads in the notch when the pointer is on the laptop screen.")
-                .font(.system(size: TK.TextSize.formCaption))
-                .foregroundStyle(.secondary)
-            languagePicker
-            Toggle(isOn: $draft.quietMode) {
-                Text("Quiet mode")
-                Text("Don't open the prompt by itself. A dot on the menu bar icon shows waiting files.")
+private struct GeneralTab: View {
+    @Bindable var store: SettingsDraft
+    @State private var language = AppLanguage.shared.selection
+
+    var body: some View {
+        Form {
+            Section("General") {
+                Toggle("Launch at login", isOn: $store.draft.launchAtLogin)
+                Picker("Show new downloads", selection: $store.draft.promptPresentation) {
+                    Text("Under the menu bar icon").tag(PromptPresentation.menuBar)
+                    Text("Automatically").tag(PromptPresentation.automatic)
+                    Text("In the notch").tag(PromptPresentation.notch)
+                }
+                Text("Automatically shows new downloads in the notch when the pointer is on the laptop screen.")
+                    .font(.system(size: TK.TextSize.formCaption))
+                    .foregroundStyle(.secondary)
+                languagePicker
+                Toggle(isOn: $store.draft.quietMode) {
+                    Text("Quiet mode")
+                    Text("Don't open the prompt by itself. A dot on the menu bar icon shows waiting files.")
+                }
             }
         }
     }
@@ -144,197 +130,48 @@ struct SettingsView: View {
             }
         }
     }
+}
 
-    private var folders: some View {
-        Section("Watch folders") {
-            ForEach(model.folders) { folder in
-                HStack {
-                    Image(systemName: folder.status == .ok ? "folder" : "exclamationmark.triangle")
-                        .foregroundStyle(folder.status == .ok ? Color.secondary : Color.orange)
-                    VStack(alignment: .leading) {
-                        Text(verbatim: (folder.path as NSString).abbreviatingWithTildeInPath)
+private struct FoldersTab: View {
+    let model: AppModel
+
+    var body: some View {
+        Form {
+            Section("Watch folders") {
+                ForEach(model.folders) { folder in
+                    HStack {
+                        Image(systemName: folder.status == .ok ? "folder" : "exclamationmark.triangle")
+                            .foregroundStyle(folder.status == .ok ? Color.secondary : Color.orange)
+                        VStack(alignment: .leading) {
+                            Text(verbatim: (folder.path as NSString).abbreviatingWithTildeInPath)
+                            if folder.status == .noAccess {
+                                Text("DropKeeper has no access to this folder.")
+                                    .font(.system(size: TK.TextSize.formCaption))
+                                    .foregroundStyle(.secondary)
+                            } else if folder.status == .unavailable {
+                                Text("This folder is not available.")
+                                    .font(.system(size: TK.TextSize.formCaption))
+                                    .foregroundStyle(.secondary)
+                            }
+                        }
+                        Spacer()
                         if folder.status == .noAccess {
-                            Text("DropKeeper has no access to this folder.")
-                                .font(.system(size: TK.TextSize.formCaption))
-                                .foregroundStyle(.secondary)
-                        } else if folder.status == .unavailable {
-                            Text("This folder is not available.")
-                                .font(.system(size: TK.TextSize.formCaption))
-                                .foregroundStyle(.secondary)
+                            Button("Grant access") { openPrivacySettings() }
+                            Button("Check again") { Task { await model.refreshFolders() } }
                         }
-                    }
-                    Spacer()
-                    if folder.status == .noAccess {
-                        Button("Grant access") { openPrivacySettings() }
-                        Button("Check again") { Task { await model.refreshFolders() } }
-                    }
-                    Button {
-                        if let id = folder.id { Task { await model.removeFolder(id: id) } }
-                    } label: {
-                        Image(systemName: "trash")
-                    }
-                    .buttonStyle(.borderless)
-                    .help(Text("Remove folder"))
-                    .accessibilityLabel(Text("Remove folder"))
-                }
-            }
-            Button("Add folder…") { addFolder() }
-        }
-    }
-
-    private var timeline: some View {
-        Section {
-            ForEach(draft.timelineStops.indices, id: \.self) { index in
-                HStack {
-                    Picker(selection: stopBinding(index)) {
-                        ForEach(StopPresets.options(for: index, in: draft.timelineStops), id: \.self) {
-                            Text(DurationLabel.short($0)).tag($0)
+                        Button {
+                            if let id = folder.id { Task { await model.removeFolder(id: id) } }
+                        } label: {
+                            Image(systemName: "trash")
                         }
-                    } label: {
-                        Text(verbatim: "#\(index + 1)")
+                        .buttonStyle(.borderless)
+                        .help(Text("Remove folder"))
+                        .accessibilityLabel(Text("Remove folder"))
                     }
-                    Button {
-                        draft.timelineStops.remove(at: index)
-                    } label: {
-                        Image(systemName: "trash")
-                    }
-                    .buttonStyle(.borderless)
-                    .disabled(draft.timelineStops.count <= 2)
-                    .help(Text("Remove time"))
-                    .accessibilityLabel(Text("Remove time"))
                 }
-            }
-            Button("Add time") {
-                if let stop = StopPresets.stopToAdd(to: draft.timelineStops) { draft.timelineStops.append(stop) }
-            }
-            .disabled(draft.timelineStops.count >= 5 || StopPresets.stopToAdd(to: draft.timelineStops) == nil)
-        } header: {
-            Text("Timeline")
-        } footer: {
-            Text("Times you can pick in the prompt.")
-                .font(.system(size: TK.TextSize.formCaption))
-                .foregroundStyle(.secondary)
-        }
-    }
-
-    private var expiry: some View {
-        Section("Expiry") {
-            Picker(
-                "Default action",
-                selection: Binding(
-                    get: { DefaultChoiceTag.tag(for: draft.defaultChoice, stops: draft.timelineStops) },
-                    set: { draft.defaultChoice = DefaultChoiceTag.choice(for: $0, stops: draft.timelineStops) })
-            ) {
-                Text("Keep it").tag(-1)
-                ForEach(draft.timelineStops.indices, id: \.self) { index in
-                    Text("Delete after \(DurationLabel.long(draft.timelineStops[index]))").tag(index)
-                }
-            }
-            Picker("Apply default action after", selection: $draft.gracePeriod) {
-                ForEach(Settings.gracePeriodOptions, id: \.self) { Text(DurationLabel.long($0)).tag($0) }
-            }
-            Picker(
-                "Expired files",
-                selection: Binding(
-                    get: { draft.deleteMode },
-                    set: { mode in
-                        if mode == .permanent { confirmPermanent = true } else { draft.deleteMode = mode }
-                    })
-            ) {
-                Text("Move to Trash").tag(DeleteMode.trash)
-                Text("Delete permanently").tag(DeleteMode.permanent)
-            }
-            Toggle("Mark scheduled files with the “Temporary” Finder tag", isOn: $draft.finderTagEnabled)
-        }
-    }
-
-    private var ignored: some View {
-        Section("Ignored extensions") {
-            ForEach(draft.ignoredPatterns, id: \.self) { pattern in
-                HStack {
-                    Text(verbatim: pattern)
-                    Spacer()
-                    Button {
-                        draft.ignoredPatterns.removeAll { $0 == pattern }
-                    } label: {
-                        Image(systemName: "trash")
-                    }
-                    .buttonStyle(.borderless)
-                    .help(Text("Remove extension"))
-                    .accessibilityLabel(Text("Remove extension"))
-                }
-            }
-            HStack {
-                TextField("Extension, e.g. dmg", text: $newExtension)
-                    .onSubmit(addExtension)
-                Button("Add", action: addExtension)
-                    .disabled(IgnorePattern.normalize(newExtension) == nil)
+                Button("Add folder…") { addFolder() }
             }
         }
-    }
-
-    private var data: some View {
-        Section("Data") {
-            Picker("Keep history for", selection: $draft.historyRetention) {
-                Text("1 month").tag(HistoryRetention.oneMonth)
-                Text("3 months").tag(HistoryRetention.threeMonths)
-                Text("6 months").tag(HistoryRetention.sixMonths)
-                Text("1 year").tag(HistoryRetention.oneYear)
-                Text("2 years").tag(HistoryRetention.twoYears)
-                Text("Forever").tag(HistoryRetention.forever)
-            }
-            HStack {
-                Button("Clear history now…") { confirmClear = true }
-                if let clearedCount {
-                    Text("Removed \(clearedCount) records").foregroundStyle(.secondary)
-                }
-            }
-        }
-    }
-
-    private static let version = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "–"
-
-    private var about: some View {
-        Section("About") {
-            HStack(alignment: .center, spacing: TK.Space.l) {
-                Image("Lockup").resizable().scaledToFit().frame(height: 28)
-                Spacer()
-                Text("Version \(Self.version)")
-                    .foregroundStyle(.secondary)
-            }
-            Text("Free and open source (MIT). 100 % offline, no analytics, no tracking, nothing leaves your computer.")
-            Text("Inspired by TempCat.").foregroundStyle(.secondary)
-            Link("github.com/direcat/dropkeeper", destination: URL(string: "https://github.com/direcat/dropkeeper")!)
-        }
-    }
-
-    /// Saves an edit. The engine may normalize it (e.g. re-sort stops); when that result equals the settings it
-    /// already had, `model.settings` doesn't change and `onChange` never resyncs the draft, so do it here. Setting
-    /// `draft` to `model.settings` never saves again (`onChange(of: draft)` skips values equal to `model.settings`).
-    private func save(_ edit: DropKeeperCore.Settings) async {
-        await model.update(edit)
-        if draft == edit { draft = model.settings }
-    }
-
-    /// Bounds-checked binding: removing a stop re-renders rows whose index may no longer exist. It ignores a value
-    /// another stop already uses.
-    private func stopBinding(_ index: Int) -> Binding<TimeInterval> {
-        Binding(
-            get: { draft.timelineStops.indices.contains(index) ? draft.timelineStops[index] : draft.timelineStops[0] },
-            set: { value in
-                guard draft.timelineStops.indices.contains(index),
-                    StopPresets.options(for: index, in: draft.timelineStops).contains(value)
-                else { return }
-                draft.timelineStops[index] = value
-            })
-    }
-
-    private func addExtension() {
-        guard let pattern = IgnorePattern.normalize(newExtension), !draft.ignoredPatterns.contains(pattern) else {
-            return
-        }
-        draft.ignoredPatterns.append(pattern)
-        newExtension = ""
     }
 
     private func addFolder() {
@@ -350,5 +187,211 @@ struct SettingsView: View {
     private func openPrivacySettings() {
         let url = URL(string: "x-apple.systempreferences:com.apple.preference.security?Privacy_FilesAndFolders")!
         NSWorkspace.shared.open(url)
+    }
+}
+
+private struct ExpiryTab: View {
+    @Bindable var store: SettingsDraft
+
+    var body: some View {
+        Form {
+            timeline
+            expiry
+        }
+        .alert("Delete files permanently?", isPresented: $store.confirmPermanent) {
+            Button("Delete permanently", role: .destructive) { store.draft.deleteMode = .permanent }
+            Button("Cancel", role: .cancel) {}
+        } message: {
+            Text("Expired files will be deleted right away instead of going to the Trash. This can't be undone.")
+        }
+    }
+
+    private var timeline: some View {
+        Section {
+            ForEach(store.draft.timelineStops.indices, id: \.self) { index in
+                HStack {
+                    Picker(selection: stopBinding(index)) {
+                        ForEach(StopPresets.options(for: index, in: store.draft.timelineStops), id: \.self) {
+                            Text(DurationLabel.short($0)).tag($0)
+                        }
+                    } label: {
+                        Text(verbatim: "#\(index + 1)")
+                    }
+                    Button {
+                        store.draft.timelineStops.remove(at: index)
+                    } label: {
+                        Image(systemName: "trash")
+                    }
+                    .buttonStyle(.borderless)
+                    .disabled(store.draft.timelineStops.count <= 2)
+                    .help(Text("Remove time"))
+                    .accessibilityLabel(Text("Remove time"))
+                }
+            }
+            Button("Add time") {
+                if let stop = StopPresets.stopToAdd(to: store.draft.timelineStops) {
+                    store.draft.timelineStops.append(stop)
+                }
+            }
+            .disabled(
+                store.draft.timelineStops.count >= 5 || StopPresets.stopToAdd(to: store.draft.timelineStops) == nil)
+        } header: {
+            Text("Timeline")
+        } footer: {
+            Text("Times you can pick in the prompt.")
+                .font(.system(size: TK.TextSize.formCaption))
+                .foregroundStyle(.secondary)
+        }
+    }
+
+    private var expiry: some View {
+        Section("Expiry") {
+            Picker(
+                "Default action",
+                selection: Binding(
+                    get: {
+                        DefaultChoiceTag.tag(for: store.draft.defaultChoice, stops: store.draft.timelineStops)
+                    },
+                    set: {
+                        store.draft.defaultChoice = DefaultChoiceTag.choice(
+                            for: $0, stops: store.draft.timelineStops)
+                    })
+            ) {
+                Text("Keep it").tag(-1)
+                ForEach(store.draft.timelineStops.indices, id: \.self) { index in
+                    Text("Delete after \(DurationLabel.long(store.draft.timelineStops[index]))").tag(index)
+                }
+            }
+            StepSlider(
+                "Apply default action after", values: Settings.gracePeriodOptions, selection: $store.draft.gracePeriod,
+                label: { DurationLabel.long($0) })
+            Picker(
+                "Expired files",
+                selection: Binding(
+                    get: { store.draft.deleteMode },
+                    set: { mode in
+                        if mode == .permanent { store.confirmPermanent = true } else { store.draft.deleteMode = mode }
+                    })
+            ) {
+                Text("Move to Trash").tag(DeleteMode.trash)
+                Text("Delete permanently").tag(DeleteMode.permanent)
+            }
+            Toggle("Mark scheduled files with the “Temporary” Finder tag", isOn: $store.draft.finderTagEnabled)
+        }
+    }
+
+    /// Bounds-checked binding: removing a stop re-renders rows whose index may no longer exist. It ignores a value
+    /// another stop already uses.
+    private func stopBinding(_ index: Int) -> Binding<TimeInterval> {
+        Binding(
+            get: {
+                let stops = store.draft.timelineStops
+                return stops.indices.contains(index) ? stops[index] : stops[0]
+            },
+            set: { value in
+                guard store.draft.timelineStops.indices.contains(index),
+                    StopPresets.options(for: index, in: store.draft.timelineStops).contains(value)
+                else { return }
+                store.draft.timelineStops[index] = value
+            })
+    }
+}
+
+private struct RulesTab: View {
+    @Bindable var store: SettingsDraft
+    @State private var newExtension = ""
+
+    var body: some View {
+        Form {
+            Section("Ignored extensions") {
+                ForEach(store.draft.ignoredPatterns, id: \.self) { pattern in
+                    HStack {
+                        Text(verbatim: pattern)
+                        Spacer()
+                        Button {
+                            store.draft.ignoredPatterns.removeAll { $0 == pattern }
+                        } label: {
+                            Image(systemName: "trash")
+                        }
+                        .buttonStyle(.borderless)
+                        .help(Text("Remove extension"))
+                        .accessibilityLabel(Text("Remove extension"))
+                    }
+                }
+                HStack {
+                    TextField("Extension, e.g. dmg", text: $newExtension)
+                        .onSubmit(addExtension)
+                    Button("Add", action: addExtension)
+                        .disabled(IgnorePattern.normalize(newExtension) == nil)
+                }
+            }
+        }
+    }
+
+    private func addExtension() {
+        guard let pattern = IgnorePattern.normalize(newExtension), !store.draft.ignoredPatterns.contains(pattern) else {
+            return
+        }
+        store.draft.ignoredPatterns.append(pattern)
+        newExtension = ""
+    }
+}
+
+private struct DataTab: View {
+    @Bindable var store: SettingsDraft
+
+    private static let retentionLabels: [HistoryRetention: String] = [
+        .oneMonth: String(localized: "1 month"),
+        .threeMonths: String(localized: "3 months"),
+        .sixMonths: String(localized: "6 months"),
+        .oneYear: String(localized: "1 year"),
+        .twoYears: String(localized: "2 years"),
+        .forever: String(localized: "Forever"),
+    ]
+
+    var body: some View {
+        Form {
+            Section("Data") {
+                StepSlider(
+                    "Keep history for", values: HistoryRetention.allCases, selection: $store.draft.historyRetention,
+                    label: { Self.retentionLabels[$0] ?? "" })
+                HStack {
+                    Button("Clear history now…") { store.confirmClear = true }
+                    if let clearedCount = store.clearedCount {
+                        Text("Removed \(clearedCount) records").foregroundStyle(.secondary)
+                    }
+                }
+            }
+        }
+        .alert("Clear history?", isPresented: $store.confirmClear) {
+            Button("Clear history", role: .destructive) {
+                Task { await store.clearHistory() }
+            }
+            Button("Cancel", role: .cancel) {}
+        } message: {
+            Text("Scheduled and waiting files are not affected.")
+        }
+    }
+}
+
+private struct AboutTab: View {
+    private static let version = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "–"
+
+    var body: some View {
+        Form {
+            Section("About") {
+                HStack(alignment: .center, spacing: TK.Space.l) {
+                    Image("Lockup").resizable().scaledToFit().frame(height: 28)
+                    Spacer()
+                    Text("Version \(Self.version)")
+                        .foregroundStyle(.secondary)
+                }
+                Text(
+                    "Free and open source (MIT). 100 % offline, no analytics, no tracking, nothing leaves your computer."
+                )
+                Link(
+                    "direcat.github.io/dropkeeper", destination: URL(string: "https://direcat.github.io/dropkeeper/")!)
+            }
+        }
     }
 }

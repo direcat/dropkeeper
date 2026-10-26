@@ -79,6 +79,9 @@ enum TK {
         static let timelineHaloGap: CGFloat = 3
         static let timelineHaloWidth: CGFloat = 2
         static let timelineTrackWidth: CGFloat = 2
+        static let settingsWindow = CGSize(width: 680, height: 560)
+        /// Room for the longest value label beside a Settings step slider.
+        static let stepSliderLabel: CGFloat = 90
     }
     enum Motion {
         static let open = Animation.spring(response: 0.35, dampingFraction: 0.82)

@@ -693,6 +693,24 @@
         "fr" : { "stringUnit" : { "state" : "translated", "value" : "Afficher dans le Finder" } }
       }
     },
+    "Folders" : {
+      "comment" : "Settings tab title: the watched folders",
+      "localizations" : {
+        "cs" : { "stringUnit" : { "state" : "translated", "value" : "Složky" } },
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Ordner" } },
+        "es" : { "stringUnit" : { "state" : "translated", "value" : "Carpetas" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Dossiers" } }
+      }
+    },
+    "Rules" : {
+      "comment" : "Settings tab title: which downloads DropKeeper handles",
+      "localizations" : {
+        "cs" : { "stringUnit" : { "state" : "translated", "value" : "Pravidla" } },
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Regeln" } },
+        "es" : { "stringUnit" : { "state" : "translated", "value" : "Reglas" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Règles" } }
+      }
+    },
     "General" : {
       "comment" : "Settings section title",
       "localizations" : {
@@ -1248,17 +1266,8 @@
         "fr" : { "stringUnit" : { "state" : "translated", "value" : "Gratuit et open source (MIT). 100 % hors ligne, aucune analyse, aucun suivi, rien ne quitte votre ordinateur." } }
       }
     },
-    "Inspired by TempCat." : {
-      "comment" : "Settings: credit to the app that inspired DropKeeper",
-      "localizations" : {
-        "cs" : { "stringUnit" : { "state" : "translated", "value" : "Inspirováno aplikací TempCat." } },
-        "de" : { "stringUnit" : { "state" : "translated", "value" : "Inspiriert von TempCat." } },
-        "es" : { "stringUnit" : { "state" : "translated", "value" : "Inspirado en TempCat." } },
-        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Inspiré de TempCat." } }
-      }
-    },
-    "github.com/direcat/dropkeeper" : {
-      "comment" : "Settings: link to the project repository",
+    "direcat.github.io/dropkeeper" : {
+      "comment" : "Settings: link to the project website",
       "shouldTranslate" : false
     },
     "OK" : {

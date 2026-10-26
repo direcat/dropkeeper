@@ -1,3 +1,4 @@
+import AppKit
 import DropKeeperCore
 import SwiftUI
 import Testing
@@ -73,4 +74,36 @@ private func render(_ view: some View) -> CGImage? {
 @Test func idleAccessibilityValueAnnouncesCountdown() {
     #expect(NotchIdleView.accessibilityValue(urgentSeconds: 7) == "Deleting in 0:07")
     #expect(NotchIdleView.accessibilityValue(urgentSeconds: nil) == nil)
+}
+
+@MainActor
+@Test(arguments: SettingsTab.allCases) func settingsTabRendersAtWindowSize(tab: SettingsTab) throws {
+    let model = AppModel(applyLoginItem: { _ in })
+    let view = SettingsTabView(tab: tab, model: model, store: SettingsDraft(model: model))
+    let renderer = ImageRenderer(content: view)
+    renderer.proposedSize = ProposedViewSize(TK.Size.settingsWindow)
+    let image = try #require(renderer.cgImage)
+    #expect(CGFloat(image.width) >= TK.Size.settingsWindow.width)
+    #expect(CGFloat(image.height) >= TK.Size.settingsWindow.height)
+}
+
+/// The spike: AppKit's toolbar tabs in this app's plain window give one toolbar item per tab, each with its symbol.
+@MainActor
+@Test func settingsWindowHasToolbarTabs() throws {
+    let suite = "DropKeeperAppTests.\(UUID().uuidString)"
+    let defaults = try #require(UserDefaults(suiteName: suite))
+    defer { defaults.removePersistentDomain(forName: suite) }
+    defaults.set(3, forKey: SettingsTabViewController.selectedTabKey)
+    let model = AppModel(defaults: defaults, applyLoginItem: { _ in })
+    let controller = SettingsTabViewController(model: model, store: SettingsDraft(model: model), defaults: defaults)
+    let window = NSWindow(contentViewController: controller)
+    window.styleMask = [.titled, .closable]
+    window.toolbarStyle = .preference
+    #expect(controller.tabStyle == .toolbar)
+    #expect(controller.tabViewItems.count == SettingsTab.allCases.count)
+    #expect(controller.tabViewItems.allSatisfy { $0.image != nil })
+    #expect(controller.selectedTabViewItemIndex == 3)
+    #expect(window.toolbar?.items.count == SettingsTab.allCases.count)
+    controller.selectedTabViewItemIndex = 5
+    #expect(defaults.integer(forKey: SettingsTabViewController.selectedTabKey) == 5)
 }
