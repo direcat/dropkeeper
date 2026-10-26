@@ -149,6 +149,8 @@ final class AppModel {
             break  // failed files arrive through the file observation
         case .foldersChanged:
             await refreshState()
+        case .ruleApplied:
+            break  // the notice for applied rules comes with the 1.1 UI
         }
     }
 

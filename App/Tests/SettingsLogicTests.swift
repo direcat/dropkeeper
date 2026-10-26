@@ -27,7 +27,7 @@ import Testing
     var unsorted = Settings()
     unsorted.timelineStops = [86_400, 1800, 1800, 10, 99_999_999, 3600, 604_800]
     unsorted.defaultChoice = .expireAfter(10)
-    unsorted.ignoredExtensions = [".DMG", "dmg", " zip", ""]
+    unsorted.ignoredPatterns = [".DMG", "dmg", " zip", ""]
     unsorted.gracePeriod = 42
     var tooFew = Settings()
     tooFew.timelineStops = [3600, 3600]

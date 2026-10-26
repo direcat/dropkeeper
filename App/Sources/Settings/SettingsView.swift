@@ -250,12 +250,12 @@ struct SettingsView: View {
 
     private var ignored: some View {
         Section("Ignored extensions") {
-            ForEach(draft.ignoredExtensions, id: \.self) { ext in
+            ForEach(draft.ignoredPatterns, id: \.self) { pattern in
                 HStack {
-                    Text(verbatim: ".\(ext)")
+                    Text(verbatim: pattern)
                     Spacer()
                     Button {
-                        draft.ignoredExtensions.removeAll { $0 == ext }
+                        draft.ignoredPatterns.removeAll { $0 == pattern }
                     } label: {
                         Image(systemName: "trash")
                     }
@@ -268,7 +268,7 @@ struct SettingsView: View {
                 TextField("Extension, e.g. dmg", text: $newExtension)
                     .onSubmit(addExtension)
                 Button("Add", action: addExtension)
-                    .disabled(Self.trimmedExtension(newExtension).isEmpty)
+                    .disabled(IgnorePattern.normalize(newExtension) == nil)
             }
         }
     }
@@ -329,14 +329,11 @@ struct SettingsView: View {
             })
     }
 
-    private static func trimmedExtension(_ text: String) -> String {
-        text.trimmingCharacters(in: CharacterSet(charactersIn: ". ")).lowercased()
-    }
-
     private func addExtension() {
-        let ext = Self.trimmedExtension(newExtension)
-        guard !ext.isEmpty, !draft.ignoredExtensions.contains(ext) else { return }
-        draft.ignoredExtensions.append(ext)
+        guard let pattern = IgnorePattern.normalize(newExtension), !draft.ignoredPatterns.contains(pattern) else {
+            return
+        }
+        draft.ignoredPatterns.append(pattern)
         newExtension = ""
     }
 
