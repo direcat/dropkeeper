@@ -41,6 +41,7 @@ public struct Settings: Codable, Sendable, Equatable {
     public static let minStop: TimeInterval = 300
     public static let maxStop: TimeInterval = 90 * 86_400
     public static let gracePeriodOptions: [TimeInterval] = [60, 300, 900, 3600]
+    public static let reminderLeadTimeOptions: [TimeInterval] = [60, 120, 300, 600, 900, 1800, 3600]
 
     public var launchAtLogin = true
     public var promptPresentation = PromptPresentation.menuBar
@@ -52,12 +53,15 @@ public struct Settings: Codable, Sendable, Equatable {
     public var finderTagEnabled = false
     public var ignoredPatterns = IgnorePattern.defaults
     public var historyRetention = HistoryRetention.oneYear
+    public var reminderEnabled = true
+    public var reminderLeadTime: TimeInterval = 300
 
     public init() {}
 
     enum CodingKeys: String, CodingKey {
         case launchAtLogin, promptPresentation, quietMode, timelineStops, gracePeriod, defaultChoice,
-            deleteMode, finderTagEnabled, ignoredPatterns, historyRetention
+            deleteMode, finderTagEnabled, ignoredPatterns, historyRetention,
+            reminderEnabled, reminderLeadTime
     }
 
     /// Pre-1.1 key, decode-only: migrated into `ignoredPatterns` when that key is absent.
@@ -90,6 +94,10 @@ public struct Settings: Codable, Sendable, Equatable {
         }
         historyRetention =
             try container.decodeIfPresent(HistoryRetention.self, forKey: .historyRetention) ?? defaults.historyRetention
+        reminderEnabled =
+            try container.decodeIfPresent(Bool.self, forKey: .reminderEnabled) ?? defaults.reminderEnabled
+        reminderLeadTime =
+            try container.decodeIfPresent(TimeInterval.self, forKey: .reminderLeadTime) ?? defaults.reminderLeadTime
     }
 
     /// The action to apply by default. `.lastChosen` follows `lastChoice` while it is still available
@@ -115,6 +123,7 @@ public struct Settings: Codable, Sendable, Equatable {
         if stops.count < 2 { stops = Settings().timelineStops }
         result.timelineStops = Array(stops.prefix(5))
         if !Self.gracePeriodOptions.contains(gracePeriod) { result.gracePeriod = 300 }
+        if !Self.reminderLeadTimeOptions.contains(reminderLeadTime) { result.reminderLeadTime = 300 }
         if case .expireAfter(let duration) = defaultChoice, !result.timelineStops.contains(duration) {
             result.defaultChoice = .keep
         }

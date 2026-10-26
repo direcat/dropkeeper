@@ -29,6 +29,18 @@ public struct ItemActions: Sendable {
         if tagEnabled { try? fs.setTag(Self.finderTag, present: true, at: file.path) }
     }
 
+    /// Pushes a scheduled file's expiry back by `length` and rewrites the expiry xattr. The length is recorded
+    /// as `scheduleDuration`, so records from before it was stored keep extending by the same amount.
+    public func extend(_ file: inout TrackedFile, by length: TimeInterval, now: Date) {
+        guard let expiry = file.expiresAt else { return }
+        let extended = expiry.addingTimeInterval(length)
+        file.expiresAt = extended
+        file.scheduleDuration = length
+        file.failureCount = 0
+        file.updatedAt = now
+        try? fs.writeXattr(Self.expiryAttribute, value: ISODate.format(extended), at: file.path)
+    }
+
     public func keep(_ file: inout TrackedFile, now: Date) {
         file.state = .kept
         file.expiresAt = nil

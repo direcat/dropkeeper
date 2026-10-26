@@ -22,6 +22,20 @@ extension DropKeeperEngine {
         }
     }
 
+    /// Extends scheduled items by their timer length; other states are skipped. Every id is processed;
+    /// failures are reported together afterwards.
+    public func extend(ids: [FileID]) throws {
+        let now = env.time.now()
+        defer { rescheduleTimer() }
+        try forEach(ids) { id in
+            guard var file = try store.file(id: id), file.state == .scheduled, let length = file.timerLength else {
+                return
+            }
+            actions.extend(&file, by: length, now: now)
+            try store.update(file)
+        }
+    }
+
     /// Keeps active and failed items. Every id is processed; failures are reported together afterwards.
     /// With `recordChoice`, "keep" is also remembered for the "last chosen time" default.
     public func keep(ids: [FileID], recordChoice: Bool = false) throws {

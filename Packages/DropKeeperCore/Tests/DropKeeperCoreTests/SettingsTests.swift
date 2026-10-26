@@ -120,3 +120,21 @@ import Testing
     #expect(String(bytes: try encoder.encode(DefaultChoice.expireAfter(3600)), encoding: .utf8) == expireJSON)
     #expect(String(bytes: try encoder.encode(DefaultChoice.lastChosen), encoding: .utf8) == lastJSON)
 }
+
+@Test func reminderDefaults() throws {
+    let settings = Settings()
+    #expect(settings.reminderEnabled)
+    #expect(settings.reminderLeadTime == 300)
+    // A 1.0 blob has neither key.
+    let decoded = try JSONDecoder().decode(Settings.self, from: Data(#"{"quietMode":true}"#.utf8))
+    #expect(decoded.reminderEnabled)
+    #expect(decoded.reminderLeadTime == 300)
+}
+
+@Test func reminderLeadTimeNormalizes() {
+    var settings = Settings()
+    settings.reminderLeadTime = 42
+    #expect(settings.normalized().reminderLeadTime == 300)
+    settings.reminderLeadTime = 900
+    #expect(settings.normalized().reminderLeadTime == 900)
+}
