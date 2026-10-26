@@ -24,6 +24,12 @@ private let folder = "/fake/D"
 ])
 func candidateRules(path: String, expected: Bool) {
     #expect(
-        DownloadDetector.isCandidate(path: path, folderPath: folder, ignoredExtensions: ["dmg", "pkg"])
+        DownloadDetector.isCandidate(path: path, folderPath: folder, ignoredPatterns: ["*.dmg", "*.pkg"])
             == expected)
+}
+
+@Test func detectorSkipsOfficeOwnerFile() {
+    let defaults = IgnorePattern.defaults
+    #expect(!DownloadDetector.isCandidate(path: "/d/~$x.docx", folderPath: "/d", ignoredPatterns: defaults))
+    #expect(DownloadDetector.isCandidate(path: "/d/x.docx", folderPath: "/d", ignoredPatterns: defaults))
 }

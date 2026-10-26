@@ -13,7 +13,7 @@ import Testing
     #expect(settings.defaultChoice == .keep)
     #expect(settings.deleteMode == .trash)
     #expect(!settings.finderTagEnabled)
-    #expect(settings.ignoredExtensions.isEmpty)
+    #expect(settings.ignoredPatterns == IgnorePattern.defaults)
     #expect(settings.historyRetention == .oneYear)
 }
 
@@ -26,15 +26,15 @@ import Testing
     #expect(settings.normalized().timelineStops == Settings().timelineStops)  // fewer than 2 → defaults
 }
 
-@Test func normalizesGraceAndDefaultChoiceAndExtensions() {
+@Test func normalizesGraceAndDefaultChoiceAndPatterns() {
     var settings = Settings()
     settings.gracePeriod = 42
     settings.defaultChoice = .expireAfter(12_345)
-    settings.ignoredExtensions = [".DMG", "pkg", "", "dmg"]
+    settings.ignoredPatterns = [".DMG", "pkg", "", "*.dmg"]
     let norm = settings.normalized()
     #expect(norm.gracePeriod == 300)
     #expect(norm.defaultChoice == .keep)  // not one of the timeline stops
-    #expect(norm.ignoredExtensions == ["dmg", "pkg"])
+    #expect(norm.ignoredPatterns == ["*.dmg", "*.pkg"])
 }
 
 @Test func decodesMissingKeysWithDefaults() throws {
@@ -63,4 +63,22 @@ import Testing
     let date = Date(timeIntervalSince1970: 1_800_000_000)
     #expect(ISODate.parse(ISODate.format(date)) == date)
     #expect(ISODate.parse("garbage") == nil)
+}
+
+@Test func newInstallGetsDefaultPatterns() { #expect(Settings().ignoredPatterns == IgnorePattern.defaults) }
+
+@Test func legacyExtensionsMigrateOnce() throws {
+    let json = #"{"ignoredExtensions":["dmg","zip"]}"#
+    let decoded = try JSONDecoder().decode(Settings.self, from: Data(json.utf8))
+    #expect(decoded.ignoredPatterns == ["~$*", "#*#", "*~", "*.dmg", "*.zip"])
+    var edited = decoded
+    edited.ignoredPatterns.removeFirst()  // user removes "~$*"
+    let again = try JSONDecoder().decode(Settings.self, from: JSONEncoder().encode(edited))
+    #expect(again.ignoredPatterns == ["#*#", "*~", "*.dmg", "*.zip"])
+}
+
+@Test func normalizedPatternsAreTrimmedAndDeduped() {
+    var settings = Settings()
+    settings.ignoredPatterns = ["ZIP", "*.zip", "", "~$*"]
+    #expect(settings.normalized().ignoredPatterns == ["*.zip", "~$*"])
 }

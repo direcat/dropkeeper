@@ -293,11 +293,11 @@ import Testing
         #expect(file.expiresAt == harness.time.now().addingTimeInterval(3600))
     }
 
-    @Test func ignoredExtensionsAreSkipped() async throws {
+    @Test func ignoredPatternsAreSkipped() async throws {
         let harness = try EngineHarness()
         try await harness.startWithDownloads()
         var settings = await harness.engine.currentSettings
-        settings.ignoredExtensions = [".DMG"]
+        settings.ignoredPatterns = [".DMG"]
         try await harness.engine.updateSettings(settings)
         await harness.drop("Installer.dmg")
         #expect(try harness.files().isEmpty)

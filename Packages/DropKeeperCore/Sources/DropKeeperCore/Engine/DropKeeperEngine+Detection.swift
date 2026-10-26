@@ -31,7 +31,7 @@ extension DropKeeperEngine {
     func isNewItem(path: String, stat: FileStat, folder: WatchedFolder, since: Date, now: Date) -> Bool {
         guard
             DownloadDetector.isCandidate(
-                path: path, folderPath: folder.path, ignoredExtensions: settings.ignoredExtensions)
+                path: path, folderPath: folder.path, ignoredPatterns: settings.ignoredPatterns)
         else { return false }
         guard let added = stat.addedDate ?? stat.creationDate else { return false }
         var bound = since
@@ -99,7 +99,7 @@ extension DropKeeperEngine {
         for (path, stat) in tracker.poll(now: now, fs: env.fs) {
             guard let folder = folder(containing: path),
                 DownloadDetector.isCandidate(
-                    path: path, folderPath: folder.path, ignoredExtensions: settings.ignoredExtensions),
+                    path: path, folderPath: folder.path, ignoredPatterns: settings.ignoredPatterns),
                 trackedRecord(at: path, stat: stat) == nil
             else { continue }
             let file = TrackedFile.new(path: path, stat: stat, folderId: folder.id, now: now)

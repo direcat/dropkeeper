@@ -42,14 +42,19 @@ public struct Settings: Codable, Sendable, Equatable {
     public var defaultChoice = DefaultChoice.keep
     public var deleteMode = DeleteMode.trash
     public var finderTagEnabled = false
-    public var ignoredExtensions: [String] = []
+    public var ignoredPatterns = IgnorePattern.defaults
     public var historyRetention = HistoryRetention.oneYear
 
     public init() {}
 
     enum CodingKeys: String, CodingKey {
         case launchAtLogin, promptPresentation, quietMode, timelineStops, gracePeriod, defaultChoice,
-            deleteMode, finderTagEnabled, ignoredExtensions, historyRetention
+            deleteMode, finderTagEnabled, ignoredPatterns, historyRetention
+    }
+
+    /// Pre-1.1 key, decode-only: migrated into `ignoredPatterns` when that key is absent.
+    private enum LegacyKeys: String, CodingKey {
+        case ignoredExtensions
     }
 
     public init(from decoder: any Decoder) throws {
@@ -68,8 +73,13 @@ public struct Settings: Codable, Sendable, Equatable {
         deleteMode = try container.decodeIfPresent(DeleteMode.self, forKey: .deleteMode) ?? defaults.deleteMode
         finderTagEnabled =
             try container.decodeIfPresent(Bool.self, forKey: .finderTagEnabled) ?? defaults.finderTagEnabled
-        ignoredExtensions =
-            try container.decodeIfPresent([String].self, forKey: .ignoredExtensions) ?? defaults.ignoredExtensions
+        if let patterns = try container.decodeIfPresent([String].self, forKey: .ignoredPatterns) {
+            ignoredPatterns = patterns
+        } else {
+            let legacy = try decoder.container(keyedBy: LegacyKeys.self)
+            let extensions = try legacy.decodeIfPresent([String].self, forKey: .ignoredExtensions) ?? []
+            ignoredPatterns = defaults.ignoredPatterns + extensions.map { "*.\($0)" }
+        }
         historyRetention =
             try container.decodeIfPresent(HistoryRetention.self, forKey: .historyRetention) ?? defaults.historyRetention
     }
@@ -85,10 +95,10 @@ public struct Settings: Codable, Sendable, Equatable {
             result.defaultChoice = .keep
         }
         var seen = Set<String>()
-        result.ignoredExtensions =
-            ignoredExtensions
-            .map { $0.trimmingCharacters(in: CharacterSet(charactersIn: ". ")).lowercased() }
-            .filter { !$0.isEmpty && seen.insert($0).inserted }
+        result.ignoredPatterns =
+            ignoredPatterns
+            .compactMap(IgnorePattern.normalize)
+            .filter { seen.insert($0).inserted }
         return result
     }
 }
