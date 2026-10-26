@@ -4,6 +4,8 @@ All notable changes to DropKeeper are documented here. The format follows [Keep 
 
 ## [Unreleased]
 
+## [1.1.0] - 2026-10-26
+
 ### Added
 - Rules by file type, name pattern or folder: first match wins, reorderable (Move up / Move down), and a matched file skips the prompt with a short notice and a Change button. Starter rules for Installers, Screenshots on Desktop, Images, Archives and Invitations & contacts ship disabled.
 - Pre-expiry reminder (on by default, 5 minutes before): Extend by the timer length, Keep or Delete now.
