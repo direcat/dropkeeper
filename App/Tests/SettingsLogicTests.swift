@@ -116,3 +116,24 @@ func wildcardOnlyPatternsMatchEverything(raw: String) {
 func ordinaryPatternsAreNotMatchAll(raw: String) {
     #expect(!PatternCheck.matchesEverything(raw))
 }
+
+@Test func ruleOrderMovesAndClamps() {
+    let rules = (1...3).map { Rule(name: "r\($0)", match: .category(.images), duration: 60) }
+    #expect(RuleOrder.move(rules, id: rules[0].id, by: 1).map(\.name) == ["r2", "r1", "r3"])
+    #expect(RuleOrder.move(rules, id: rules[2].id, by: -1).map(\.name) == ["r1", "r3", "r2"])
+    #expect(RuleOrder.move(rules, id: rules[0].id, by: -1) == rules)
+    #expect(RuleOrder.move(rules, id: rules[2].id, by: 1) == rules)
+    #expect(RuleOrder.move(rules, id: UUID(), by: 1) == rules)
+}
+
+@Test func defaultRuleNamesAreLocalizedUntilRenamed() {
+    let installers = Rule.defaults(home: "/h")[0]
+    #expect(RuleSummary.displayName(for: installers) == RuleSummary.categoryName(.installers))
+    var renamed = installers
+    renamed.name = "My installers"
+    #expect(RuleSummary.displayName(for: renamed) == "My installers")
+    let custom = Rule(name: "Installers", match: .category(.installers), duration: 60)
+    #expect(RuleSummary.displayName(for: custom) == "Installers")
+    let desktop = Rule.defaults(home: "/h")[1]
+    #expect(RuleSummary.displayName(for: desktop) == String(localized: "Screenshots on Desktop"))
+}

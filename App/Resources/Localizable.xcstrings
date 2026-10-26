@@ -1381,7 +1381,7 @@
     "* matches any characters and ? matches one. A plain word such as zip means *.zip." : {
       "comment" : "Caption under the ignored file pattern field",
       "localizations" : {
-        "cs" : { "stringUnit" : { "state" : "translated", "value" : "* nahradí libovolné znaky a ? jeden znak. Samotné slovo, například zip, znamená *.zip." } },
+        "cs" : { "stringUnit" : { "state" : "translated", "value" : "* odpovídá libovolným znakům a ? jednomu znaku. Samotné slovo, například zip, znamená *.zip." } },
         "de" : { "stringUnit" : { "state" : "translated", "value" : "* steht für beliebige Zeichen, ? für genau eins. Ein einfaches Wort wie zip bedeutet *.zip." } },
         "es" : { "stringUnit" : { "state" : "translated", "value" : "* sustituye cualquier cantidad de caracteres y ? uno solo. Una palabra suelta, como zip, equivale a *.zip." } },
         "fr" : { "stringUnit" : { "state" : "translated", "value" : "* remplace n’importe quels caractères et ? un seul. Un simple mot comme zip équivaut à *.zip." } }
@@ -1592,6 +1592,33 @@
         "de" : { "stringUnit" : { "state" : "translated", "value" : "Sichern" } },
         "es" : { "stringUnit" : { "state" : "translated", "value" : "Guardar" } },
         "fr" : { "stringUnit" : { "state" : "translated", "value" : "Enregistrer" } }
+      }
+    },
+    "Screenshots on Desktop" : {
+      "comment" : "Name of the suggested rule for screenshots on the Desktop",
+      "localizations" : {
+        "cs" : { "stringUnit" : { "state" : "translated", "value" : "Snímky obrazovky na ploše" } },
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Bildschirmfotos auf dem Schreibtisch" } },
+        "es" : { "stringUnit" : { "state" : "translated", "value" : "Capturas de pantalla en el Escritorio" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Captures d’écran sur le Bureau" } }
+      }
+    },
+    "Move up" : {
+      "comment" : "VoiceOver label of the button that moves a rule earlier in the list",
+      "localizations" : {
+        "cs" : { "stringUnit" : { "state" : "translated", "value" : "Posunout nahoru" } },
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Nach oben" } },
+        "es" : { "stringUnit" : { "state" : "translated", "value" : "Subir" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Monter" } }
+      }
+    },
+    "Move down" : {
+      "comment" : "VoiceOver label of the button that moves a rule later in the list",
+      "localizations" : {
+        "cs" : { "stringUnit" : { "state" : "translated", "value" : "Posunout dolů" } },
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Nach unten" } },
+        "es" : { "stringUnit" : { "state" : "translated", "value" : "Bajar" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Descendre" } }
       }
     },
     "DropKeeper" : {

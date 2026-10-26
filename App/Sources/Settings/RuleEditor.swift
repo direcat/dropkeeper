@@ -9,6 +9,7 @@ struct RuleEditor: View {
     let folders: [WatchedFolder]
     let onSave: (Rule) -> Void
     @Environment(\.dismiss) private var dismiss
+    private let original: Rule
     @State private var rule: Rule
     @State private var kind: MatchKind
     @State private var category: RuleCategory
@@ -18,7 +19,10 @@ struct RuleEditor: View {
         self.isNew = isNew
         self.folders = folders
         self.onSave = onSave
-        _rule = State(initialValue: rule)
+        original = rule
+        var shown = rule
+        shown.name = RuleSummary.displayName(for: rule)
+        _rule = State(initialValue: shown)
         switch rule.match {
         case .category(let category):
             _kind = State(initialValue: .category)
@@ -46,8 +50,11 @@ struct RuleEditor: View {
 
     var body: some View {
         VStack(spacing: 0) {
+            Text(isNew ? "New rule" : "Edit rule")
+                .font(.headline)
+                .padding(.top, TK.Space.l)
             Form {
-                TextField("Name", text: $rule.name)
+                TextField("Name", text: $rule.name, prompt: Text(verbatim: fallbackName))
                 Picker("What", selection: $kind) {
                     Text("Kind of file").tag(MatchKind.category)
                     Text("File name pattern").tag(MatchKind.pattern)
@@ -88,6 +95,13 @@ struct RuleEditor: View {
         .frame(width: TK.Size.ruleEditor.width, height: TK.Size.ruleEditor.height)
     }
 
+    private var fallbackName: String {
+        switch kind {
+        case .category: RuleSummary.categoryName(category)
+        case .pattern: normalizedPattern ?? pattern
+        }
+    }
+
     private func save() {
         var saved = rule
         switch kind {
@@ -95,11 +109,9 @@ struct RuleEditor: View {
         case .pattern: saved.match = .pattern(normalizedPattern ?? pattern)
         }
         if saved.name.trimmingCharacters(in: .whitespaces).isEmpty {
-            saved.name =
-                switch saved.match {
-                case .category(let category): RuleSummary.categoryName(category)
-                case .pattern(let pattern): pattern
-                }
+            saved.name = fallbackName
+        } else if saved.name == RuleSummary.displayName(for: original) {
+            saved.name = original.name  // untouched: keep Core's name so a default rule stays translatable
         }
         onSave(saved)
         dismiss()

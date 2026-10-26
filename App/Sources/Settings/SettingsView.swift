@@ -309,11 +309,21 @@ private struct ExpiryTab: View {
 private struct RulesTab: View {
     @Bindable var store: SettingsDraft
     let model: AppModel
+    @State private var editing: EditedRule?
 
     var body: some View {
         Form {
-            RulesSection(store: store, model: model)
+            RulesSection(store: store, model: model, editing: $editing)
             IgnoredFilesSection(store: store)
+        }
+        .sheet(item: $editing) { edited in
+            RuleEditor(rule: edited.rule, isNew: edited.isNew, folders: model.folders) { saved in
+                if let index = store.draft.rules.firstIndex(where: { $0.id == saved.id }) {
+                    store.draft.rules[index] = saved
+                } else {
+                    store.draft.rules.append(saved)
+                }
+            }
         }
     }
 }
