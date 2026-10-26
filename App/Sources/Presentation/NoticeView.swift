@@ -39,6 +39,7 @@ struct NoticeView: View {
                         .contentShape(Rectangle())
                 }
                 .buttonStyle(.plain)
+                .focusable(false)
                 .font(.system(size: TK.TextSize.title, weight: .medium))
                 .foregroundStyle(TK.Notch.accentText)
                 // Keep the visible text aligned with the panel padding despite the larger hit area.

@@ -178,8 +178,11 @@ final class AppModel {
         now = Date()
         // Reminders become due by time passing, so they are refreshed on every tick and their wake is merged in
         // before the early return: with no file near expiry the clock must still fire when a window opens.
-        reminders.update(
+        // Assigned only on change: observers fire on every mutation, which would re-render the panel per tick.
+        var updated = reminders
+        updated.update(
             scheduled: scheduled, now: now, enabled: settings.reminderEnabled, leadTime: settings.reminderLeadTime)
+        if updated != reminders { reminders = updated }
         let reminderWake = reminders.nextWake(
             scheduled: scheduled, now: now, enabled: settings.reminderEnabled, leadTime: settings.reminderLeadTime)
         let countdownWake = Countdown.nextRefresh(scheduled: scheduled, now: now)

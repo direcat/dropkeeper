@@ -133,7 +133,7 @@ private func pendingFile(_ id: String) -> TrackedFile {
                 hovering: false) == .notice)
     }
 
-    /// Without an engine the action fails and reports it: proves the reminder ids reach the engine call.
+    /// With nothing due, the reminder actions don't even call the engine.
     @Test func reminderActionsWithoutDueFilesDoNothing() async {
         let fixture = Fixture()
         defer { fixture.cleanUp() }
@@ -142,6 +142,39 @@ private func pendingFile(_ id: String) -> TrackedFile {
         await model.keepReminders()
         await model.deleteReminders()
         #expect(!model.panelError.isVisible)  // nothing is due, so nothing was attempted
+    }
+
+    private func modelWithDueFile(_ fixture: Fixture) -> AppModel {
+        let now = Date()
+        var due = scheduledFile(expiresIn: 0, id: "due.dmg")
+        due.updatedAt = now.addingTimeInterval(-3480)
+        due.expiresAt = now.addingTimeInterval(120)
+        fixture.model.apply([due])
+        return fixture.model
+    }
+
+    /// Without an engine each action fails and reports it, which proves the due files reach the engine call.
+    @Test func reminderActionsWithDueFilesCallTheEngine() async {
+        for action in [
+            { (app: AppModel) in await app.extendReminders() }, { (app: AppModel) in await app.keepReminders() },
+            { (app: AppModel) in await app.deleteReminders() },
+        ] {
+            let fixture = Fixture()
+            defer { fixture.cleanUp() }
+            let model = modelWithDueFile(fixture)
+            #expect(model.reminders.due.count == 1)
+            await action(model)
+            #expect(model.panelError.isVisible)
+        }
+    }
+
+    @Test func dismissRemindersEmptiesDue() {
+        let fixture = Fixture()
+        defer { fixture.cleanUp() }
+        let model = modelWithDueFile(fixture)
+        model.dismissReminders()
+        #expect(model.reminders.due.isEmpty)
+        #expect(!model.isNoticeVisible)
     }
 
     /// Onboarding shows `lastError` when adding the folder fails, so the failure must set it.

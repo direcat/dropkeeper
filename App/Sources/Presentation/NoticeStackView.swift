@@ -1,47 +1,62 @@
 import DropKeeperCore
 import SwiftUI
 
+/// What the stack shows: the reminder, the rule notice and the trash notice (each may be empty).
+struct NoticeStackContent: Equatable {
+    var reminders: [TrackedFile] = []
+    var rules: [RuleApplication] = []
+    var trashed: [TrackedFile] = []
+
+    var isEmpty: Bool { reminders.isEmpty && rules.isEmpty && trashed.isEmpty }
+
+    /// The current bars; while none is left and the panel is still fading out (`holdsLast`), the last non-empty
+    /// content, so the panel doesn't empty out before it is gone.
+    static func resolve(current: Self, last: Self, holdsLast: Bool) -> Self {
+        current.isEmpty && holdsLast ? last : current
+    }
+}
+
 /// The bars above the prompt, top to bottom: pre-expiry reminder, rule notice, "Moved to Trash" notice.
 /// None of them takes keyboard focus, so the prompt below keeps its focus, selection and Return.
 struct NoticeStackView: View {
     let model: AppModel
-    /// The panel shows only this stack: the trash notice then stays on screen while the panel fades out.
+    /// The panel shows only this stack: its last content then stays on screen while the panel fades out.
     let holdsNotice: Bool
-    @State private var hadNotice = false
+    @State private var last = NoticeStackContent()
 
-    private var showsReminder: Bool { !model.reminders.due.isEmpty }
-    private var showsRule: Bool { model.ruleNotice.isVisible }
-    private var showsNotice: Bool {
-        model.notice.isVisible || (holdsNotice && hadNotice && !showsReminder && !showsRule)
+    private var current: NoticeStackContent {
+        NoticeStackContent(
+            reminders: model.reminders.due, rules: model.ruleNotice.items, trashed: model.notice.items)
     }
 
     var body: some View {
+        let shown = NoticeStackContent.resolve(current: current, last: last, holdsLast: holdsNotice)
         VStack(spacing: 0) {
-            if showsReminder {
+            if !shown.reminders.isEmpty {
                 ReminderBarView(
-                    files: model.reminders.due,
+                    files: shown.reminders,
                     onExtend: { Task { await model.extendReminders() } },
                     onKeep: { Task { await model.keepReminders() } },
                     onDelete: { Task { await model.deleteReminders() } },
                     onDismiss: { model.dismissReminders() })
             }
-            if showsRule {
-                if showsReminder { separator }
+            if !shown.rules.isEmpty {
+                if !shown.reminders.isEmpty { separator }
                 RuleNoticeView(
-                    applications: model.ruleNotice.items, onChange: { model.changeRuleNotice() },
+                    applications: shown.rules, onChange: { model.changeRuleNotice() },
                     onHover: { inside in
                         if inside { model.pauseRuleNotice() } else { model.resumeRuleNotice() }
                     })
             }
-            if showsNotice {
-                if showsReminder || showsRule { separator }
+            if !shown.trashed.isEmpty {
+                if !shown.reminders.isEmpty || !shown.rules.isEmpty { separator }
                 NoticeView(
-                    files: model.notice.items, canUndo: model.settings.deleteMode == .trash,
+                    files: shown.trashed, canUndo: model.settings.deleteMode == .trash,
                     onUndo: { Task { await model.undoNotice() } })
             }
         }
-        .onChange(of: model.notice.isVisible, initial: true) { _, visible in
-            if visible { hadNotice = true }
+        .onChange(of: current, initial: true) { _, new in
+            if !new.isEmpty { last = new }
         }
     }
 

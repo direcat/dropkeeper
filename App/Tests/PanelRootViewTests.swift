@@ -69,3 +69,16 @@ import Testing
     #expect(model.reminders.due.count == 1)
     #expect(height() > promptAlone)
 }
+
+/// Reported sequence: a trash notice ended, a reminder came and went. While fading out, the stack must show the
+/// reminder it last had, never an empty "0 files" trash notice.
+@Test func fadingStackShowsItsLastContentNotAFabricatedNotice() {
+    let reminder = NoticeStackContent(reminders: [scheduledFile(expiresIn: 60, id: "due.dmg")])
+    let empty = NoticeStackContent()
+    let shown = NoticeStackContent.resolve(current: empty, last: reminder, holdsLast: true)
+    #expect(shown == reminder)
+    #expect(shown.trashed.isEmpty)
+    #expect(NoticeStackContent.resolve(current: empty, last: reminder, holdsLast: false).isEmpty)
+    let live = NoticeStackContent(trashed: [scheduledFile(expiresIn: 0, id: "a.pdf")])
+    #expect(NoticeStackContent.resolve(current: live, last: reminder, holdsLast: true) == live)
+}
