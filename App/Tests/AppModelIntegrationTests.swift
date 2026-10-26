@@ -63,16 +63,22 @@ private final class LoginItemRecorder {
     }
 
     /// A started model with one watched folder; `drop` creates a file and waits for its prompt.
-    private func startedModel(root: URL, defaults: UserDefaults) async throws -> (AppModel, URL) {
+    private struct Started {
+        let model: AppModel
+        let folder: URL
+        let bootstrap: EngineBootstrap.Result
+    }
+
+    private func startedModel(root: URL, defaults: UserDefaults) async throws -> Started {
         let folder = root.appendingPathComponent("Downloads", isDirectory: true)
         try FileManager.default.createDirectory(at: folder, withIntermediateDirectories: false)
         let model = AppModel(defaults: defaults, applyLoginItem: { _ in })
-        await model.start(
-            with: try EngineBootstrap.make(
-                databaseURL: root.appendingPathComponent("db/dropkeeper.sqlite"), defaults: defaults))
+        let bootstrap = try EngineBootstrap.make(
+            databaseURL: root.appendingPathComponent("db/dropkeeper.sqlite"), defaults: defaults)
+        await model.start(with: bootstrap)
         #expect(await model.addFolder(folder))
         try await Task.sleep(for: .milliseconds(300))
-        return (model, folder)
+        return Started(model: model, folder: folder, bootstrap: bootstrap)
     }
 
     private func drop(_ name: String, in folder: URL, model: AppModel) async throws -> FileID {
@@ -87,7 +93,8 @@ private final class LoginItemRecorder {
         let suite = "DropKeeperAppTests.\(UUID().uuidString)"
         let defaults = try #require(UserDefaults(suiteName: suite))
         defer { defaults.removePersistentDomain(forName: suite) }
-        let (model, folder) = try await startedModel(root: root, defaults: defaults)
+        let started = try await startedModel(root: root, defaults: defaults)
+        let (model, folder, bootstrap) = (started.model, started.folder, started.bootstrap)
 
         var settings = model.settings
         settings.defaultChoice = .lastChosen
@@ -110,7 +117,8 @@ private final class LoginItemRecorder {
         let suite = "DropKeeperAppTests.\(UUID().uuidString)"
         let defaults = try #require(UserDefaults(suiteName: suite))
         defer { defaults.removePersistentDomain(forName: suite) }
-        let (model, folder) = try await startedModel(root: root, defaults: defaults)
+        let started = try await startedModel(root: root, defaults: defaults)
+        let (model, folder, bootstrap) = (started.model, started.folder, started.bootstrap)
 
         var settings = model.settings
         settings.defaultChoice = .lastChosen
@@ -118,6 +126,8 @@ private final class LoginItemRecorder {
 
         let id = try await drop("one.pdf", in: folder, model: model)
         await model.schedule([id], duration: 86_400)
+        #expect(await bootstrap.engine.resolvedDefaultChoice == .keep)  // asked of the engine, not the cache
+        await model.update(model.settings)  // refreshes the cached choice
         _ = try await drop("two.pdf", in: folder, model: model)
         #expect(model.resolvedChoice == .keep)
         #expect(model.timeline.selected == .keep)
