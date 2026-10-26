@@ -54,8 +54,22 @@ The default is "Under the menu bar icon" (the notch is opt-in). All notch checks
 - [ ] Onboarding: if adding Downloads fails, an alert explains why.
 - [ ] If the engine can't start, an alert says so and DropKeeper quits (no silent menu bar item).
 
+## 1.1 features
+- [ ] Unified panel, menu bar and notch: a reminder, a rule notice and "Moved to Trash" show as bars above the prompt (the prompt keeps focus; Return and the arrow keys still act on the prompt); bars stack without flicker and the panel resizes smoothly.
+- [ ] Quiet mode: reminders and rule notices still show (they do not open a prompt by themselves) and the menu bar dot behaves as before.
+- [ ] Rules: enable Installers, download a matching file; it skips the prompt, a notice names the rule and Change reopens the prompt. First match wins; Move up / Move down change the outcome; a disabled rule never matches.
+- [ ] Rules on Desktop: with Desktop watched, a screenshot matches Screenshots on Desktop; with Desktop not watched, the hint in the rule editor explains how to watch it.
+- [ ] Duplicate prompt: download the same file twice into one folder; the prompt shows "Same as …" and Delete duplicate removes the new copy; with duplicate detection off in Settings, no such offer.
+- [ ] Reminder: with the default 5 minutes, a scheduled file shows a reminder shortly before expiry; Extend adds the timer length, Keep keeps it, Delete now trashes it at once (with Undo). Turned off in Settings: no reminder.
+- [ ] Last chosen time: pick 1 day on one file; the next prompt preselects 1 day and Return applies it.
+- [ ] Settings tabs: eyeball the toolbar tabs (Safari-style: General, Folders, Expiry, Rules, Data, About) and that the window opens centered every time, also after moving it and on a second display.
+- [ ] Settings sliders: time values change with the slider and the value label updates; ignored file patterns can be added and removed.
+- [ ] Upgrade 1.0 to 1.1: with a 1.0 database and defaults that have ignored extensions (e.g. pdf), launch 1.1; they appear in Ignored files as `*.pdf` together with the default patterns (`~$*`, `#*#`, `*~`), and every other setting is unchanged.
+- [ ] Ignored patterns: a file named `~$report.docx` or `notes.txt~` in a watched folder gets no prompt.
+
 ## Accessibility and appearance
 - [ ] VoiceOver: the timeline reads "Delete in 1 hour, at …" and can be adjusted with VoiceOver gestures.
+- [ ] VoiceOver: the time sliders in Settings read their label and value and can be adjusted; the rule rows' Move up and Move down actions are announced and work.
 - [ ] Reduce Motion: panels fade instead of growing.
 - [ ] Light and dark appearance: Settings and onboarding look right; the notch UI is always black.
 
