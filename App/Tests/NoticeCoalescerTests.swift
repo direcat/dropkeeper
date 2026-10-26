@@ -53,6 +53,16 @@ private let base = Date(timeIntervalSince1970: 1_800_000_000)
     #expect(!notice.isVisible)
 }
 
+@Test func addWhilePausedMergesAndRestoresTheFullWindow() {
+    var notice = NoticeCoalescer<TrackedFile>(window: 6)
+    notice.add([scheduledFile(expiresIn: 0, id: "a")], now: base)
+    notice.pause(now: base.addingTimeInterval(4))
+    notice.add([scheduledFile(expiresIn: 0, id: "b")], now: base.addingTimeInterval(10))
+    #expect(notice.items.map(\.id) == ["a", "b"])
+    notice.resume(now: base.addingTimeInterval(20))
+    #expect(notice.expiresAt == base.addingTimeInterval(26))
+}
+
 @Test func panelErrorShowsForItsWindowAndTheLatestWins() {
     var error = PanelError()
     #expect(!error.isVisible)

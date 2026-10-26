@@ -211,7 +211,7 @@ final class AppModel {
 
     private func scheduleRuleNoticeExpiry() {
         ruleNoticeTask?.cancel()
-        guard let expiresAt = ruleNotice.expiresAt else { return }
+        guard !ruleNotice.isPaused, let expiresAt = ruleNotice.expiresAt else { return }
         let delay = max(0, expiresAt.timeIntervalSinceNow)
         ruleNoticeTask = Task { [weak self] in
             try? await Task.sleep(for: .seconds(delay))

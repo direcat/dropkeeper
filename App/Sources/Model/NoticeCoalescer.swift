@@ -19,13 +19,18 @@ struct NoticeCoalescer<Item: Equatable & Identifiable>: Equatable where Item.ID 
     }
 
     mutating func add(_ new: [Item], now: Date) {
-        if isPaused || expiresAt.map({ now < $0 }) == true {
+        if isPaused {
+            // `expiresAt` stays as pause left it; `resume` derives it from the full window again.
+            items += new
+            remaining = window
+            return
+        }
+        if expiresAt.map({ now < $0 }) == true {
             items += new
         } else {
             items = new
         }
         expiresAt = now.addingTimeInterval(window)
-        if isPaused { remaining = window }
     }
 
     mutating func expireIfDue(now: Date) {
