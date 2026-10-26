@@ -13,7 +13,7 @@ private final class Gate: Sendable {
     }
 }
 
-@Suite struct EngineRulesTests {
+@Suite(.serialized) struct EngineRulesTests {
     private let content = Data("same bytes".utf8)
 
     private func imagesRule(folder: String = EngineHarness.downloads) -> Rule {
@@ -229,12 +229,38 @@ private final class Gate: Sendable {
         let harness = try await harness(rules: [imagesRule()])
         addSibling("a.png", to: harness, content: Data("other byte".utf8))
         let gate = hold(harness)
-        await dropContent("b.png", in: harness)
-        await harness.advance(2)  // the entry is ready again while the check is still running
+        let path = await dropContent("b.png", in: harness)
+        await harness.event(path, [.created, .isFile])  // observed again while the check is held
+        await harness.advance(2)  // ready again: skipped, not lost
+        #expect(try harness.files().isEmpty)
         gate.open()
         await harness.settleDuplicateChecks()
         await harness.advance(2)
         #expect(try harness.files().map(\.state) == [.scheduled])
+    }
+
+    @Test func copyKeepsItsOwnIdentityWhenTheOriginalLeavesDuringTheCheck() async throws {
+        let harness = try await harness(rules: [imagesRule()])
+        let original = EngineHarness.downloads + "/a.png"
+        harness.fs.createFile(original, content: content, added: harness.time.now())
+        await harness.event(original, [.created, .isFile])
+        await harness.advance(1)
+        await harness.settleDuplicateChecks()
+        let first = try #require(try harness.files().first)
+        // A Finder copy carries the original's id and expiry marks.
+        let copy = EngineHarness.downloads + "/a copy.png"
+        harness.fs.createFile(copy, content: content, added: harness.time.now())
+        try? harness.fs.writeXattr(ItemActions.idAttribute, value: first.id, at: copy)
+        let gate = hold(harness)
+        await harness.event(copy, [.created, .isFile])
+        await harness.advance(1)
+        harness.fs.delete(original)  // the original leaves while the compare is gated
+        await harness.event(original, [.removed, .isFile])
+        gate.open()
+        await harness.settleDuplicateChecks()
+        let inserted = try #require(try harness.files().first { $0.path == copy })
+        #expect(inserted.id != first.id)
+        #expect(harness.fs.xattr(ItemActions.idAttribute, at: copy) == inserted.id)
     }
 
     @Test func stopWaitsForTheCheckAndAppliesTheRule() async throws {
