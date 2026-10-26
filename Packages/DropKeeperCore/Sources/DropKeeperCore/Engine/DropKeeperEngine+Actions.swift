@@ -10,9 +10,11 @@ extension DropKeeperEngine {
     // MARK: User actions
 
     /// Schedules active items. Every id is processed; failures are reported together afterwards.
-    public func schedule(ids: [FileID], duration: TimeInterval) throws {
+    /// With `recordChoice`, the duration is also remembered for the "last chosen time" default.
+    public func schedule(ids: [FileID], duration: TimeInterval, recordChoice: Bool = false) throws {
         let now = env.time.now()
         defer { rescheduleTimer() }
+        if recordChoice { storeLastChoice(.expireAfter(duration)) }
         try forEach(ids) { id in
             guard var file = try store.file(id: id), file.state.isActive else { return }
             actions.schedule(&file, duration: duration, now: now, tagEnabled: settings.finderTagEnabled)
@@ -21,9 +23,11 @@ extension DropKeeperEngine {
     }
 
     /// Keeps active and failed items. Every id is processed; failures are reported together afterwards.
-    public func keep(ids: [FileID]) throws {
+    /// With `recordChoice`, "keep" is also remembered for the "last chosen time" default.
+    public func keep(ids: [FileID], recordChoice: Bool = false) throws {
         let now = env.time.now()
         defer { rescheduleTimer() }
+        if recordChoice { storeLastChoice(.keep) }
         try forEach(ids) { id in
             guard var file = try store.file(id: id), file.state.isActive || file.state == .failed else { return }
             actions.keep(&file, now: now)

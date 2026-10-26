@@ -298,7 +298,7 @@ public actor DropKeeperEngine {
     }
 
     private func applyDefaultChoice(_ file: inout TrackedFile, now: Date) {
-        switch settings.defaultChoice {
+        switch settings.resolve(lastChoice: storedLastChoice()) {
         case .keep:
             actions.keep(&file, now: now)
         case .expireAfter(let duration):
@@ -329,6 +329,24 @@ public actor DropKeeperEngine {
 
 extension DropKeeperEngine {
     // MARK: Housekeeping
+
+    /// The action the default currently resolves to (reads the remembered choice and the settings).
+    public var resolvedDefaultChoice: ResolvedChoice { settings.resolve(lastChoice: storedLastChoice()) }
+
+    func storedLastChoice() -> ResolvedChoice? {
+        guard let raw = (try? store.meta(.lastChoice)) ?? nil else { return nil }
+        if raw == "keep" { return .keep }
+        return TimeInterval(raw).map { .expireAfter($0) }
+    }
+
+    func storeLastChoice(_ choice: ResolvedChoice) {
+        let raw: String
+        switch choice {
+        case .keep: raw = "keep"
+        case .expireAfter(let duration): raw = String(Int64(duration))
+        }
+        try? store.setMeta(.lastChoice, raw)
+    }
 
     func metaDate(_ key: MetaKey) -> Date? {
         (try? store.meta(key)).flatMap(ISODate.parse)

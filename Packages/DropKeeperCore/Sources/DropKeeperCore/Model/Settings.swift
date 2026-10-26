@@ -7,6 +7,14 @@ public enum PromptPresentation: String, Codable, Sendable, CaseIterable {
 public enum DefaultChoice: Codable, Sendable, Equatable {
     case keep
     case expireAfter(TimeInterval)
+    /// Follows what the user last picked in the prompt (see `Settings.resolve`).
+    case lastChosen
+}
+
+/// A concrete default action, after `DefaultChoice.lastChosen` has been resolved.
+public enum ResolvedChoice: Equatable, Sendable {
+    case keep
+    case expireAfter(TimeInterval)
 }
 
 public enum DeleteMode: String, Codable, Sendable, CaseIterable {
@@ -82,6 +90,22 @@ public struct Settings: Codable, Sendable, Equatable {
         }
         historyRetention =
             try container.decodeIfPresent(HistoryRetention.self, forKey: .historyRetention) ?? defaults.historyRetention
+    }
+
+    /// The action to apply by default. `.lastChosen` follows `lastChoice` while it is still available
+    /// (`.keep`, or a duration that is a timeline stop), otherwise it falls back to `.keep`.
+    public func resolve(lastChoice: ResolvedChoice?) -> ResolvedChoice {
+        switch defaultChoice {
+        case .keep:
+            return .keep
+        case .expireAfter(let duration):
+            return .expireAfter(duration)
+        case .lastChosen:
+            switch lastChoice {
+            case .expireAfter(let duration) where timelineStops.contains(duration): return .expireAfter(duration)
+            case .keep, .expireAfter, nil: return .keep
+            }
+        }
     }
 
     /// Returns a copy with every value inside its allowed range.

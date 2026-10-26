@@ -82,3 +82,41 @@ import Testing
     settings.ignoredPatterns = ["ZIP", "*.zip", "", "~$*"]
     #expect(settings.normalized().ignoredPatterns == ["*.zip", "~$*"])
 }
+
+@Test func lastChosenResolution() {
+    var settings = Settings()
+    settings.defaultChoice = .lastChosen
+    #expect(settings.resolve(lastChoice: nil) == .keep)
+    #expect(settings.resolve(lastChoice: .expireAfter(3600)) == .expireAfter(3600))
+    #expect(settings.resolve(lastChoice: .expireAfter(12_345)) == .keep)  // stop no longer on the timeline
+    #expect(settings.resolve(lastChoice: .keep) == .keep)
+}
+
+@Test func fixedChoicesIgnoreTheLastChoice() {
+    var settings = Settings()
+    settings.defaultChoice = .keep
+    #expect(settings.resolve(lastChoice: .expireAfter(3600)) == .keep)
+    settings.defaultChoice = .expireAfter(86_400)
+    #expect(settings.resolve(lastChoice: .keep) == .expireAfter(86_400))
+}
+
+@Test func lastChosenSurvivesNormalization() {
+    var settings = Settings()
+    settings.defaultChoice = .lastChosen
+    #expect(settings.normalized().defaultChoice == .lastChosen)
+}
+
+@Test func defaultChoiceEncodingsStayCompatible() throws {
+    let encoder = JSONEncoder()
+    encoder.outputFormatting = [.sortedKeys]
+    // Blobs written by 1.0 (synthesized Codable) must still decode and re-encode identically.
+    let keepJSON = #"{"keep":{}}"#
+    let expireJSON = #"{"expireAfter":{"_0":3600}}"#
+    let lastJSON = #"{"lastChosen":{}}"#
+    #expect(try JSONDecoder().decode(DefaultChoice.self, from: Data(keepJSON.utf8)) == .keep)
+    #expect(try JSONDecoder().decode(DefaultChoice.self, from: Data(expireJSON.utf8)) == .expireAfter(3600))
+    #expect(try JSONDecoder().decode(DefaultChoice.self, from: Data(lastJSON.utf8)) == .lastChosen)
+    #expect(String(bytes: try encoder.encode(DefaultChoice.keep), encoding: .utf8) == keepJSON)
+    #expect(String(bytes: try encoder.encode(DefaultChoice.expireAfter(3600)), encoding: .utf8) == expireJSON)
+    #expect(String(bytes: try encoder.encode(DefaultChoice.lastChosen), encoding: .utf8) == lastJSON)
+}

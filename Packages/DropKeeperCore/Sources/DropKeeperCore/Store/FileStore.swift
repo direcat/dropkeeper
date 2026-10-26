@@ -6,6 +6,7 @@ public enum MetaKey: String, Sendable {
     case lastHeartbeatAt = "last_heartbeat_at"
     case lastMaintenanceAt = "last_maintenance_at"
     case lastHistoryClearAt = "last_history_clear_at"
+    case lastChoice = "last_choice"
 }
 
 public struct StoreOpenResult: Sendable {
