@@ -13,6 +13,7 @@ final class AppModel {
     private(set) var folders: [WatchedFolder] = []
     private(set) var queue = PromptQueue()
     private(set) var notice = NoticeCoalescer()
+    private(set) var reminders = ReminderTracker()
     private(set) var now = Date()
     private(set) var lastError: String?
     private(set) var panelError = PanelError()
@@ -172,7 +173,14 @@ final class AppModel {
     private func scheduleClock() {
         clockTask?.cancel()
         now = Date()
-        guard let next = Countdown.nextRefresh(scheduled: scheduled, now: now) else { return }
+        // Reminders become due by time passing, so they are refreshed on every tick and their wake is merged in
+        // before the early return: with no file near expiry the clock must still fire when a window opens.
+        reminders.update(
+            scheduled: scheduled, now: now, enabled: settings.reminderEnabled, leadTime: settings.reminderLeadTime)
+        let reminderWake = reminders.nextWake(
+            scheduled: scheduled, now: now, enabled: settings.reminderEnabled, leadTime: settings.reminderLeadTime)
+        let countdownWake = Countdown.nextRefresh(scheduled: scheduled, now: now)
+        guard let next = [countdownWake, reminderWake].compactMap(\.self).min() else { return }
         let delay = max(0.1, next.timeIntervalSince(now))
         clockTask = Task { [weak self] in
             try? await Task.sleep(for: .seconds(delay))
@@ -322,6 +330,7 @@ final class AppModel {
         let loginChanged = newSettings.launchAtLogin != settings.launchAtLogin
         await perform { try await $0.updateSettings(newSettings) }
         await refreshState()
+        scheduleClock()  // the reminder settings may have changed what is due
         promptVisibilityChanged()  // e.g. Quiet mode turned on while the prompt was open
         if loginChanged { applyLoginItem(settings.launchAtLogin) }
         let fresh = TimelineModel(durations: settings.timelineStops, preselect: resolvedChoice)
