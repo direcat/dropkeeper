@@ -179,20 +179,7 @@ extension DropKeeperEngine {
             return
         }
         let now = env.time.now()
-        // The file may have vanished or changed while the bytes were compared; normal detection sees it again.
-        guard let fresh = env.fs.stat(file.path) else { return }
-        let isSameFile = fresh.inode == stat.inode && fresh.volumeId == stat.volumeId
-        guard isSameFile, fresh.size == stat.size else {
-            // A replaced file is not ours to clear; the same file that grew still carries our marks.
-            if isSameFile { actions.clearMarks(at: file.path) }
-            tracker.observe(file.path, size: fresh.size, now: now)
-            return
-        }
-        guard let folder = folder(containing: file.path) else {
-            actions.clearMarks(at: file.path)
-            return
-        }
-        guard trackedRecord(at: file.path, stat: fresh) == nil else { return }
+        guard let folder = validatedFolder(for: file, stat: stat, now: now) else { return }
         // The rule may have been disabled or removed meanwhile: then the file is a plain pending item.
         let current = RuleMatcher.firstMatch(
             name: (file.path as NSString).lastPathComponent, path: file.path, folderPath: folder.path,
@@ -209,6 +196,25 @@ extension DropKeeperEngine {
         if file.state == .scheduled, let current {
             notify.yield(.ruleApplied([RuleApplication(file: file, ruleId: current.id, ruleName: current.name)]))
         }
+    }
+
+    /// The folder to insert a rule-path file into, or nil when the file vanished, changed, was claimed or its
+    /// folder is gone. A changed file is observed again; the marks of a file that is still ours are cleared.
+    private func validatedFolder(for file: TrackedFile, stat: FileStat, now: Date) -> WatchedFolder? {
+        // The file may have vanished or changed while the bytes were compared; normal detection sees it again.
+        guard let fresh = env.fs.stat(file.path) else { return nil }
+        let isSameFile = fresh.inode == stat.inode && fresh.volumeId == stat.volumeId
+        guard isSameFile, fresh.size == stat.size else {
+            // A replaced file is not ours to clear; the same file that grew still carries our marks.
+            if isSameFile { actions.clearMarks(at: file.path) }
+            tracker.observe(file.path, size: fresh.size, now: now)
+            return nil
+        }
+        guard let folder = folder(containing: file.path) else {
+            actions.clearMarks(at: file.path)
+            return nil
+        }
+        return trackedRecord(at: file.path, stat: fresh) == nil ? folder : nil
     }
 
     /// Waits for every running duplicate check to finish (tests only).
