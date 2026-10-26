@@ -12,8 +12,8 @@ Keep what matters. Let the rest disappear. When a file lands in a watched folder
 - **100 % offline** — no analytics, no tracking, no update checks, no network access at all. Enforced in CI.
 - **Free and open source** (MIT).
 - **Works on any display setup** — a prompt under the menu bar icon, or (optional) from the notch.
-- **Rules** — match by file type or folder (installers, screenshots, images, archives, invitations) and skip the prompt; first match wins.
-- **Reminders** — a heads-up 5 minutes before a file goes: extend it, keep it or delete it now.
+- **Rules** — match by file type, name pattern or folder (installers, screenshots, images, archives, invitations) and skip the prompt; first match wins.
+- **Reminders** — a heads-up before a file goes (5 minutes by default): extend it, keep it or delete it now.
 - **Duplicate detection** — a file that matches one in the same folder is flagged, with a one-click Delete duplicate.
 - **Ignored files** — name patterns (like `~$*` for Office owner files) that DropKeeper never touches.
 - **Several watched folders** — Downloads by default, add Desktop or any other folder.

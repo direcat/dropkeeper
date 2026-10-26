@@ -5,7 +5,7 @@ All notable changes to DropKeeper are documented here. The format follows [Keep 
 ## [Unreleased]
 
 ### Added
-- Rules by file type or folder: first match wins, reorderable (Move up / Move down), and a matched file skips the prompt with a short notice and a Change button. Starter rules for Installers, Screenshots on Desktop, Images, Archives and Invitations & contacts ship disabled.
+- Rules by file type, name pattern or folder: first match wins, reorderable (Move up / Move down), and a matched file skips the prompt with a short notice and a Change button. Starter rules for Installers, Screenshots on Desktop, Images, Archives and Invitations & contacts ship disabled.
 - Pre-expiry reminder (on by default, 5 minutes before): Extend by the timer length, Keep or Delete now.
 - Duplicate detection in the same folder: the prompt offers "Same as …" and Delete duplicate; can be turned off in Settings.
 - Default action "Last chosen time": the next file gets the time you picked last.
@@ -13,9 +13,8 @@ All notable changes to DropKeeper are documented here. The format follows [Keep 
 - Reminders, rule notices and "Moved to Trash" appear as bars above the prompt, in one unified panel in the menu bar and in the notch.
 
 ### Changed
-- With the default action set to Keep, the prompt now preselects Keep, so Return keeps the file (before, it scheduled 1 h).
-- The prompt preselects what the grace period would apply, including Keep.
-- Settings is split into toolbar tabs (General, Folders, Expiry, Rules, Data, About) in a larger window that opens centered; time values use sliders; About links to the website.
+- The prompt preselects what the grace period would apply, including Keep: with the default action set to Keep, Return now keeps the file (before, it scheduled 1 h).
+- Settings is split into toolbar tabs (General, Folders, Expiry, Rules, Data, About) in a larger window that opens centered; time values use sliders; About links to the website; the "Inspired by TempCat" line is gone from the About tab (the credit stays in the README).
 - Ignored extensions are migrated to name patterns (`*.ext`) when you upgrade from 1.0; nothing you set is lost.
 
 ## [1.0.2] - 2026-10-20
