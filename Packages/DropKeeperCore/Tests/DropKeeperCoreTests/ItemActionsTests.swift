@@ -34,3 +34,27 @@ private func makeFile(_ fs: FakeFileSystem, _ path: String = "/fake/D/a.pdf") ->
     #expect(fs.xattr(ItemActions.idAttribute, at: file.path) == file.id)
     #expect(fs.tags(at: file.path).isEmpty)
 }
+
+@Test func scheduleRecordsDuration() {
+    let fs = FakeFileSystem()
+    var file = makeFile(fs)
+    let actions = ItemActions(fs: fs)
+    actions.schedule(&file, duration: 3600, now: TestTimeSource.base, tagEnabled: false)
+    #expect(file.scheduleDuration == 3600)
+    actions.keep(&file, now: TestTimeSource.base)
+    #expect(file.scheduleDuration == nil)
+}
+
+@Test func timerLengthFallsBackForLegacyRecords() {
+    let fs = FakeFileSystem()
+    var file = makeFile(fs)
+    file.state = .scheduled
+    file.scheduleDuration = nil
+    file.updatedAt = TestTimeSource.base
+    file.expiresAt = TestTimeSource.base.addingTimeInterval(7200)
+    #expect(file.timerLength == 7200)
+    file.scheduleDuration = 60
+    #expect(file.timerLength == 60)
+    file.state = .kept
+    #expect(file.timerLength == nil)
+}

@@ -21,6 +21,7 @@ public struct ItemActions: Sendable {
         let expiry = now.addingTimeInterval(duration)
         file.state = .scheduled
         file.expiresAt = expiry
+        file.scheduleDuration = duration
         file.failureCount = 0
         file.updatedAt = now
         try? fs.writeXattr(Self.idAttribute, value: file.id, at: file.path)
@@ -31,6 +32,7 @@ public struct ItemActions: Sendable {
     public func keep(_ file: inout TrackedFile, now: Date) {
         file.state = .kept
         file.expiresAt = nil
+        file.scheduleDuration = nil
         file.failureCount = 0
         file.updatedAt = now
         clearMarks(at: file.path)

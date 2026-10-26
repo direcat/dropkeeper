@@ -112,3 +112,15 @@ private func sampleFolder(_ path: String = "/fake/D") -> WatchedFolder {
     let names = try FileManager.default.contentsOfDirectory(atPath: dir.path)
     #expect(names.contains { $0.hasPrefix("dropkeeper.sqlite.corrupt-") })
 }
+
+@Test func migrationV2AddsNullableColumns() throws {
+    let store = try FileStore.inMemory()
+    var withFields = sampleFile(id: "A")
+    withFields.scheduleDuration = 3600
+    withFields.duplicateOf = "report.pdf"
+    try store.insert(withFields)
+    try store.insert(sampleFile(id: "B", inode: 43, path: "/fake/D/b.pdf"))
+    #expect(try store.file(id: "A") == withFields)
+    #expect(try store.file(id: "B")?.scheduleDuration == nil)
+    #expect(try store.file(id: "B")?.duplicateOf == nil)
+}

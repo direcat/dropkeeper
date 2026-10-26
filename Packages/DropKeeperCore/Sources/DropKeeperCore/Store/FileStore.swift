@@ -115,6 +115,12 @@ public final class FileStore: Sendable {
                 table.column("value", .text).notNull()
             }
         }
+        migrator.registerMigration("v2") { db in
+            try db.alter(table: "tracked_file") { table in
+                table.add(column: "schedule_duration", .double)
+                table.add(column: "duplicate_of", .text)
+            }
+        }
         return migrator
     }
 
