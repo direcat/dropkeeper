@@ -98,6 +98,27 @@ public final class LiveFileSystem: FileSystem {
         return canonicalPath(String(cString: buffer))
     }
 
+    public func contentsEqual(_ first: String, _ second: String) -> Bool {
+        guard let left = FileHandle(forReadingAtPath: first), let right = FileHandle(forReadingAtPath: second) else {
+            return false
+        }
+        defer {
+            try? left.close()
+            try? right.close()
+        }
+        let chunkSize = 1 << 20
+        do {
+            while true {
+                let leftChunk = try left.read(upToCount: chunkSize) ?? Data()
+                let rightChunk = try right.read(upToCount: chunkSize) ?? Data()
+                guard leftChunk == rightChunk else { return false }
+                if leftChunk.isEmpty { return true }
+            }
+        } catch {
+            return false
+        }
+    }
+
     public func canonicalPath(_ path: String) -> String {
         guard let resolved = realpath(path, nil) else { return path }
         defer { free(resolved) }

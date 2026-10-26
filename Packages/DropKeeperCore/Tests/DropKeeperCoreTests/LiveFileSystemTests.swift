@@ -88,4 +88,27 @@ import Testing
         try fs.moveItem(from: original, to: dir.path + "/B")
         #expect(fs.resolveBookmark(data).map(fs.canonicalPath) == dir.path + "/B")
     }
+
+    @Test func contentsEqualStopsAtDifference() throws {
+        let dir = try TempDir()
+        defer { dir.cleanup() }
+        let chunk = String(repeating: "a", count: 1_048_576)
+        let original = dir.createFile("a.bin", contents: chunk + "x" + chunk)
+        let same = dir.createFile("same.bin", contents: chunk + "x" + chunk)
+        let differs = dir.createFile("differs.bin", contents: chunk + "y" + chunk)
+        let shorter = dir.createFile("shorter.bin", contents: chunk + "x")
+        #expect(fs.contentsEqual(original, same))
+        #expect(!fs.contentsEqual(original, differs))
+        #expect(!fs.contentsEqual(original, shorter))
+        #expect(!fs.contentsEqual(shorter, original))
+    }
+
+    @Test func contentsEqualFalseForMissingFile() throws {
+        let dir = try TempDir()
+        defer { dir.cleanup() }
+        let original = dir.createFile("a.txt")
+        #expect(!fs.contentsEqual(original, dir.path + "/missing"))
+        #expect(!fs.contentsEqual(dir.path + "/missing", original))
+        #expect(!fs.contentsEqual(dir.path + "/m1", dir.path + "/m2"))
+    }
 }

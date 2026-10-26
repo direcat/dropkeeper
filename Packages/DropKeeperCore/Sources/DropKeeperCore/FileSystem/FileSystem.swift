@@ -41,6 +41,8 @@ public protocol FileSystem: Sendable {
     func removeItem(_ path: String) throws
     func moveItem(from: String, to: String) throws
     func path(forInode inode: Int64, onVolumeOf referencePath: String) -> String?
+    /// True when both files can be read and hold identical bytes; any open/read error yields false.
+    func contentsEqual(_ first: String, _ second: String) -> Bool
     func canonicalPath(_ path: String) -> String
     func bookmark(for path: String) -> Data?
     func resolveBookmark(_ data: Data) -> String?

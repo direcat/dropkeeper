@@ -14,6 +14,7 @@ final class FakeFileSystem: FileSystem {
         var added: Date?
         var xattrs: [String: String] = [:]
         var tags: [String] = []
+        var content: Data?
     }
 
     struct State: Sendable {
@@ -49,6 +50,13 @@ final class FakeFileSystem: FileSystem {
                 inode: state.nextInode, volume: volume, size: size, isDirectory: false, added: added)
             return state.nextInode
         }
+    }
+
+    @discardableResult
+    func createFile(_ path: String, content: Data, added: Date?, volume: String = "VOL-A") -> Int64 {
+        let inode = createFile(path, size: Int64(content.count), added: added, volume: volume)
+        state.withLock { $0.entries[path]?.content = content }
+        return inode
     }
 
     func setSize(_ path: String, _ size: Int64) {
@@ -175,6 +183,15 @@ final class FakeFileSystem: FileSystem {
         state.withLock { state in
             guard let volume = state.entries[referencePath]?.volume else { return nil }
             return state.entries.first { $0.value.inode == inode && $0.value.volume == volume }?.key
+        }
+    }
+
+    func contentsEqual(_ first: String, _ second: String) -> Bool {
+        state.withLock { state in
+            guard let left = state.entries[first]?.content,
+                let right = state.entries[second]?.content
+            else { return false }
+            return left == right
         }
     }
 
