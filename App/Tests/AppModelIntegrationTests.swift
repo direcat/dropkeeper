@@ -134,6 +134,26 @@ private final class LoginItemRecorder {
         await model.stop()
     }
 
+    /// `extendReminders` hands the due ids to this call; the engine pushes the expiry back by the timer length.
+    @Test func reminderExtendCallsEngine() async throws {
+        let root = try tempDir()
+        defer { try? FileManager.default.removeItem(at: root) }
+        let suite = "DropKeeperAppTests.\(UUID().uuidString)"
+        let defaults = try #require(UserDefaults(suiteName: suite))
+        defer { defaults.removePersistentDomain(forName: suite) }
+        let started = try await startedModel(root: root, defaults: defaults)
+        let (model, folder) = (started.model, started.folder)
+
+        let id = try await drop("one.pdf", in: folder, model: model)
+        await model.schedule([id], duration: 86_400)
+        try await waitUntil { model.scheduled.count == 1 }
+        let before = try #require(model.scheduled.first?.expiresAt)
+        await model.extend([id])
+        try await waitUntil { model.scheduled.first?.expiresAt != before }
+        #expect(try #require(model.scheduled.first?.expiresAt) == before.addingTimeInterval(86_400))
+        await model.stop()
+    }
+
     @Test func loginItemIsAppliedOnFirstLaunchAndOnChangeOnly() async throws {
         let root = try tempDir()
         defer { try? FileManager.default.removeItem(at: root) }

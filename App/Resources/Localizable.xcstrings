@@ -1,6 +1,69 @@
 {
   "sourceLanguage" : "en",
   "strings" : {
+    "Extend by %@" : {
+      "comment" : "Reminder bar button: push the deadline back by the timer length, e.g. Extend by 30 min",
+      "localizations" : {
+        "cs" : { "stringUnit" : { "state" : "translated", "value" : "Prodloužit o %@" } },
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Um %@ verlängern" } },
+        "es" : { "stringUnit" : { "state" : "translated", "value" : "Ampliar %@" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Prolonger de %@" } }
+      }
+    },
+    "Extend" : {
+      "comment" : "Reminder bar button when the files have different timer lengths",
+      "localizations" : {
+        "cs" : { "stringUnit" : { "state" : "translated", "value" : "Prodloužit" } },
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Verlängern" } },
+        "es" : { "stringUnit" : { "state" : "translated", "value" : "Ampliar" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Prolonger" } }
+      }
+    },
+    "Delete now" : {
+      "comment" : "Reminder bar button: dispose of the files right away",
+      "localizations" : {
+        "cs" : { "stringUnit" : { "state" : "translated", "value" : "Smazat hned" } },
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Jetzt löschen" } },
+        "es" : { "stringUnit" : { "state" : "translated", "value" : "Eliminar ahora" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Supprimer maintenant" } }
+      }
+    },
+    "Deleted in %@" : {
+      "comment" : "Reminder bar subtitle with the time left, e.g. Deleted in 5 min",
+      "localizations" : {
+        "cs" : { "stringUnit" : { "state" : "translated", "value" : "Smazání za %@" } },
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Löschung in %@" } },
+        "es" : { "stringUnit" : { "state" : "translated", "value" : "Se eliminará en %@" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Suppression dans %@" } }
+      }
+    },
+    "%@ — deleted in %@ (%@)" : {
+      "comment" : "Rule notice: file name or file count, time until deletion, rule name",
+      "localizations" : {
+        "cs" : { "stringUnit" : { "state" : "translated", "value" : "%@ — smazání za %@ (%@)" } },
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "%@ — Löschung in %@ (%@)" } },
+        "es" : { "stringUnit" : { "state" : "translated", "value" : "%@ — se eliminará en %@ (%@)" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "%@ — suppression dans %@ (%@)" } }
+      }
+    },
+    "Change" : {
+      "comment" : "Rule notice button: open the rule that scheduled the file",
+      "localizations" : {
+        "cs" : { "stringUnit" : { "state" : "translated", "value" : "Změnit" } },
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Ändern" } },
+        "es" : { "stringUnit" : { "state" : "translated", "value" : "Cambiar" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Modifier" } }
+      }
+    },
+    "Dismiss reminder" : {
+      "comment" : "Reminder bar close button (VoiceOver)",
+      "localizations" : {
+        "cs" : { "stringUnit" : { "state" : "translated", "value" : "Skrýt připomínku" } },
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Erinnerung schließen" } },
+        "es" : { "stringUnit" : { "state" : "translated", "value" : "Descartar recordatorio" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Ignorer le rappel" } }
+      }
+    },
     "%lld days" : {
       "comment" : "Timeline stop in days, e.g. 1 day, 10 days",
       "localizations" : {

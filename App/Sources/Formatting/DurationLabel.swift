@@ -15,6 +15,11 @@ enum DurationLabel {
         return String(localized: "\(minutes) min", comment: "Timeline stop in minutes, e.g. 30 min")
     }
 
+    /// Time left until a deadline, rounded up to the minute and never below one: "5 min", "1 h".
+    static func remaining(_ seconds: TimeInterval) -> String {
+        short(max(1, (seconds / 60).rounded(.up)) * 60)
+    }
+
     /// Spelled-out duration for VoiceOver and settings: "1 hour", "10 days".
     static func long(_ seconds: TimeInterval, locale: Locale = .current) -> String {
         let formatter = DateComponentsFormatter()

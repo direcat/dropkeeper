@@ -60,6 +60,9 @@ final class PanelCoordinator {
         _ = model.queue.current?.id
         _ = model.notice.isVisible
         _ = model.notice.items.count
+        _ = model.ruleNotice.isVisible
+        _ = model.ruleNotice.items.count
+        _ = model.reminders.due.count
         _ = model.panelError.message
         _ = model.scheduled.count
         _ = model.settings.promptPresentation
@@ -71,7 +74,7 @@ final class PanelCoordinator {
         let screens = ScreenDescriptor.current()
         let idleTarget = PresentationResolver.idleTarget(setting, screens: screens)
         let content = PanelDecision.content(
-            promptAvailable: model.isPromptAvailable, noticeVisible: model.notice.isVisible,
+            promptAvailable: model.isPromptAvailable, noticeVisible: model.isNoticeVisible,
             errorVisible: model.panelError.isVisible && !isPopoverShown(), target: idleTarget,
             scheduledCount: model.scheduled.count, hovering: hovering)
         let previousContent = lastContent

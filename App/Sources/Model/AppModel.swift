@@ -50,6 +50,9 @@ final class AppModel {
 
     var urgentSeconds: Int? { Countdown.urgentSeconds(scheduled: scheduled, now: now) }
     var hasProblems: Bool { !failed.isEmpty || folders.contains { $0.status != .ok } }
+    /// Any bar above (or instead of) the prompt: a trash notice, a rule notice or a reminder. Quiet mode doesn't
+    /// hold these back, only the prompt.
+    var isNoticeVisible: Bool { notice.isVisible || ruleNotice.isVisible || !reminders.due.isEmpty }
     var isPromptAvailable: Bool { queue.current != nil && (!settings.quietMode || promptRequested) }
 
     // MARK: Lifecycle
@@ -209,6 +212,11 @@ final class AppModel {
         scheduleRuleNoticeExpiry()  // resume moved `expiresAt`
     }
 
+    /// Opens the rule that moved the file so the user can change it (the action itself comes with the rules UI).
+    func changeRuleNotice() {
+        // Intentionally empty until the rules UI exists.
+    }
+
     private func scheduleRuleNoticeExpiry() {
         ruleNoticeTask?.cancel()
         guard !ruleNotice.isPaused, let expiresAt = ruleNotice.expiresAt else { return }
@@ -310,6 +318,36 @@ final class AppModel {
 
     /// Disposes of the files now, like an expiry (Trash or permanent, per Settings); the notice offers Undo.
     func deleteNow(_ ids: [FileID]) async { await perform(.delete) { try await $0.deleteNow(ids: ids) } }
+
+    func extend(_ ids: [FileID]) async { await perform(.update) { try await $0.extend(ids: ids) } }
+
+    // MARK: Reminder actions
+
+    func extendReminders() async {
+        let ids = reminders.due.map(\.id)
+        guard !ids.isEmpty else { return }
+        await extend(ids)
+    }
+
+    func keepReminders() async {
+        let ids = reminders.due.map(\.id)
+        guard !ids.isEmpty else { return }
+        await keep(ids)
+    }
+
+    /// Permanent deletion asks first; the Trash can be undone from the notice.
+    func deleteReminders() async {
+        let files = reminders.due
+        guard !files.isEmpty else { return }
+        if settings.deleteMode == .permanent, !DeleteConfirmation.confirm(name: NoticeView.title(for: files)) {
+            return
+        }
+        await deleteNow(files.map(\.id))
+    }
+
+    func dismissReminders() {
+        reminders.dismiss(ids: reminders.due.map(\.id))
+    }
 
     // MARK: Folders & settings
 

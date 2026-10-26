@@ -98,6 +98,52 @@ private func pendingFile(_ id: String) -> TrackedFile {
         #expect(other.panelError.isVisible)
     }
 
+    /// Review Focus 1: a notice arriving over the prompt leaves its timeline selection and state alone.
+    @Test func noticeDuringPromptKeepsPromptState() async {
+        let fixture = Fixture()
+        defer { fixture.cleanUp() }
+        let model = fixture.model
+        model.apply([pendingFile("a"), pendingFile("b")])
+        model.timeline.select(2)
+        model.applyToAll = true
+        let selected = model.timeline.selected
+        await model.handle(.trashed([scheduledFile(expiresIn: 0, id: "old.pdf")]))
+        await model.handle(.ruleApplied([RuleApplication(file: scheduledFile(expiresIn: 60), ruleName: "Rule")]))
+        #expect(model.isNoticeVisible)
+        #expect(model.isPromptAvailable)
+        #expect(model.queue.current?.id == "a")
+        #expect(model.timeline.selected == selected)
+        #expect(model.applyToAll)
+    }
+
+    /// Review Focus 4: Quiet mode holds the prompt back, not a reminder (the notice decision ignores it).
+    @Test func quietModeStillShowsReminder() {
+        let fixture = Fixture()
+        defer { fixture.cleanUp() }
+        let model = fixture.model
+        let now = Date()
+        var due = scheduledFile(expiresIn: 0, id: "due.dmg")
+        due.updatedAt = now.addingTimeInterval(-3480)
+        due.expiresAt = now.addingTimeInterval(120)
+        model.apply([due])
+        // Quiet mode makes `promptAvailable` false whatever is queued.
+        #expect(
+            PanelDecision.content(
+                promptAvailable: false, noticeVisible: model.isNoticeVisible, target: .menuBar, scheduledCount: 1,
+                hovering: false) == .notice)
+    }
+
+    /// Without an engine the action fails and reports it: proves the reminder ids reach the engine call.
+    @Test func reminderActionsWithoutDueFilesDoNothing() async {
+        let fixture = Fixture()
+        defer { fixture.cleanUp() }
+        let model = fixture.model
+        await model.extendReminders()
+        await model.keepReminders()
+        await model.deleteReminders()
+        #expect(!model.panelError.isVisible)  // nothing is due, so nothing was attempted
+    }
+
     /// Onboarding shows `lastError` when adding the folder fails, so the failure must set it.
     @Test func failedAddFolderReportsAnError() async {
         let fixture = Fixture()

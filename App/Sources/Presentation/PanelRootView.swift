@@ -37,6 +37,10 @@ struct PanelRootView: View {
         switch content {
         case .prompt:
             if let file = model.queue.current {
+                if model.isNoticeVisible {
+                    NoticeStackView(model: model, holdsNotice: false)
+                    Rectangle().fill(TK.Notch.hairline).frame(height: 1)
+                }
                 PromptView(
                     file: file, stackCount: model.queue.items.count, timeline: $model.timeline,
                     applyToAll: $model.applyToAll, now: model.now,
@@ -46,9 +50,7 @@ struct PanelRootView: View {
                     onOpen: { FileOpener.open(FinderReveal.target(for: file.path)) })
             }
         case .notice:
-            NoticeView(
-                files: model.notice.items, canUndo: model.settings.deleteMode == .trash,
-                onUndo: { Task { await model.undoNotice() } })
+            NoticeStackView(model: model, holdsNotice: true)
         case .idle:
             NotchIdleView(count: model.scheduled.count, urgentSeconds: model.urgentSeconds, notchWidth: notchWidth)
         case .idleExpanded:

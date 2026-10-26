@@ -201,6 +201,31 @@ private func reviewFocusPanelDecision(_ testCase: DecisionCase) {
             scheduledCount: testCase.count, hovering: testCase.hovering) == testCase.expected)
 }
 
+/// A scheduled file inside its reminder window: its 1 h timer ends in two minutes, the lead time is five.
+private func dueFile(_ id: String) -> TrackedFile {
+    var file = scheduledFile(expiresIn: 0, id: id)
+    let now = Date()
+    file.updatedAt = now.addingTimeInterval(-3480)
+    file.expiresAt = now.addingTimeInterval(120)
+    return file
+}
+
+@MainActor
+@Test func reminderMakesNoticeVisible() {
+    let suite = "PresentationTests.\(UUID().uuidString)"
+    let defaults = UserDefaults(suiteName: suite)!
+    defer { defaults.removePersistentDomain(forName: suite) }
+    let model = AppModel(defaults: defaults, applyLoginItem: { _ in })
+    #expect(!model.isNoticeVisible)
+    model.apply([dueFile("a.pdf")])
+    #expect(model.reminders.due.count == 1)
+    #expect(model.isNoticeVisible)
+    #expect(
+        PanelDecision.content(
+            promptAvailable: false, noticeVisible: model.isNoticeVisible, target: .menuBar, scheduledCount: 1,
+            hovering: false) == .notice)
+}
+
 @Test func notchShapeHasSquareTopAndRoundedBottom() {
     let rect = CGRect(x: 0, y: 0, width: 420, height: 132)
     let path = NotchShape(bottomRadius: 20).path(in: rect)
