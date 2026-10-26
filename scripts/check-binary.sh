@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # Checks a built DropKeeper.app keeps the offline promise:
-# no networking frameworks, no DEBUG-only switches, only allow-listed URL strings.
+# no networking frameworks, no DEBUG-only switches, the release bundle id, only allow-listed URL strings.
 # Usage: scripts/check-binary.sh <path/to/DropKeeper.app>
 set -euo pipefail
 APP="$(cd "$(dirname "${1:?usage: check-binary.sh <DropKeeper.app>}")" && pwd)/$(basename "$1")"
@@ -28,6 +28,12 @@ fi
 # literals so they never show up in `strings`; the suite name is the reliable marker.
 if all_strings | grep -E '^(dbPath|noLoginItem|watch)$|^net\.direcat\.dropkeeper\.debug\.dbpath$'; then
   echo "check-binary: DEBUG-only launch switches present in this build (see above)" >&2; FAIL=1
+fi
+
+# The release must keep exactly this bundle id (Debug builds use ...debug), or macOS permissions and the cask break.
+BUNDLE_ID=$(/usr/libexec/PlistBuddy -c 'Print :CFBundleIdentifier' "$APP/Contents/Info.plist" 2>/dev/null || true)
+if [ "$BUNDLE_ID" != "net.direcat.dropkeeper" ]; then
+  echo "check-binary: CFBundleIdentifier is '$BUNDLE_ID', expected exactly 'net.direcat.dropkeeper' (is this a Debug build?)" >&2; FAIL=1
 fi
 
 ALLOW=$(grep -vE '^[[:space:]]*(#|$)' scripts/binary-url-allowlist.txt || true)
