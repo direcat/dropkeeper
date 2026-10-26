@@ -71,3 +71,48 @@ import Testing
         SettingsTab.allCases.map(\.systemImage)
             == ["gearshape", "folder", "timer", "list.bullet.rectangle", "externaldrive", "info.circle"])
 }
+
+@Test func defaultChoiceTagRoundTripsLastChosen() {
+    let stops: [TimeInterval] = [1800, 3600]
+    #expect(DefaultChoiceTag.tag(for: .lastChosen, stops: stops) == -2)
+    #expect(DefaultChoiceTag.choice(for: -2, stops: stops) == .lastChosen)
+    #expect(DefaultChoiceTag.choice(for: -1, stops: stops) == .keep)
+    #expect(DefaultChoiceTag.choice(for: 1, stops: stops) == .expireAfter(3600))
+}
+
+@Test func ruleSummaryText() {
+    let category = Rule(name: "Installers", match: .category(.installers), duration: 86_400)
+    let text = RuleSummary.text(for: category)
+    #expect(text.hasPrefix("\(RuleSummary.categoryName(.installers)) · "))
+    #expect(text.hasSuffix(" · \(DurationLabel.long(86_400))"))
+    let pattern = Rule(
+        name: "Invoices", match: .pattern("invoice*.pdf"), folderPath: "/Users/me/Desktop", duration: 3600)
+    #expect(RuleSummary.text(for: pattern) == "invoice*.pdf · Desktop · \(DurationLabel.long(3600))")
+}
+
+private func watched(_ id: Int64, _ path: String) -> WatchedFolder {
+    WatchedFolder(
+        id: id, path: path, bookmark: nil, volumeId: "v", addedAt: Date(timeIntervalSince1970: 0), baselineEventId: 0,
+        status: .ok)
+}
+
+@Test func desktopRuleIsInertWhenDesktopNotWatched() {
+    let desktop = Rule(
+        name: "Screenshots", match: .category(.screenshots), folderPath: "/Users/me/Desktop", duration: 3600)
+    let everywhere = Rule(name: "Images", match: .category(.images), duration: 3600)
+    let downloads = watched(1, "/Users/me/Downloads")
+    let watchedDesktop = watched(2, "/Users/me/Desktop")
+    #expect(RuleSummary.isInert(desktop, watched: [downloads]))
+    #expect(!RuleSummary.isInert(desktop, watched: [downloads, watchedDesktop]))
+    #expect(!RuleSummary.isInert(everywhere, watched: []))
+}
+
+@Test(arguments: ["*", "**", "?*", "*?*", "?"])
+func wildcardOnlyPatternsMatchEverything(raw: String) {
+    #expect(PatternCheck.matchesEverything(raw))
+}
+
+@Test(arguments: ["zip", ".DMG", "~$*", "*.zip", "invoice?.pdf", "", "  "])
+func ordinaryPatternsAreNotMatchAll(raw: String) {
+    #expect(!PatternCheck.matchesEverything(raw))
+}

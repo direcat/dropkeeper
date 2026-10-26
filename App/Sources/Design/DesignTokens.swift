@@ -80,6 +80,7 @@ enum TK {
         static let timelineHaloWidth: CGFloat = 2
         static let timelineTrackWidth: CGFloat = 2
         static let settingsWindow = CGSize(width: 680, height: 560)
+        static let ruleEditor = CGSize(width: 480, height: 400)
         /// Room for the longest value label beside a Settings step slider.
         static let stepSliderLabel: CGFloat = 90
     }

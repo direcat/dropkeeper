@@ -27,12 +27,14 @@ enum StopPresets {
 
 enum DefaultChoiceTag {
     static func tag(for choice: DefaultChoice, stops: [TimeInterval]) -> Int {
+        if case .lastChosen = choice { return -2 }
         guard case .expireAfter(let duration) = choice, let index = stops.firstIndex(of: duration) else { return -1 }
         return index
     }
 
     static func choice(for tag: Int, stops: [TimeInterval]) -> DefaultChoice {
-        stops.indices.contains(tag) ? .expireAfter(stops[tag]) : .keep
+        if tag == -2 { return .lastChosen }
+        return stops.indices.contains(tag) ? .expireAfter(stops[tag]) : .keep
     }
 }
 
@@ -49,7 +51,7 @@ struct SettingsTabView: View {
             case .general: GeneralTab(store: store)
             case .folders: FoldersTab(model: model)
             case .expiry: ExpiryTab(store: store)
-            case .rules: RulesTab(store: store)
+            case .rules: RulesTab(store: store, model: model)
             case .data: DataTab(store: store)
             case .about: AboutTab()
             }
@@ -257,6 +259,7 @@ private struct ExpiryTab: View {
                             for: $0, stops: store.draft.timelineStops)
                     })
             ) {
+                Text("Last chosen time").tag(-2)
                 Text("Keep it").tag(-1)
                 ForEach(store.draft.timelineStops.indices, id: \.self) { index in
                     Text("Delete after \(DurationLabel.long(store.draft.timelineStops[index]))").tag(index)
@@ -265,6 +268,12 @@ private struct ExpiryTab: View {
             StepSlider(
                 "Apply default action after", values: Settings.gracePeriodOptions, selection: $store.draft.gracePeriod,
                 label: { DurationLabel.long($0) })
+            Toggle("Remind before deleting", isOn: $store.draft.reminderEnabled)
+            StepSlider(
+                "Remind", values: Settings.reminderLeadTimeOptions, selection: $store.draft.reminderLeadTime,
+                label: { DurationLabel.long($0) }
+            )
+            .disabled(!store.draft.reminderEnabled)
             Picker(
                 "Expired files",
                 selection: Binding(
@@ -299,41 +308,13 @@ private struct ExpiryTab: View {
 
 private struct RulesTab: View {
     @Bindable var store: SettingsDraft
-    @State private var newExtension = ""
+    let model: AppModel
 
     var body: some View {
         Form {
-            Section("Ignored extensions") {
-                ForEach(store.draft.ignoredPatterns, id: \.self) { pattern in
-                    HStack {
-                        Text(verbatim: pattern)
-                        Spacer()
-                        Button {
-                            store.draft.ignoredPatterns.removeAll { $0 == pattern }
-                        } label: {
-                            Image(systemName: "trash")
-                        }
-                        .buttonStyle(.borderless)
-                        .help(Text("Remove extension"))
-                        .accessibilityLabel(Text("Remove extension"))
-                    }
-                }
-                HStack {
-                    TextField("Extension, e.g. dmg", text: $newExtension)
-                        .onSubmit(addExtension)
-                    Button("Add", action: addExtension)
-                        .disabled(IgnorePattern.normalize(newExtension) == nil)
-                }
-            }
+            RulesSection(store: store, model: model)
+            IgnoredFilesSection(store: store)
         }
-    }
-
-    private func addExtension() {
-        guard let pattern = IgnorePattern.normalize(newExtension), !store.draft.ignoredPatterns.contains(pattern) else {
-            return
-        }
-        store.draft.ignoredPatterns.append(pattern)
-        newExtension = ""
     }
 }
 

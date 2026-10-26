@@ -1071,33 +1071,6 @@
         "fr" : { "stringUnit" : { "state" : "translated", "value" : "Annuler" } }
       }
     },
-    "Ignored extensions" : {
-      "comment" : "Settings section title",
-      "localizations" : {
-        "cs" : { "stringUnit" : { "state" : "translated", "value" : "Ignorované přípony" } },
-        "de" : { "stringUnit" : { "state" : "translated", "value" : "Ignorierte Dateiendungen" } },
-        "es" : { "stringUnit" : { "state" : "translated", "value" : "Extensiones ignoradas" } },
-        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Extensions ignorées" } }
-      }
-    },
-    "Remove extension" : {
-      "comment" : "VoiceOver label of the button that removes an ignored extension",
-      "localizations" : {
-        "cs" : { "stringUnit" : { "state" : "translated", "value" : "Odebrat příponu" } },
-        "de" : { "stringUnit" : { "state" : "translated", "value" : "Dateiendung entfernen" } },
-        "es" : { "stringUnit" : { "state" : "translated", "value" : "Quitar extensión" } },
-        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Retirer l’extension" } }
-      }
-    },
-    "Extension, e.g. dmg" : {
-      "comment" : "Placeholder of the ignored extension text field",
-      "localizations" : {
-        "cs" : { "stringUnit" : { "state" : "translated", "value" : "Přípona, např. dmg" } },
-        "de" : { "stringUnit" : { "state" : "translated", "value" : "Dateiendung, z. B. dmg" } },
-        "es" : { "stringUnit" : { "state" : "translated", "value" : "Extensión, p. ej. dmg" } },
-        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Extension, p. ex. dmg" } }
-      }
-    },
     "Add" : {
       "comment" : "Button that adds an ignored extension",
       "localizations" : {
@@ -1349,6 +1322,276 @@
         "de" : { "stringUnit" : { "state" : "translated", "value" : "Fenster" } },
         "es" : { "stringUnit" : { "state" : "translated", "value" : "Ventana" } },
         "fr" : { "stringUnit" : { "state" : "translated", "value" : "Fenêtre" } }
+      }
+    },
+    "Last chosen time" : {
+      "comment" : "Settings default action: follows the time last picked in the prompt",
+      "localizations" : {
+        "cs" : { "stringUnit" : { "state" : "translated", "value" : "Naposledy zvolený čas" } },
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Zuletzt gewählte Zeit" } },
+        "es" : { "stringUnit" : { "state" : "translated", "value" : "Último tiempo elegido" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Dernier délai choisi" } }
+      }
+    },
+    "Remind before deleting" : {
+      "comment" : "Settings toggle: warn before a scheduled file is deleted",
+      "localizations" : {
+        "cs" : { "stringUnit" : { "state" : "translated", "value" : "Připomenout před smazáním" } },
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Vor dem Löschen erinnern" } },
+        "es" : { "stringUnit" : { "state" : "translated", "value" : "Recordar antes de eliminar" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Rappeler avant la suppression" } }
+      }
+    },
+    "Remind" : {
+      "comment" : "Settings slider: how long before deletion the reminder comes",
+      "localizations" : {
+        "cs" : { "stringUnit" : { "state" : "translated", "value" : "Připomenout předem" } },
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Erinnern vor" } },
+        "es" : { "stringUnit" : { "state" : "translated", "value" : "Recordar con" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Rappeler avant" } }
+      }
+    },
+    "Ignored files" : {
+      "comment" : "Settings section title",
+      "localizations" : {
+        "cs" : { "stringUnit" : { "state" : "translated", "value" : "Ignorované soubory" } },
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Ignorierte Dateien" } },
+        "es" : { "stringUnit" : { "state" : "translated", "value" : "Archivos ignorados" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Fichiers ignorés" } }
+      }
+    },
+    "Pattern, e.g. *.dmg or ~$*" : {
+      "comment" : "Placeholder of the ignored file pattern text field",
+      "localizations" : {
+        "cs" : { "stringUnit" : { "state" : "translated", "value" : "Vzor, např. *.dmg nebo ~$*" } },
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Muster, z. B. *.dmg oder ~$*" } },
+        "es" : { "stringUnit" : { "state" : "translated", "value" : "Patrón, p. ej. *.dmg o ~$*" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Motif, p. ex. *.dmg ou ~$*" } }
+      }
+    },
+    "Remove pattern" : {
+      "comment" : "VoiceOver label of the button that removes an ignored file pattern",
+      "localizations" : {
+        "cs" : { "stringUnit" : { "state" : "translated", "value" : "Odebrat vzor" } },
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Muster entfernen" } },
+        "es" : { "stringUnit" : { "state" : "translated", "value" : "Quitar patrón" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Retirer le motif" } }
+      }
+    },
+    "* matches any characters and ? matches one. A plain word such as zip means *.zip." : {
+      "comment" : "Caption under the ignored file pattern field",
+      "localizations" : {
+        "cs" : { "stringUnit" : { "state" : "translated", "value" : "* nahradí libovolné znaky a ? jeden znak. Samotné slovo, například zip, znamená *.zip." } },
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "* steht für beliebige Zeichen, ? für genau eins. Ein einfaches Wort wie zip bedeutet *.zip." } },
+        "es" : { "stringUnit" : { "state" : "translated", "value" : "* sustituye cualquier cantidad de caracteres y ? uno solo. Una palabra suelta, como zip, equivale a *.zip." } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "* remplace n’importe quels caractères et ? un seul. Un simple mot comme zip équivaut à *.zip." } }
+      }
+    },
+    "This pattern would match every file." : {
+      "comment" : "Caption shown when a pattern consists only of wildcards",
+      "localizations" : {
+        "cs" : { "stringUnit" : { "state" : "translated", "value" : "Tento vzor by odpovídal všem souborům." } },
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Dieses Muster würde auf jede Datei passen." } },
+        "es" : { "stringUnit" : { "state" : "translated", "value" : "Este patrón coincidiría con todos los archivos." } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Ce motif correspondrait à tous les fichiers." } }
+      }
+    },
+    "Detect duplicate downloads" : {
+      "comment" : "Settings toggle: flag a download identical to a file already in a watched folder",
+      "localizations" : {
+        "cs" : { "stringUnit" : { "state" : "translated", "value" : "Rozpoznávat duplicitní stažené soubory" } },
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Doppelte Downloads erkennen" } },
+        "es" : { "stringUnit" : { "state" : "translated", "value" : "Detectar descargas duplicadas" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Détecter les téléchargements en double" } }
+      }
+    },
+    "Add rule" : {
+      "comment" : "Button that adds an automatic rule",
+      "localizations" : {
+        "cs" : { "stringUnit" : { "state" : "translated", "value" : "Přidat pravidlo" } },
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Regel hinzufügen" } },
+        "es" : { "stringUnit" : { "state" : "translated", "value" : "Añadir regla" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Ajouter une règle" } }
+      }
+    },
+    "New rule" : {
+      "comment" : "Title of the rule editor when adding a rule",
+      "localizations" : {
+        "cs" : { "stringUnit" : { "state" : "translated", "value" : "Nové pravidlo" } },
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Neue Regel" } },
+        "es" : { "stringUnit" : { "state" : "translated", "value" : "Nueva regla" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Nouvelle règle" } }
+      }
+    },
+    "Edit rule" : {
+      "comment" : "Title of the rule editor and VoiceOver label of the edit button",
+      "localizations" : {
+        "cs" : { "stringUnit" : { "state" : "translated", "value" : "Upravit pravidlo" } },
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Regel bearbeiten" } },
+        "es" : { "stringUnit" : { "state" : "translated", "value" : "Editar regla" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Modifier la règle" } }
+      }
+    },
+    "Delete rule" : {
+      "comment" : "VoiceOver label of the button that deletes a rule",
+      "localizations" : {
+        "cs" : { "stringUnit" : { "state" : "translated", "value" : "Smazat pravidlo" } },
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Regel löschen" } },
+        "es" : { "stringUnit" : { "state" : "translated", "value" : "Eliminar regla" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Supprimer la règle" } }
+      }
+    },
+    "%@ isn't a watched folder, so this rule does nothing." : {
+      "comment" : "Hint on a rule whose folder is not watched; %@ is the folder path",
+      "localizations" : {
+        "cs" : { "stringUnit" : { "state" : "translated", "value" : "%@ není sledovaná složka, takže toto pravidlo nic nedělá." } },
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "%@ ist kein überwachter Ordner, daher bewirkt diese Regel nichts." } },
+        "es" : { "stringUnit" : { "state" : "translated", "value" : "%@ no es una carpeta vigilada, así que esta regla no hace nada." } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "%@ n’est pas un dossier surveillé, cette règle ne fait donc rien." } }
+      }
+    },
+    "all folders" : {
+      "comment" : "Rule summary: the rule applies to every watched folder",
+      "localizations" : {
+        "cs" : { "stringUnit" : { "state" : "translated", "value" : "všechny složky" } },
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "alle Ordner" } },
+        "es" : { "stringUnit" : { "state" : "translated", "value" : "todas las carpetas" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "tous les dossiers" } }
+      }
+    },
+    "Installers" : {
+      "comment" : "Rule category name",
+      "localizations" : {
+        "cs" : { "stringUnit" : { "state" : "translated", "value" : "Instalační soubory" } },
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Installationsdateien" } },
+        "es" : { "stringUnit" : { "state" : "translated", "value" : "Instaladores" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Installeurs" } }
+      }
+    },
+    "Images" : {
+      "comment" : "Rule category name",
+      "localizations" : {
+        "cs" : { "stringUnit" : { "state" : "translated", "value" : "Obrázky" } },
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Bilder" } },
+        "es" : { "stringUnit" : { "state" : "translated", "value" : "Imágenes" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Images" } }
+      }
+    },
+    "Archives" : {
+      "comment" : "Rule category name",
+      "localizations" : {
+        "cs" : { "stringUnit" : { "state" : "translated", "value" : "Archivy" } },
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Archive" } },
+        "es" : { "stringUnit" : { "state" : "translated", "value" : "Archivos comprimidos" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Archives" } }
+      }
+    },
+    "Invitations & contacts" : {
+      "comment" : "Rule category name",
+      "localizations" : {
+        "cs" : { "stringUnit" : { "state" : "translated", "value" : "Pozvánky a kontakty" } },
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Einladungen & Kontakte" } },
+        "es" : { "stringUnit" : { "state" : "translated", "value" : "Invitaciones y contactos" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Invitations et contacts" } }
+      }
+    },
+    "Screenshots" : {
+      "comment" : "Rule category name",
+      "localizations" : {
+        "cs" : { "stringUnit" : { "state" : "translated", "value" : "Snímky obrazovky" } },
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Bildschirmfotos" } },
+        "es" : { "stringUnit" : { "state" : "translated", "value" : "Capturas de pantalla" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Captures d’écran" } }
+      }
+    },
+    "Name" : {
+      "comment" : "Rule editor: the rule's name field",
+      "localizations" : {
+        "cs" : { "stringUnit" : { "state" : "translated", "value" : "Název" } },
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Name" } },
+        "es" : { "stringUnit" : { "state" : "translated", "value" : "Nombre" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Nom" } }
+      }
+    },
+    "What" : {
+      "comment" : "Rule editor: what the rule matches",
+      "localizations" : {
+        "cs" : { "stringUnit" : { "state" : "translated", "value" : "Co" } },
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Was" } },
+        "es" : { "stringUnit" : { "state" : "translated", "value" : "Qué" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Quoi" } }
+      }
+    },
+    "Kind of file" : {
+      "comment" : "Rule editor: match files by category",
+      "localizations" : {
+        "cs" : { "stringUnit" : { "state" : "translated", "value" : "Druh souboru" } },
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Dateityp" } },
+        "es" : { "stringUnit" : { "state" : "translated", "value" : "Tipo de archivo" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Type de fichier" } }
+      }
+    },
+    "File name pattern" : {
+      "comment" : "Rule editor: match files by name pattern",
+      "localizations" : {
+        "cs" : { "stringUnit" : { "state" : "translated", "value" : "Vzor názvu souboru" } },
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Dateinamenmuster" } },
+        "es" : { "stringUnit" : { "state" : "translated", "value" : "Patrón de nombre" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Motif de nom" } }
+      }
+    },
+    "Kind" : {
+      "comment" : "Rule editor: category picker",
+      "localizations" : {
+        "cs" : { "stringUnit" : { "state" : "translated", "value" : "Druh" } },
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Art" } },
+        "es" : { "stringUnit" : { "state" : "translated", "value" : "Tipo" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Type" } }
+      }
+    },
+    "Pattern, e.g. invoice*.pdf" : {
+      "comment" : "Placeholder of the rule's file name pattern field",
+      "localizations" : {
+        "cs" : { "stringUnit" : { "state" : "translated", "value" : "Vzor, např. faktura*.pdf" } },
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Muster, z. B. rechnung*.pdf" } },
+        "es" : { "stringUnit" : { "state" : "translated", "value" : "Patrón, p. ej. factura*.pdf" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Motif, p. ex. facture*.pdf" } }
+      }
+    },
+    "Where" : {
+      "comment" : "Rule editor: which watched folder the rule applies to",
+      "localizations" : {
+        "cs" : { "stringUnit" : { "state" : "translated", "value" : "Kde" } },
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Wo" } },
+        "es" : { "stringUnit" : { "state" : "translated", "value" : "Dónde" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Où" } }
+      }
+    },
+    "All watched folders" : {
+      "comment" : "Rule editor: the rule applies to every watched folder",
+      "localizations" : {
+        "cs" : { "stringUnit" : { "state" : "translated", "value" : "Všechny sledované složky" } },
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Alle überwachten Ordner" } },
+        "es" : { "stringUnit" : { "state" : "translated", "value" : "Todas las carpetas vigiladas" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Tous les dossiers surveillés" } }
+      }
+    },
+    "When" : {
+      "comment" : "Rule editor: how long after a file arrives the rule deletes it",
+      "localizations" : {
+        "cs" : { "stringUnit" : { "state" : "translated", "value" : "Kdy" } },
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Wann" } },
+        "es" : { "stringUnit" : { "state" : "translated", "value" : "Cuándo" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Quand" } }
+      }
+    },
+    "Save" : {
+      "comment" : "Button that saves the rule editor",
+      "localizations" : {
+        "cs" : { "stringUnit" : { "state" : "translated", "value" : "Uložit" } },
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Sichern" } },
+        "es" : { "stringUnit" : { "state" : "translated", "value" : "Guardar" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Enregistrer" } }
       }
     },
     "DropKeeper" : {
