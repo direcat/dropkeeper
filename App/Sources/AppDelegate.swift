@@ -144,7 +144,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         #if DEBUG
             // A `-dbPath` run keeps that state in a separate suite, so it never marks the real app as launched
             // or leaves folder hints that would turn its next real launch into a recovery. A new database starts
-            // with empty state, like a first launch.
+            // with empty state, like a first launch. The suite name must differ from the Debug bundle id, because
+            // `UserDefaults(suiteName:)` refuses the app's own domain.
             if let path = UserDefaults.standard.string(forKey: "dbPath"),
                 let suite = UserDefaults(suiteName: debugSuiteName)
             {
@@ -158,7 +159,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     }()
 
     #if DEBUG
-        private static let debugSuiteName = "net.direcat.dropkeeper.debug"
+        private static let debugSuiteName = "net.direcat.dropkeeper.debug.dbpath"
     #endif
 
     private static func databaseURL() throws -> URL {

@@ -4,7 +4,7 @@ Run before every release. Record the macOS version and Mac model.
 
 ## Safe test run (development builds)
 
-Debug builds accept launch arguments that keep testing away from your real data: `-dbPath <file>` uses a separate database and a separate defaults suite, `-noLoginItem YES` leaves login items alone, and `-watch <folder>` (only together with `-dbPath`) watches a test folder. With both, onboarding offers the test folder (already watched) instead of the real Downloads, so a first-launch run never asks for or watches Downloads. Nothing in your real database, defaults or login items is touched. A new `-dbPath` file starts like a first launch.
+Debug builds accept launch arguments that keep testing away from your real data: `-dbPath <file>` uses a separate database and a separate defaults suite, `-noLoginItem YES` leaves login items alone, and `-watch <folder>` (only together with `-dbPath`) watches a test folder. With both, onboarding offers the test folder (already watched) instead of the real Downloads, so a first-launch run never asks for or watches Downloads. Nothing in your real database, defaults or login items is touched. A new `-dbPath` file starts like a first launch. Debug builds use the bundle id `net.direcat.dropkeeper.debug`, so they have their own settings and folder permissions and never replace the installed app.
 
 Build the debug app into `build/dd`, then run it:
 

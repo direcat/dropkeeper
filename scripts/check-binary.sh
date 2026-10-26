@@ -26,7 +26,7 @@ fi
 # The exact DEBUG-only identifiers from App/Sources/AppDelegate.swift: the launch-argument keys
 # (dbPath, noLoginItem, watch) and the debug defaults suite name. The compiler may inline short
 # literals so they never show up in `strings`; the suite name is the reliable marker.
-if all_strings | grep -E '^(dbPath|noLoginItem|watch)$|^net\.direcat\.dropkeeper\.debug$'; then
+if all_strings | grep -E '^(dbPath|noLoginItem|watch)$|^net\.direcat\.dropkeeper\.debug\.dbpath$'; then
   echo "check-binary: DEBUG-only launch switches present in this build (see above)" >&2; FAIL=1
 fi
 
