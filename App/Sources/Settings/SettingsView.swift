@@ -171,7 +171,7 @@ private struct FoldersTab: View {
                         .accessibilityLabel(Text("Remove folder"))
                     }
                 }
-                Button("Add folder…") { addFolder() }
+                Button("Add folder") { addFolder() }
             }
         }
     }
@@ -347,7 +347,7 @@ private struct DataTab: View {
                     "Keep history for", values: HistoryRetention.allCases, selection: $store.draft.historyRetention,
                     label: { Self.retentionLabels[$0] ?? "" })
                 HStack {
-                    Button("Clear history now…") { store.confirmClear = true }
+                    Button("Clear history now") { store.confirmClear = true }
                     if let clearedCount = store.clearedCount {
                         Text("Removed \(clearedCount) records").foregroundStyle(.secondary)
                     }

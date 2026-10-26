@@ -924,13 +924,13 @@
         "fr" : { "stringUnit" : { "state" : "translated", "value" : "Retirer le dossier" } }
       }
     },
-    "Add folder…" : {
+    "Add folder" : {
       "comment" : "Settings button that adds a watched folder",
       "localizations" : {
-        "cs" : { "stringUnit" : { "state" : "translated", "value" : "Přidat složku…" } },
-        "de" : { "stringUnit" : { "state" : "translated", "value" : "Ordner hinzufügen…" } },
-        "es" : { "stringUnit" : { "state" : "translated", "value" : "Añadir carpeta…" } },
-        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Ajouter un dossier…" } }
+        "cs" : { "stringUnit" : { "state" : "translated", "value" : "Přidat složku" } },
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Ordner hinzufügen" } },
+        "es" : { "stringUnit" : { "state" : "translated", "value" : "Añadir carpeta" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Ajouter un dossier" } }
       }
     },
     "Watch folder" : {
@@ -1194,13 +1194,13 @@
         "fr" : { "stringUnit" : { "state" : "translated", "value" : "Indéfiniment" } }
       }
     },
-    "Clear history now…" : {
+    "Clear history now" : {
       "comment" : "Settings button that asks to clear the history",
       "localizations" : {
-        "cs" : { "stringUnit" : { "state" : "translated", "value" : "Vymazat historii…" } },
-        "de" : { "stringUnit" : { "state" : "translated", "value" : "Verlauf jetzt löschen…" } },
-        "es" : { "stringUnit" : { "state" : "translated", "value" : "Borrar historial ahora…" } },
-        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Effacer l’historique maintenant…" } }
+        "cs" : { "stringUnit" : { "state" : "translated", "value" : "Vymazat historii" } },
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Verlauf jetzt löschen" } },
+        "es" : { "stringUnit" : { "state" : "translated", "value" : "Borrar historial ahora" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Effacer l’historique maintenant" } }
       }
     },
     "Clear history?" : {
