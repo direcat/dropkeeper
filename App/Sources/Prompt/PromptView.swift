@@ -9,6 +9,10 @@ struct PromptView: View {
     @Binding var timeline: TimelineModel
     @Binding var applyToAll: Bool
     let now: Date
+    /// Remaining share (0…1) of the auto-hide countdown; nil shows no bar.
+    let hideProgress: Double?
+    /// Whole seconds left until the prompt hides, for the caption.
+    let hideSeconds: Int?
     let onDone: () -> Void
     let onKeep: () -> Void
     let onClose: () -> Void
@@ -33,6 +37,7 @@ struct PromptView: View {
                 .focusEffectDisabled(false)
             }
             TimelineView(model: $timeline, now: now)
+            Rectangle().fill(TK.Palette.hairline).frame(height: TK.Size.cardStroke)
             HStack {
                 Button("Keep", action: onKeep)
                     .buttonStyle(PromptButtonStyle(primary: false))
@@ -43,6 +48,7 @@ struct PromptView: View {
                     .keyboardShortcut(.defaultAction)
                     .focusEffectDisabled(false)
             }
+            hideIndicator
         }
         .padding(TK.Space.l)
         .frame(width: TK.Size.panelWidth)
@@ -64,19 +70,22 @@ struct PromptView: View {
 
     private var header: some View {
         HStack(spacing: TK.Space.m) {
-            FinderIcon(path: file.path, kind: file.kind)
+            FinderIcon(path: file.path, kind: file.kind, size: TK.Size.promptIcon)
+                .clipShape(RoundedRectangle(cornerRadius: TK.Radius.control))
             VStack(alignment: .leading, spacing: 2) {
                 FileNameLink(
                     name: file.displayName, font: .system(size: TK.TextSize.title, weight: .semibold), action: onOpen)
-                Text(metadata)
+                Text(Self.metadata(for: file))
                     .font(.system(size: TK.TextSize.small))
                     .foregroundStyle(TK.Palette.textSecondary)
             }
             Spacer(minLength: TK.Space.s)
             Button(action: onClose) {
                 Image(systemName: "xmark")
-                    .font(.system(size: TK.TextSize.small, weight: .regular))
-                    .frame(width: 28, height: 28)
+                    .font(.system(size: TK.TextSize.caption, weight: .semibold))
+                    .frame(width: TK.Size.closeButton, height: TK.Size.closeButton)
+                    .background(TK.Palette.fill, in: Circle())
+                    .contentShape(Circle())
             }
             .buttonStyle(.plain)
             .keyboardShortcut(.cancelAction)
@@ -110,10 +119,36 @@ struct PromptView: View {
         }
     }
 
-    private var metadata: String {
+    /// "49 KB · Downloads": the size and the name of the folder the file lies in.
+    static func metadata(for file: TrackedFile) -> String {
         let size = file.sizeBytes.map { ByteCountFormatter.string(fromByteCount: $0, countStyle: .file) }
-        let stack = stackCount > 1 ? String(localized: "\(stackCount) new files") : nil
-        return [size, stack].compactMap(\.self).joined(separator: " · ")
+        let folder = URL(fileURLWithPath: file.path).deletingLastPathComponent().lastPathComponent
+        return [size, folder.isEmpty ? nil : folder].compactMap(\.self).joined(separator: " · ")
+    }
+
+    static func hideCaption(seconds: Int?) -> String? {
+        seconds.map { String(localized: "Hides in \($0) s · stays in the list") }
+    }
+
+    @ViewBuilder
+    private var hideIndicator: some View {
+        if let hideProgress, let caption = Self.hideCaption(seconds: hideSeconds) {
+            VStack(spacing: TK.Space.s) {
+                Capsule().fill(TK.Palette.fill)
+                    .frame(height: TK.Size.hideBar)
+                    .overlay(alignment: .leading) {
+                        GeometryReader { geometry in
+                            Capsule().fill(TK.Palette.textTertiary)
+                                .frame(width: geometry.size.width * min(max(hideProgress, 0), 1))
+                        }
+                    }
+                Text(caption)
+                    .font(.system(size: TK.TextSize.caption))
+                    .foregroundStyle(TK.Palette.textTertiary)
+            }
+            .accessibilityElement(children: .ignore)
+            .accessibilityLabel(Text(caption))
+        }
     }
 }
 
@@ -149,7 +184,7 @@ struct PromptButtonStyle: ButtonStyle {
         configuration.label
             .font(.system(size: TK.TextSize.title, weight: .medium))
             .padding(.horizontal, TK.Space.m)
-            .padding(.vertical, 6)
+            .padding(.vertical, TK.Space.s)
             .foregroundStyle(primary ? TK.Palette.onAccent : TK.Palette.textPrimary)
             .background(
                 primary ? TK.Palette.accent : TK.Palette.fill,
@@ -170,7 +205,7 @@ struct PromptButtonStyle: ButtonStyle {
         firstSeen: now, expiresAt: nil, trashPath: nil, failureCount: 0, updatedAt: now)
     PromptView(
         file: file, stackCount: 3, duplicateOf: "Quarterly report final.pdf", timeline: $timeline,
-        applyToAll: $applyToAll, now: now,
+        applyToAll: $applyToAll, now: now, hideProgress: 0.7, hideSeconds: 21,
         onDone: {}, onKeep: {}, onClose: {}, onOpen: {}, onDeleteDuplicate: {}
     )
     .background(TK.Palette.cardTint)

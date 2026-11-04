@@ -81,6 +81,7 @@ enum TK {
     /// Text sizes in points. The panel tokens are the original 11/12/13 pt plus 2; the form tokens serve the
     /// Settings and Onboarding windows (system body is 13 pt there, captions 10 and 12).
     enum TextSize {
+        static let caption: CGFloat = 12
         static let small: CGFloat = 13
         static let body: CGFloat = 14
         static let title: CGFloat = 15
@@ -97,11 +98,16 @@ enum TK {
         static let fileGlyph: CGFloat = 40
         static let listRow: CGFloat = 48
         static let timelineDot: CGFloat = 10
-        static let timelineDotSelected: CGFloat = 18
-        /// Ring around the selected dot: the gap between dot and ring, and the ring's line width.
-        static let timelineHaloGap: CGFloat = 3
-        static let timelineHaloWidth: CGFloat = 2
-        static let timelineTrackWidth: CGFloat = 2
+        static let timelineKnob: CGFloat = 22
+        /// The translucent accent ring around the knob, and its opacity.
+        static let timelineKnobHalo: CGFloat = 4
+        static let timelineKnobHaloOpacity = 0.25
+        static let timelineTrackWidth: CGFloat = 4
+        /// The Finder icon in the prompt header and the round close button.
+        static let promptIcon: CGFloat = 44
+        static let closeButton: CGFloat = 24
+        /// The auto-hide progress bar under the prompt buttons.
+        static let hideBar: CGFloat = 3
         static let settingsWindow = CGSize(width: 680, height: 560)
         static let ruleEditor = CGSize(width: 480, height: 400)
         /// Room for the longest value label beside a Settings step slider.

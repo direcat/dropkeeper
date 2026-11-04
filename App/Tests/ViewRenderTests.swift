@@ -20,8 +20,8 @@ private func render(_ view: some View) -> CGImage? {
     let view = PromptView(
         file: file, stackCount: 3, duplicateOf: nil,
         timeline: .constant(TimelineModel(durations: Settings().timelineStops, preselect: .keep)),
-        applyToAll: .constant(false), now: base, onDone: {}, onKeep: {}, onClose: {}, onOpen: {},
-        onDeleteDuplicate: {})
+        applyToAll: .constant(false), now: base, hideProgress: nil, hideSeconds: nil,
+        onDone: {}, onKeep: {}, onClose: {}, onOpen: {}, onDeleteDuplicate: {})
     let image = try #require(render(view))
     #expect(image.width >= Int(TK.Size.panelWidth))
 }
@@ -33,12 +33,36 @@ private func render(_ view: some View) -> CGImage? {
         PromptView(
             file: file, stackCount: 1, duplicateOf: duplicateOf,
             timeline: .constant(TimelineModel(durations: Settings().timelineStops, preselect: .keep)),
-            applyToAll: .constant(false), now: base, onDone: {}, onKeep: {}, onClose: {}, onOpen: {},
-            onDeleteDuplicate: {})
+            applyToAll: .constant(false), now: base, hideProgress: nil, hideSeconds: nil,
+            onDone: {}, onKeep: {}, onClose: {}, onOpen: {}, onDeleteDuplicate: {})
     }
     let plain = try #require(render(make(nil)))
     let flagged = try #require(render(make("report.pdf")))
     #expect(flagged.height > plain.height)  // the hint and the Delete duplicate button add a row
+}
+
+@MainActor
+private func prompt(hideProgress: Double?, hideSeconds: Int?) -> PromptView {
+    PromptView(
+        file: scheduledFile(expiresIn: 0, id: "report.pdf"), stackCount: 1, duplicateOf: nil,
+        timeline: .constant(TimelineModel(durations: Settings().timelineStops, preselect: .keep)),
+        applyToAll: .constant(false), now: base, hideProgress: hideProgress, hideSeconds: hideSeconds,
+        onDone: {}, onKeep: {}, onClose: {}, onOpen: {}, onDeleteDuplicate: {})
+}
+
+@MainActor
+@Test func promptRendersHideBarOnlyWithProgress() throws {
+    let with = try #require(render(prompt(hideProgress: 0.5, hideSeconds: 15)))
+    let without = try #require(render(prompt(hideProgress: nil, hideSeconds: nil)))
+    #expect(with.height > without.height)  // the bar and the caption add a row
+    #expect(PromptView.hideCaption(seconds: 15) == "Hides in 15 s · stays in the list")
+    #expect(PromptView.hideCaption(seconds: nil) == nil)
+}
+
+@MainActor
+@Test func promptMetadataIsSizeAndFolderName() {
+    let file = scheduledFile(expiresIn: 0, id: "report.pdf")  // path /tmp/report.pdf, 1 byte
+    #expect(PromptView.metadata(for: file) == "\(ByteCountFormatter.string(fromByteCount: 1, countStyle: .file)) · tmp")
 }
 
 @MainActor

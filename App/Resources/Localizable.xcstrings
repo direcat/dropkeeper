@@ -409,30 +409,6 @@
           "other" : { "stringUnit" : { "state" : "translated", "value" : "Appliquer aux %lld nouveaux fichiers" } } } } }
       }
     },
-    "%lld new files" : {
-      "comment" : "Prompt metadata: number of stacked new files",
-      "localizations" : {
-        "en" : { "variations" : { "plural" : {
-          "one" : { "stringUnit" : { "state" : "translated", "value" : "%lld new file" } },
-          "other" : { "stringUnit" : { "state" : "translated", "value" : "%lld new files" } } } } },
-        "cs" : { "variations" : { "plural" : {
-          "one" : { "stringUnit" : { "state" : "translated", "value" : "%lld nový soubor" } },
-          "few" : { "stringUnit" : { "state" : "translated", "value" : "%lld nové soubory" } },
-          "many" : { "stringUnit" : { "state" : "translated", "value" : "%lld nového souboru" } },
-          "other" : { "stringUnit" : { "state" : "translated", "value" : "%lld nových souborů" } } } } },
-        "de" : { "variations" : { "plural" : {
-          "one" : { "stringUnit" : { "state" : "translated", "value" : "%lld neue Datei" } },
-          "other" : { "stringUnit" : { "state" : "translated", "value" : "%lld neue Dateien" } } } } },
-        "es" : { "variations" : { "plural" : {
-          "one" : { "stringUnit" : { "state" : "translated", "value" : "%lld archivo nuevo" } },
-          "many" : { "stringUnit" : { "state" : "translated", "value" : "%lld archivos nuevos" } },
-          "other" : { "stringUnit" : { "state" : "translated", "value" : "%lld archivos nuevos" } } } } },
-        "fr" : { "variations" : { "plural" : {
-          "one" : { "stringUnit" : { "state" : "translated", "value" : "%lld nouveau fichier" } },
-          "many" : { "stringUnit" : { "state" : "translated", "value" : "%lld nouveaux fichiers" } },
-          "other" : { "stringUnit" : { "state" : "translated", "value" : "%lld nouveaux fichiers" } } } } }
-      }
-    },
     "Welcome to DropKeeper" : {
       "localizations" : {
         "cs" : { "stringUnit" : { "state" : "translated", "value" : "Vítá vás DropKeeper" } },
@@ -496,6 +472,15 @@
         "de" : { "stringUnit" : { "state" : "translated", "value" : "Löschen in %@" } },
         "es" : { "stringUnit" : { "state" : "translated", "value" : "Eliminar en %@" } },
         "fr" : { "stringUnit" : { "state" : "translated", "value" : "Supprimer dans %@" } }
+      }
+    },
+    "Hides in %lld s · stays in the list" : {
+      "comment" : "Prompt caption under the auto-hide bar; the file stays in the list",
+      "localizations" : {
+        "cs" : { "stringUnit" : { "state" : "translated", "value" : "Skryje se za %lld s · zůstane v seznamu" } },
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Wird in %lld s ausgeblendet · bleibt in der Liste" } },
+        "es" : { "stringUnit" : { "state" : "translated", "value" : "Se oculta en %lld s · permanece en la lista" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Se masque dans %lld s · reste dans la liste" } }
       }
     },
     "Done" : {

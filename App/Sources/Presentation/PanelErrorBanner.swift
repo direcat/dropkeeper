@@ -9,6 +9,7 @@ struct PanelErrorBanner: View {
     var body: some View {
         HStack(alignment: .firstTextBaseline, spacing: TK.Space.s) {
             Image(systemName: "exclamationmark.triangle.fill")
+                .foregroundStyle(TK.Palette.warning)
                 .accessibilityHidden(true)
             Text(message)
                 .fixedSize(horizontal: false, vertical: true)

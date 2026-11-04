@@ -10,7 +10,7 @@ struct TimelineView: View {
     /// Horizontal inset of the first and last dot inside the track.
     private let trackInset: CGFloat = 26
     /// Vertical centers of the three rows: deletion time, dots, stop labels.
-    /// The dot row leaves room for the selected dot's halo (28 pt across) below the label row.
+    /// The dot row leaves room for the knob and its halo (30 pt across).
     private let labelRowY: CGFloat = 10
     private let dotRowY: CGFloat = 38
     private let stopLabelRowY: CGFloat = 66
@@ -22,14 +22,17 @@ struct TimelineView: View {
         GeometryReader { geometry in
             let stopX = positions(width: geometry.size.width)
             ZStack(alignment: .topLeading) {
-                ClampedCenterLayout(centerX: stopX[model.selectedIndex]) { selectedLabel }
+                ClampedCenterLayout(centerX: geometry.size.width / 2) { selectedLabel }
                     .frame(width: geometry.size.width, height: labelRowHeight)
                     .position(x: geometry.size.width / 2, y: labelRowY)
                 lines(stopX)
                 ForEach(model.stops.indices, id: \.self) { index in
                     dot(index).position(x: stopX[index], y: dotRowY)
                     Text(label(for: model.stops[index]))
-                        .font(.system(size: TK.TextSize.small, weight: .medium))
+                        .font(
+                            .system(
+                                size: TK.TextSize.small, weight: index == model.selectedIndex ? .bold : .regular)
+                        )
                         .monospacedDigit()
                         .foregroundStyle(
                             index == model.selectedIndex ? TK.Palette.textPrimary : TK.Palette.textSecondary
@@ -75,45 +78,54 @@ struct TimelineView: View {
             path.move(to: CGPoint(x: stopX[0], y: dotRowY))
             path.addLine(to: CGPoint(x: stopX[lastDuration], y: dotRowY))
         }
-        .stroke(TK.Palette.hairline, lineWidth: TK.Size.timelineTrackWidth)
+        .stroke(TK.Palette.fill, style: StrokeStyle(lineWidth: TK.Size.timelineTrackWidth, lineCap: .round))
         if case .duration = model.selected {
             Path { path in
                 path.move(to: CGPoint(x: stopX[0], y: dotRowY))
                 path.addLine(to: CGPoint(x: stopX[model.selectedIndex], y: dotRowY))
             }
-            .stroke(TK.Palette.accent, lineWidth: TK.Size.timelineTrackWidth)
+            .stroke(TK.Palette.accent, style: StrokeStyle(lineWidth: TK.Size.timelineTrackWidth, lineCap: .round))
         }
     }
 
+    /// A stop dot; the selected stop shows the knob instead, which also keeps the stop's hit area.
     private func dot(_ index: Int) -> some View {
         let selected = index == model.selectedIndex
-        let size = selected ? TK.Size.timelineDotSelected : TK.Size.timelineDot
-        return Circle()
-            .fill(model.isHighlighted(index) ? TK.Palette.accent : TK.Palette.hairline)
-            .frame(width: size, height: size)
-            // Halo around the selected dot, so it stands out from the highlighted ones before it.
-            .overlay {
-                Circle()
-                    .strokeBorder(TK.Palette.accent, lineWidth: TK.Size.timelineHaloWidth)
-                    .padding(-(TK.Size.timelineHaloGap + TK.Size.timelineHaloWidth))
-                    .opacity(selected ? 0.4 : 0)
-            }
-            .frame(width: dotHitSize, height: dotHitSize)
-            .contentShape(Rectangle())
-            .onTapGesture { select(index) }
+        return ZStack {
+            Circle()
+                .fill(model.isHighlighted(index) ? TK.Palette.accent : TK.Palette.textTertiary)
+                .frame(width: TK.Size.timelineDot, height: TK.Size.timelineDot)
+                .opacity(selected ? 0 : 1)
+            Circle()
+                .fill(Color.white)
+                .frame(width: TK.Size.timelineKnob, height: TK.Size.timelineKnob)
+                .shadow(color: .black.opacity(0.3), radius: 2, y: 1)
+                .overlay {
+                    Circle()
+                        .strokeBorder(
+                            TK.Palette.accent.opacity(TK.Size.timelineKnobHaloOpacity),
+                            lineWidth: TK.Size.timelineKnobHalo
+                        )
+                        .padding(-TK.Size.timelineKnobHalo)
+                }
+                .opacity(selected ? 1 : 0)
+        }
+        .frame(width: dotHitSize, height: dotHitSize)
+        .contentShape(Rectangle())
+        .onTapGesture { select(index) }
     }
 
     @ViewBuilder
     private var selectedLabel: some View {
         if let date = model.deletionDate(from: now) {
             Text(TimeLabels.deletion(at: date, now: now))
-                .font(.system(size: TK.TextSize.title, weight: .semibold))
+                .font(.system(size: TK.TextSize.small, weight: .semibold))
                 .monospacedDigit()
                 .foregroundStyle(TK.Palette.accentText)
                 .fixedSize()
         } else {
             Text("Kept")
-                .font(.system(size: TK.TextSize.title, weight: .semibold))
+                .font(.system(size: TK.TextSize.small, weight: .semibold))
                 .foregroundStyle(TK.Palette.textSecondary)
                 .fixedSize()
         }
