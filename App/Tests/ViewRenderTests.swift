@@ -42,10 +42,8 @@ private func render(_ view: some View) -> CGImage? {
 }
 
 @MainActor
-@Test func noticeAndIdleRender() {
+@Test func noticeRenders() {
     #expect(render(NoticeView(files: [scheduledFile(expiresIn: 0, id: "a.pdf")], canUndo: true, onUndo: {})) != nil)
-    #expect(render(NotchIdleView(count: 3, urgentSeconds: nil, notchWidth: 200)) != nil)
-    #expect(render(NotchIdleView(count: 1, urgentSeconds: 7, notchWidth: 200)) != nil)
 }
 
 @Test func reviewFocusNoticeTitleMergesFiles() {
@@ -69,11 +67,6 @@ private func render(_ view: some View) -> CGImage? {
     #expect(ClampedCenterLayout.clampedCenter(20, labelWidth: 100, width: 388) == 50)
     // Wider than the track: centered in it.
     #expect(ClampedCenterLayout.clampedCenter(20, labelWidth: 400, width: 388) == 194)
-}
-
-@Test func idleAccessibilityValueAnnouncesCountdown() {
-    #expect(NotchIdleView.accessibilityValue(urgentSeconds: 7) == "Deleting in 0:07")
-    #expect(NotchIdleView.accessibilityValue(urgentSeconds: nil) == nil)
 }
 
 @MainActor

@@ -148,8 +148,8 @@ private func pendingFile(_ id: String) -> TrackedFile {
         // Quiet mode makes `promptAvailable` false whatever is queued.
         #expect(
             PanelDecision.content(
-                promptAvailable: false, noticeVisible: model.isNoticeVisible, target: .menuBar, scheduledCount: 1,
-                hovering: false) == .notice)
+                promptAvailable: false, noticeVisible: model.isNoticeVisible, errorVisible: false)
+                == .notice)
     }
 
     /// With nothing due, the reminder actions don't even call the engine.

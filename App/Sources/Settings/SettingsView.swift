@@ -82,14 +82,6 @@ private struct GeneralTab: View {
         Form {
             Section("General") {
                 Toggle("Launch at login", isOn: $store.draft.launchAtLogin)
-                Picker("Show new downloads", selection: $store.draft.promptPresentation) {
-                    Text("Under the menu bar icon").tag(PromptPresentation.menuBar)
-                    Text("Automatically").tag(PromptPresentation.automatic)
-                    Text("In the notch").tag(PromptPresentation.notch)
-                }
-                Text("Automatically shows new downloads in the notch when the pointer is on the laptop screen.")
-                    .font(.system(size: TK.TextSize.formCaption))
-                    .foregroundStyle(.secondary)
                 languagePicker
                 Toggle(isOn: $store.draft.quietMode) {
                     Text("Quiet mode")

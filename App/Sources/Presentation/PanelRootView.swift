@@ -3,25 +3,15 @@ import SwiftUI
 struct PanelRootView: View {
     @Bindable var model: AppModel
     let content: PanelContent
-    let isNotch: Bool
-    let notchWidth: CGFloat
-    /// Keeps open content below the hardware notch (`PanelDecision.topInset`); part of the fitting size.
-    var topInset: CGFloat = 0
-    let actions: AppActions
-    let onHover: (Bool) -> Void
 
     var body: some View {
         VStack(spacing: 0) {
             banner
             main
         }
-        .padding(.top, topInset)
-        // The closed notch is taller than its content: fill the panel the coordinator sized.
-        .frame(maxWidth: content == .idle ? .infinity : nil, maxHeight: content == .idle ? .infinity : nil)
         .background(TK.Notch.surface)
-        .clipShape(shape)
+        .clipShape(RoundedRectangle(cornerRadius: TK.Radius.notchBottom))
         .environment(\.colorScheme, .dark)
-        .onHover(perform: onHover)
     }
 
     /// The list shows the error itself, so it also has it in the menu bar popover.
@@ -53,16 +43,8 @@ struct PanelRootView: View {
             }
         case .notice:
             NoticeStackView(model: model, holdsNotice: true)
-        case .idle:
-            NotchIdleView(count: model.scheduled.count, urgentSeconds: model.urgentSeconds, notchWidth: notchWidth)
-        case .idleExpanded:
-            PendingListView(model: model, actions: actions, showsFooter: false)
         case .hidden, .error:
             EmptyView()
         }
-    }
-
-    private var shape: AnyShape {
-        isNotch ? AnyShape(NotchShape()) : AnyShape(RoundedRectangle(cornerRadius: TK.Radius.notchBottom))
     }
 }

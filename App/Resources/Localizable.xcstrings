@@ -780,51 +780,6 @@
         "fr" : { "stringUnit" : { "state" : "translated", "value" : "Redémarrer DropKeeper" } }
       }
     },
-    "Show new downloads" : {
-      "comment" : "Settings picker: where the prompt for new downloads appears",
-      "localizations" : {
-        "cs" : { "stringUnit" : { "state" : "translated", "value" : "Zobrazovat nová stažení" } },
-        "de" : { "stringUnit" : { "state" : "translated", "value" : "Neue Downloads anzeigen" } },
-        "es" : { "stringUnit" : { "state" : "translated", "value" : "Mostrar descargas nuevas" } },
-        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Afficher les nouveaux téléchargements" } }
-      }
-    },
-    "Automatically" : {
-      "comment" : "Settings option: pick the prompt location automatically",
-      "localizations" : {
-        "cs" : { "stringUnit" : { "state" : "translated", "value" : "Automaticky" } },
-        "de" : { "stringUnit" : { "state" : "translated", "value" : "Automatisch" } },
-        "es" : { "stringUnit" : { "state" : "translated", "value" : "Automáticamente" } },
-        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Automatiquement" } }
-      }
-    },
-    "Under the menu bar icon" : {
-      "comment" : "Settings option: show the prompt under the menu bar icon",
-      "localizations" : {
-        "cs" : { "stringUnit" : { "state" : "translated", "value" : "Pod ikonou v menu baru" } },
-        "de" : { "stringUnit" : { "state" : "translated", "value" : "Unter dem Menüleistensymbol" } },
-        "es" : { "stringUnit" : { "state" : "translated", "value" : "Bajo el icono de la barra de menús" } },
-        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Sous l’icône de la barre des menus" } }
-      }
-    },
-    "In the notch" : {
-      "comment" : "Settings option: show the prompt in the screen notch",
-      "localizations" : {
-        "cs" : { "stringUnit" : { "state" : "translated", "value" : "Ve výřezu" } },
-        "de" : { "stringUnit" : { "state" : "translated", "value" : "Im Notch" } },
-        "es" : { "stringUnit" : { "state" : "translated", "value" : "En el notch" } },
-        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Dans l’encoche" } }
-      }
-    },
-    "Automatically shows new downloads in the notch when the pointer is on the laptop screen." : {
-      "comment" : "Settings help text under the prompt presentation picker",
-      "localizations" : {
-        "cs" : { "stringUnit" : { "state" : "translated", "value" : "Automaticky ukáže nová stažení ve výřezu, když je kurzor na displeji notebooku." } },
-        "de" : { "stringUnit" : { "state" : "translated", "value" : "„Automatisch“ zeigt neue Downloads im Notch an, wenn sich der Zeiger auf dem Bildschirm des MacBook befindet." } },
-        "es" : { "stringUnit" : { "state" : "translated", "value" : "«Automáticamente» muestra las descargas nuevas en el notch cuando el puntero está en la pantalla del portátil." } },
-        "fr" : { "stringUnit" : { "state" : "translated", "value" : "« Automatiquement » affiche les nouveaux téléchargements dans l’encoche quand le pointeur est sur l’écran de l’ordinateur portable." } }
-      }
-    },
     "Quiet mode" : {
       "comment" : "Settings toggle",
       "localizations" : {

@@ -81,7 +81,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         let status = StatusItemController(model: model, actions: actions)
         statusItem = status
         let panels = PanelCoordinator(
-            model: model, actions: actions, statusAnchor: { [weak status] in status?.anchorFrame },
+            model: model, statusAnchor: { [weak status] in status?.anchorFrame },
             isPopoverShown: { [weak status] in status?.isPopoverShown ?? false })
         status.onPopoverChange = { [weak panels] in panels?.render() }
         panels.start()
