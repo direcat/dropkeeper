@@ -14,7 +14,8 @@ private struct PopoverMaterial: NSViewRepresentable {
     func updateNSView(_ view: NSVisualEffectView, context: Context) {}
 }
 
-/// A frosted card: blurred backdrop, a light or dark tint, a hairline inner stroke and a soft shadow.
+/// A frosted card: blurred backdrop, a light or dark tint and a white inner highlight.
+/// The soft shadow comes from the window.
 struct GlassCard<Content: View>: View {
     let radius: CGFloat
     @ViewBuilder let content: Content
@@ -34,8 +35,6 @@ struct GlassCard<Content: View>: View {
                 }
             }
             .clipShape(shape)
-            .overlay { shape.strokeBorder(TK.Palette.hairline, lineWidth: TK.Size.cardStroke) }
-            .shadow(
-                color: .black.opacity(TK.Shadow.cardOpacity), radius: TK.Shadow.cardRadius, y: TK.Shadow.cardOffset)
+            .overlay { shape.strokeBorder(TK.Palette.cardEdge, lineWidth: TK.Size.cardStroke) }
     }
 }

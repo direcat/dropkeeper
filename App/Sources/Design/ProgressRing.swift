@@ -15,8 +15,9 @@ struct ProgressRing<Center: View>: View {
 
     var body: some View {
         ZStack {
-            Circle().stroke(TK.Palette.fill, lineWidth: TK.Size.ringLine)
+            Circle().inset(by: TK.Size.ringLine / 2).stroke(TK.Palette.fill, lineWidth: TK.Size.ringLine)
             Circle()
+                .inset(by: TK.Size.ringLine / 2)
                 .trim(from: 0, to: min(max(progress, 0), 1))
                 .stroke(tint, style: StrokeStyle(lineWidth: TK.Size.ringLine, lineCap: .round))
                 .rotationEffect(.degrees(-90))

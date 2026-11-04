@@ -137,6 +137,9 @@ final class StatusItemController: NSObject, NSPopoverDelegate {
         } else {
             // Activating the app makes ⌘, and ⌘Q from the main menu work inside the popover.
             NSApp.activate()
+            // The status bar button lives in a window the app doesn't own, so the popover would not follow
+            // a forced Light or Dark appearance by itself (nil in Auto inherits the system's).
+            popover.appearance = NSApp.appearance
             popover.show(relativeTo: button.bounds, of: button, preferredEdge: .minY)
             popover.contentViewController?.view.window?.makeKey()
             onPopoverChange?()

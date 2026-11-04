@@ -38,6 +38,8 @@ enum TK {
         static let fillStrong = dynamic(
             light: Color(hex: 0x767680).opacity(0.14), dark: Color(hex: 0x767680).opacity(0.28))
         static let hairline = dynamic(light: Color.black.opacity(0.07), dark: Color.white.opacity(0.08))
+        /// The inner highlight along the edge of a glass card.
+        static let cardEdge = dynamic(light: Color.white.opacity(0.5), dark: Color.white.opacity(0.12))
         static let cardTint = dynamic(
             light: Color(hex: 0xF4F1EF).opacity(0.80), dark: Color(hex: 0x26262A).opacity(0.78))
         static let accent = dynamic(light: Petrol.p500, dark: Petrol.p400)
@@ -104,11 +106,6 @@ enum TK {
         static let ruleEditor = CGSize(width: 480, height: 400)
         /// Room for the longest value label beside a Settings step slider.
         static let stepSliderLabel: CGFloat = 90
-    }
-    enum Shadow {
-        static let cardRadius: CGFloat = 25
-        static let cardOffset: CGFloat = 9
-        static let cardOpacity = 0.28
     }
     enum Motion {
         static let open = Animation.spring(response: 0.35, dampingFraction: 0.82)
