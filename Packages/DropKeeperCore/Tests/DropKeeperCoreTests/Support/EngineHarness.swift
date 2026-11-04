@@ -1,5 +1,6 @@
 import Foundation
 import Synchronization
+import Testing
 
 @testable import DropKeeperCore
 
@@ -85,6 +86,11 @@ struct EngineHarness {
 
     func files(_ states: [FileState] = FileState.allCases) throws -> [TrackedFile] {
         try store.files(in: states)
+    }
+
+    /// The stored record whose display name is `name`.
+    func file(named name: String) throws -> TrackedFile {
+        try #require(try files().first { $0.displayName == name })
     }
 
     /// First notification matching `predicate` (notifications are buffered). Call at most once per test:

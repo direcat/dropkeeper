@@ -4,10 +4,6 @@ import Testing
 @testable import DropKeeperCore
 
 @Suite struct StatisticsTests {
-    private func id(_ harness: EngineHarness, _ name: String) throws -> String {
-        try #require(try harness.files().first { $0.displayName == name }).id
-    }
-
     @Test func emptyStoreIsZero() throws {
         #expect(try FileStore.inMemory().statistics() == .zero)
     }
@@ -18,14 +14,15 @@ import Testing
         await harness.drop("a.pdf", size: 100)
         await harness.drop("b.pdf", size: 300)
         await harness.drop("c.pdf", size: 10)
-        try await harness.engine.schedule(ids: [try id(harness, "a.pdf"), try id(harness, "b.pdf")], duration: 60)
-        try await harness.engine.keep(ids: [try id(harness, "c.pdf")])
+        try await harness.engine.schedule(
+            ids: [try harness.file(named: "a.pdf").id, try harness.file(named: "b.pdf").id], duration: 60)
+        try await harness.engine.keep(ids: [try harness.file(named: "c.pdf").id])
         await harness.advance(60)
         var settings = await harness.engine.currentSettings
         settings.deleteMode = .permanent
         try await harness.engine.updateSettings(settings)
         await harness.drop("d.pdf", size: 50)
-        try await harness.engine.deleteNow(ids: [try id(harness, "d.pdf")])
+        try await harness.engine.deleteNow(ids: [try harness.file(named: "d.pdf").id])
 
         let stats = try await harness.engine.statistics()
         #expect(stats.movedToTrash == 2 && stats.deletedPermanently == 1 && stats.kept == 1)
@@ -61,17 +58,23 @@ import Testing
         harness.time.advance(by: 1)
         await harness.engine.tick()
         await harness.settleDuplicateChecks()
-        try await harness.engine.deleteNow(ids: [try id(harness, "y.pdf")])
+        try await harness.engine.deleteNow(ids: [try harness.file(named: "y.pdf").id])
+
+        let expired = TrackedFile(
+            id: "dup-expired", folderId: nil, path: "/fake/z.pdf", inode: 9, volumeId: "V", displayName: "z.pdf",
+            kind: .document, sizeBytes: 5, state: .trashed, firstSeen: .now, expiresAt: nil, trashPath: "/t/z.pdf",
+            failureCount: 0, updatedAt: .now, duplicateOf: "orig.pdf", resolution: .expired)
+        try harness.store.insert(expired)
 
         let stats = try await harness.engine.statistics()
-        #expect(stats.scheduledByRules == 1 && stats.duplicatesDeleted == 1)
+        #expect(stats.scheduledByRules == 1 && stats.duplicatesDeleted == 2)
     }
 
     @Test func clearHistoryResetsStatistics() async throws {
         let harness = try EngineHarness()
         try await harness.startWithDownloads()
         await harness.drop("a.pdf")
-        try await harness.engine.keep(ids: [try id(harness, "a.pdf")])
+        try await harness.engine.keep(ids: [try harness.file(named: "a.pdf").id])
         #expect(try await harness.engine.statistics().handled == 1)
         _ = try await harness.engine.clearHistory()
         #expect(try await harness.engine.statistics().handled == 0)

@@ -235,7 +235,7 @@ public final class FileStore: Sendable {
             .filter(states.contains(Keys.state))
             .filter(Self.isDecision)
             .order(Keys.updatedAt.desc, Keys.id)
-            .limit(limit)
+            .limit(max(0, limit))
     }
 
     /// The most recent decisions (kept or trashed items, bookkeeping resolutions hidden), newest first.
@@ -264,13 +264,15 @@ public final class FileStore: Sendable {
                 COALESCE(SUM(CASE WHEN \(Column(Keys.state)) = \(kept) AND (\(isDecision)) THEN 1 END), 0),
                 COALESCE(SUM(CASE WHEN \(Column(Keys.viaRule)) = 1 THEN 1 END), 0),
                 COALESCE(SUM(CASE WHEN \(Column(Keys.state)) = \(trashed) AND \(Column(Keys.duplicateOf)) IS NOT NULL
-                    AND \(Column(Keys.resolution)) = \(Resolution.deletedNow.rawValue) THEN 1 END), 0),
+                    AND \(Column(Keys.resolution)) IN (
+                        \(Resolution.deletedNow.rawValue), \(Resolution.expired.rawValue))
+                    THEN 1 END), 0),
                 COALESCE(SUM(CASE WHEN \(Column(Keys.state)) = \(trashed) AND (\(isDecision))
                     THEN COALESCE(\(Column(Keys.sizeBytes)), 0) END), 0)
             FROM \(TrackedFile.self)
             """
         return try writer.read { db in
-            let row = try Row.fetchOne(db, SQLRequest<Row>(literal: sql)) ?? Row()
+            guard let row = try Row.fetchOne(db, SQLRequest<Row>(literal: sql)) else { return .zero }
             return Statistics(
                 movedToTrash: row[0], deletedPermanently: row[1], kept: row[2], scheduledByRules: row[3],
                 duplicatesDeleted: row[4], bytesFreed: row[5])
