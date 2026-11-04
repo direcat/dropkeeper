@@ -6,7 +6,6 @@ import Testing
 @Test func defaultsMatchSpec() {
     let settings = Settings()
     #expect(settings.launchAtLogin)
-    #expect(settings.promptPresentation == .menuBar)
     #expect(!settings.quietMode)
     #expect(settings.timelineStops == [1800, 3600, 86_400, 864_000])
     #expect(settings.gracePeriod == 300)
@@ -193,4 +192,36 @@ import Testing
     let decoded = try JSONDecoder().decode(Settings.self, from: Data(#"{"quietMode":true,"rules":"oops"}"#.utf8))
     #expect(decoded.quietMode)
     #expect(decoded.rules == Settings().rules)
+}
+
+@Test func newSettingsDefaults() {
+    let settings = Settings()
+    #expect(settings.notificationTimeout == 30)
+    #expect(settings.appearance == .auto)
+    #expect(Settings.notificationTimeoutOptions.last == Settings.notificationTimeoutNever)
+    #expect(
+        Settings.notificationTimeoutOptions.filter { $0 > 0 && $0 < 60 }
+            == stride(from: 5.0, through: 55, by: 5).map { $0 })
+}
+
+@Test func settings11BlobWithNotchDecodes() throws {
+    let json = #"{"promptPresentation":"notch","quietMode":true,"gracePeriod":900}"#
+    let settings = try JSONDecoder().decode(Settings.self, from: Data(json.utf8))
+    #expect(settings.quietMode && settings.gracePeriod == 900)
+    #expect(settings.notificationTimeout == 30 && settings.appearance == .auto)
+}
+
+@Test func timeoutAndAppearanceRoundTripAndNormalize() throws {
+    var settings = Settings()
+    settings.notificationTimeout = 0
+    settings.appearance = .dark
+    let back = try JSONDecoder().decode(Settings.self, from: JSONEncoder().encode(settings))
+    #expect(back.notificationTimeout == 0 && back.appearance == .dark)
+    settings.notificationTimeout = 7
+    #expect(settings.normalized().notificationTimeout == 30)
+}
+
+@Test func unknownAppearanceFallsBackToAuto() throws {
+    let settings = try JSONDecoder().decode(Settings.self, from: Data(#"{"appearance":"sepia"}"#.utf8))
+    #expect(settings.appearance == .auto)
 }

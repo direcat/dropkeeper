@@ -1,7 +1,7 @@
 import Foundation
 
-public enum PromptPresentation: String, Codable, Sendable, CaseIterable {
-    case automatic, menuBar, notch
+public enum Appearance: String, Codable, Sendable, CaseIterable {
+    case auto, light, dark
 }
 
 public enum DefaultChoice: Codable, Sendable, Equatable {
@@ -41,10 +41,15 @@ public struct Settings: Codable, Sendable, Equatable {
     public static let minStop: TimeInterval = 300
     public static let maxStop: TimeInterval = 90 * 86_400
     public static let gracePeriodOptions: [TimeInterval] = [60, 300, 900, 3600]
+    /// Seconds before an unanswered notification closes; `0` means never.
+    public static let notificationTimeoutNever: TimeInterval = 0
+    public static let notificationTimeoutOptions: [TimeInterval] =
+        [5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 55, 60, 120, 300, 600, 900, notificationTimeoutNever]
     public static let reminderLeadTimeOptions: [TimeInterval] = [60, 120, 300, 600, 900, 1800, 3600]
 
     public var launchAtLogin = true
-    public var promptPresentation = PromptPresentation.menuBar
+    public var notificationTimeout: TimeInterval = 30
+    public var appearance = Appearance.auto
     public var quietMode = false
     public var timelineStops: [TimeInterval] = [1800, 3600, 86_400, 864_000]
     public var gracePeriod: TimeInterval = 300
@@ -61,7 +66,7 @@ public struct Settings: Codable, Sendable, Equatable {
     public init() {}
 
     enum CodingKeys: String, CodingKey {
-        case launchAtLogin, promptPresentation, quietMode, timelineStops, gracePeriod, defaultChoice,
+        case launchAtLogin, notificationTimeout, appearance, quietMode, timelineStops, gracePeriod, defaultChoice,
             deleteMode, finderTagEnabled, ignoredPatterns, historyRetention,
             reminderEnabled, reminderLeadTime, rules, duplicateDetection
     }
@@ -75,9 +80,11 @@ public struct Settings: Codable, Sendable, Equatable {
         let container = try decoder.container(keyedBy: CodingKeys.self)
         let defaults = Settings()
         launchAtLogin = try container.decodeIfPresent(Bool.self, forKey: .launchAtLogin) ?? defaults.launchAtLogin
-        promptPresentation =
-            try container.decodeIfPresent(PromptPresentation.self, forKey: .promptPresentation)
-            ?? defaults.promptPresentation
+        notificationTimeout =
+            try container.decodeIfPresent(TimeInterval.self, forKey: .notificationTimeout)
+            ?? defaults.notificationTimeout
+        // An unknown raw value (e.g. from a newer version) falls back to the default.
+        appearance = (try? container.decodeIfPresent(Appearance.self, forKey: .appearance)) ?? defaults.appearance
         quietMode = try container.decodeIfPresent(Bool.self, forKey: .quietMode) ?? defaults.quietMode
         timelineStops =
             try container.decodeIfPresent([TimeInterval].self, forKey: .timelineStops) ?? defaults.timelineStops
@@ -129,6 +136,7 @@ public struct Settings: Codable, Sendable, Equatable {
         if stops.count < 2 { stops = Settings().timelineStops }
         result.timelineStops = Array(stops.prefix(5))
         if !Self.gracePeriodOptions.contains(gracePeriod) { result.gracePeriod = 300 }
+        if !Self.notificationTimeoutOptions.contains(notificationTimeout) { result.notificationTimeout = 30 }
         if !Self.reminderLeadTimeOptions.contains(reminderLeadTime) { result.reminderLeadTime = 300 }
         if case .expireAfter(let duration) = defaultChoice, !result.timelineStops.contains(duration) {
             result.defaultChoice = .keep
