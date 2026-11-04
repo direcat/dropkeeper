@@ -15,7 +15,5 @@ public enum Resolution: String, Codable, Sendable, CaseIterable, DatabaseValueCo
     }
 
     /// Raw values of the decision cases, for SQL `IN` clauses.
-    public static var decisionValues: [String] {
-        allCases.filter(\.isDecision).map(\.rawValue)
-    }
+    public static let decisionValues: [String] = allCases.filter(\.isDecision).map(\.rawValue)
 }

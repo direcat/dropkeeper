@@ -4,16 +4,12 @@ import Testing
 @testable import DropKeeperCore
 
 @Suite struct HistoryTests {
-    private func onlyFile(_ harness: EngineHarness, _ name: String) throws -> TrackedFile {
-        try #require(try harness.files().first { $0.displayName == name })
-    }
-
     @Test func historyShowsDecisionsNewestFirstLimited() async throws {
         let harness = try EngineHarness()
         try await harness.startWithDownloads()
         for index in 0..<12 {
             await harness.drop("f\(index).pdf")
-            let id = try onlyFile(harness, "f\(index).pdf").id
+            let id = try harness.file(named: "f\(index).pdf").id
             if index.isMultiple(of: 2) {
                 try await harness.engine.keep(ids: [id])
             } else {
@@ -32,20 +28,20 @@ import Testing
         let folder = try await harness.startWithDownloads()
         // userKept
         await harness.drop("kept.pdf")
-        try await harness.engine.keep(ids: [try onlyFile(harness, "kept.pdf").id])
+        try await harness.engine.keep(ids: [try harness.file(named: "kept.pdf").id])
         // movedOut
         let moved = await harness.drop("moved.pdf")
-        try await harness.engine.schedule(ids: [try onlyFile(harness, "moved.pdf").id], duration: 1800)
+        try await harness.engine.schedule(ids: [try harness.file(named: "moved.pdf").id], duration: 1800)
         harness.fs.move(moved, "/fake/Users/me/Documents/moved.pdf")
         await harness.event(moved, [.renamed, .isFile])
         // removedOutside
         let removed = await harness.drop("removed.pdf")
-        try await harness.engine.schedule(ids: [try onlyFile(harness, "removed.pdf").id], duration: 60)
+        try await harness.engine.schedule(ids: [try harness.file(named: "removed.pdf").id], duration: 60)
         harness.fs.delete(removed)
         await harness.advance(60)
         // reappeared
         let back = await harness.drop("back.pdf")
-        try await harness.engine.schedule(ids: [try onlyFile(harness, "back.pdf").id], duration: 60)
+        try await harness.engine.schedule(ids: [try harness.file(named: "back.pdf").id], duration: 60)
         await harness.advance(60)
         harness.fs.move(FakeFileSystem.trashDir + "/back.pdf", back)
         await harness.event(back, [.renamed, .isFile])
@@ -78,12 +74,12 @@ import Testing
         settings.deleteMode = .permanent
         try await harness.engine.updateSettings(settings)
         await harness.drop("a.pdf")
-        try await harness.engine.deleteNow(ids: [try onlyFile(harness, "a.pdf").id])
+        try await harness.engine.deleteNow(ids: [try harness.file(named: "a.pdf").id])
         await harness.advance(1)
         settings.deleteMode = .trash
         try await harness.engine.updateSettings(settings)
         await harness.drop("b.pdf")
-        try await harness.engine.deleteNow(ids: [try onlyFile(harness, "b.pdf").id])
+        try await harness.engine.deleteNow(ids: [try harness.file(named: "b.pdf").id])
 
         let outcomes = try harness.store.history(limit: 10).reversed().map(\.historyOutcome)
         #expect(outcomes == [.deletedPermanently, .movedToTrash(canPutBack: true)])
@@ -104,8 +100,8 @@ import Testing
         try await harness.startWithDownloads()
         await harness.drop("pending.pdf")
         await harness.drop("scheduled.pdf")
-        try await harness.engine.schedule(ids: [try onlyFile(harness, "scheduled.pdf").id], duration: 3600)
-        var failed = try onlyFile(harness, "pending.pdf")
+        try await harness.engine.schedule(ids: [try harness.file(named: "scheduled.pdf").id], duration: 3600)
+        var failed = try harness.file(named: "pending.pdf")
         failed.state = .failed
         try harness.store.update(failed)
         await harness.drop("pending2.pdf")
@@ -117,7 +113,7 @@ import Testing
         try await harness.startWithDownloads()
         await harness.drop("a.pdf")
         let stream = harness.engine.historyUpdates()
-        try await harness.engine.keep(ids: [try onlyFile(harness, "a.pdf").id])
+        try await harness.engine.keep(ids: [try harness.file(named: "a.pdf").id])
         for try await files in stream where !files.isEmpty {
             #expect(files.map(\.displayName) == ["a.pdf"])
             break

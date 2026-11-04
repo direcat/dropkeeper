@@ -1,5 +1,3 @@
-import Foundation
-
 /// Aggregate counters over the stored records (the retention window is what the store holds).
 public struct Statistics: Sendable, Equatable {
     public var movedToTrash: Int
