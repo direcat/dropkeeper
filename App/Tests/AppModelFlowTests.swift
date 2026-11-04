@@ -23,6 +23,7 @@ private func pendingFile(_ id: String) -> TrackedFile {
         init() {
             suite = "AppModelFlowTests.\(UUID().uuidString)"
             model = AppModel(defaults: UserDefaults(suiteName: suite)!, applyLoginItem: { _ in })
+            model.isVoiceOverRunning = { false }
         }
 
         func cleanUp() { UserDefaults(suiteName: suite)?.removePersistentDomain(forName: suite) }
@@ -67,7 +68,7 @@ private func pendingFile(_ id: String) -> TrackedFile {
         let model = fixture.model
         model.apply([])
         model.review("gone")
-        #expect(!model.promptRequested)  // a later download must not bypass Quiet mode
+        #expect(model.requestedFileId == nil)  // a later download must not bypass Quiet mode
     }
 
     @Test func failedUndoKeepsTheNoticeAndShowsAnError() async {
@@ -194,6 +195,138 @@ private func pendingFile(_ id: String) -> TrackedFile {
         model.dismissReminders()
         #expect(model.reminders.due.isEmpty)
         #expect(!model.isNoticeVisible)
+    }
+
+    // MARK: Auto-hide
+
+    /// A model whose clock the test moves.
+    private final class Clock {
+        var now = Date()
+    }
+
+    private func attach(_ clock: Clock, to model: AppModel) { model.clock = { clock.now } }
+
+    @Test func promptTimeoutHidesStackButFilesStayPending() {
+        let fixture = Fixture()
+        defer { fixture.cleanUp() }
+        let model = fixture.model
+        let clock = Clock()
+        attach(clock, to: model)
+        model.apply([pendingFile("a"), pendingFile("b")])
+        #expect(model.promptHideProgress == 1)
+        clock.now += 31
+        model.expireAutoHideTimers()
+        #expect(model.queue.current == nil && model.pending.count == 2)
+        #expect(model.promptHideProgress == nil)
+    }
+
+    @Test func reviewedFileIsNotAutoHiddenButNextOneIs() {
+        let fixture = Fixture()
+        defer { fixture.cleanUp() }
+        let model = fixture.model
+        model.apply([pendingFile("a"), pendingFile("b")])
+        model.dismissPrompt()  // a closed with Esc; b is current
+        model.review("a")
+        #expect(model.queue.current?.id == "a" && model.promptHideProgress == nil)
+        model.apply([pendingFile("b")])  // a was decided; b is next
+        #expect(model.queue.current?.id == "b" && model.promptHideProgress != nil)
+    }
+
+    @Test func revisitIsNotAutoHidden() async {
+        let fixture = Fixture()
+        defer { fixture.cleanUp() }
+        let model = fixture.model
+        let file = scheduledFile(expiresIn: 600, id: "a")
+        model.apply([file])
+        await model.handle(.ruleApplied([RuleApplication(file: file, ruleId: UUID(), ruleName: "Rule")]))
+        model.changeRuleNotice()
+        #expect(model.queue.isRevisiting && model.queue.current?.id == "a")
+        #expect(model.promptHideProgress == nil)
+    }
+
+    @Test func voiceOverDisablesAutoHide() {
+        let fixture = Fixture()
+        defer { fixture.cleanUp() }
+        let model = fixture.model
+        model.isVoiceOverRunning = { true }
+        model.apply([pendingFile("a")])
+        #expect(model.promptHideProgress == nil && model.promptHideSeconds == nil)
+    }
+
+    @Test func newFileJoiningTheStackRestartsTheCountdown() {
+        let fixture = Fixture()
+        defer { fixture.cleanUp() }
+        let model = fixture.model
+        let clock = Clock()
+        attach(clock, to: model)
+        model.apply([pendingFile("a")])
+        clock.now += 20
+        #expect(model.promptTimer.remaining(now: clock.now) == 10)
+        model.apply([pendingFile("a"), pendingFile("b")])
+        #expect(model.promptTimer.remaining(now: clock.now) == 30)
+        clock.now += 5
+        model.apply([pendingFile("a"), pendingFile("b")])  // unrelated update: no restart
+        #expect(model.promptTimer.remaining(now: clock.now) == 25)
+    }
+
+    @Test func keyActivityRestartsPromptTimer() {
+        let fixture = Fixture()
+        defer { fixture.cleanUp() }
+        let model = fixture.model
+        let clock = Clock()
+        attach(clock, to: model)
+        model.apply([pendingFile("a")])
+        clock.now += 12
+        model.noteKeyActivity()
+        #expect(model.promptTimer.remaining(now: clock.now) == 30)
+    }
+
+    @Test func pointerOverThePanelPausesAndResumesWithRemainingTime() {
+        let fixture = Fixture()
+        defer { fixture.cleanUp() }
+        let model = fixture.model
+        let clock = Clock()
+        attach(clock, to: model)
+        model.apply([pendingFile("a")])
+        clock.now += 10
+        model.pausePanelTimers()
+        clock.now += 100
+        model.expireAutoHideTimers()
+        #expect(model.queue.current != nil)  // paused: nothing expires
+        model.resumePanelTimers()
+        #expect(model.promptTimer.remaining(now: clock.now) == 20)
+    }
+
+    @Test func promptTimeoutNeverShowsNoBar() {
+        let fixture = Fixture()
+        defer { fixture.cleanUp() }
+        let model = fixture.model
+        var never = Settings()
+        never.notificationTimeout = Settings.notificationTimeoutNever
+        model.adopt(never)
+        model.apply([pendingFile("a")])
+        #expect(model.promptHideProgress == nil)
+    }
+
+    @Test func reminderTimeoutDismissesReminder() {
+        let fixture = Fixture()
+        defer { fixture.cleanUp() }
+        let model = modelWithDueFile(fixture)
+        let clock = Clock()
+        attach(clock, to: model)
+        model.apply(model.scheduled)  // re-sync under the test clock
+        #expect(model.reminders.due.count == 1)
+        clock.now += 31
+        model.expireAutoHideTimers()
+        #expect(model.reminders.due.isEmpty)
+    }
+
+    @Test func reminderTimerIsIndependentOfThePrompt() {
+        let fixture = Fixture()
+        defer { fixture.cleanUp() }
+        let model = modelWithDueFile(fixture)
+        #expect(model.reminderTimer.remaining(now: Date()) != nil)
+        #expect(model.promptTimer.remaining(now: Date()) == nil)  // nothing pending
     }
 
     /// Onboarding shows `lastError` when adding the folder fails, so the failure must set it.

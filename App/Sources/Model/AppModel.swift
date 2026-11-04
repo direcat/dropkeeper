@@ -1,3 +1,4 @@
+import AppKit
 import DropKeeperCore
 import Foundation
 import Observation
@@ -23,8 +24,12 @@ final class AppModel {
     private(set) var resolvedChoice = ResolvedChoice.keep
     var timeline = TimelineModel(durations: Settings().timelineStops, preselect: .keep)
     var applyToAll = false
-    /// Set when the user asks to review pending files (e.g. from the list) while Quiet mode is on.
-    var promptRequested = false
+    /// The file the user opened from the list: its prompt shows in Quiet mode and never hides by itself. Covers that
+    /// one file only; the next file in the stack is treated normally.
+    private(set) var requestedFileId: FileID?
+    /// Injectable so tests can move time; only the auto-hide timers use it.
+    @ObservationIgnored var clock: () -> Date = { Date() }
+    @ObservationIgnored var isVoiceOverRunning: () -> Bool = { NSWorkspace.shared.isVoiceOverEnabled }
 
     @ObservationIgnored private var engine: DropKeeperEngine?
     /// Only a started engine is stopped: stopping writes a heartbeat, which would narrow the next launch's scan.
@@ -33,6 +38,8 @@ final class AppModel {
     @ObservationIgnored private var clockTask: Task<Void, Never>?
     @ObservationIgnored private var noticeTask: Task<Void, Never>?
     @ObservationIgnored private var ruleNoticeTask: Task<Void, Never>?
+    /// The notification countdowns (see AppModel+AutoHide.swift). Not observed: the prompt's bar ticks by itself.
+    @ObservationIgnored var autoHide = AutoHideState()
     @ObservationIgnored private var panelErrorTask: Task<Void, Never>?
     @ObservationIgnored private var isDeciding = false
     @ObservationIgnored private let defaults: UserDefaults
@@ -55,7 +62,7 @@ final class AppModel {
     var isNoticeVisible: Bool { notice.isVisible || ruleNotice.isVisible || !reminders.due.isEmpty }
     /// A revisit comes from the user's click on a notice, so Quiet mode doesn't hold it back.
     var isPromptAvailable: Bool {
-        queue.current != nil && (!settings.quietMode || promptRequested || queue.isRevisiting)
+        queue.current != nil && (!settings.quietMode || requestedFileId == queue.current?.id || queue.isRevisiting)
     }
 
     // MARK: Lifecycle
@@ -90,6 +97,7 @@ final class AppModel {
         clockTask?.cancel()
         noticeTask?.cancel()
         ruleNoticeTask?.cancel()
+        autoHide.cancelTasks()
         panelErrorTask?.cancel()
         guard isStarted else { return }
         isStarted = false
@@ -144,8 +152,8 @@ final class AppModel {
         failed = files.filter { $0.state == .failed }
         queue.update(pending: pending, scheduled: scheduled)
         if queue.current?.id != previous { resetPromptState() }
-        if queue.current == nil { promptRequested = false }
-        scheduleClock()
+        if queue.current == nil { requestedFileId = nil }
+        scheduleClock()  // also syncs the auto-hide timers
     }
 
     func handle(_ note: EngineNotification) async {
@@ -165,10 +173,16 @@ final class AppModel {
 
     private func refreshState() async {
         guard let engine else { return }
-        settings = await engine.currentSettings
+        adopt(await engine.currentSettings)
         folders = await engine.watchedFolders
         resolvedChoice = await engine.resolvedDefaultChoice
         EngineBootstrap.rememberFolders(folders, defaults: defaults)
+    }
+
+    /// Takes new settings and re-evaluates the auto-hide timers (the timeout may have changed).
+    func adopt(_ newSettings: Settings) {
+        settings = newSettings
+        syncAutoHide()
     }
 
     private func resetPromptState() {
@@ -198,6 +212,7 @@ final class AppModel {
         updated.update(
             scheduled: scheduled, now: now, enabled: settings.reminderEnabled, leadTime: settings.reminderLeadTime)
         if updated != reminders { reminders = updated }
+        syncAutoHide()
         let reminderWake = reminders.nextWake(
             scheduled: scheduled, now: now, enabled: settings.reminderEnabled, leadTime: settings.reminderLeadTime)
         let countdownWake = Countdown.nextRefresh(scheduled: scheduled, now: now)
@@ -239,6 +254,7 @@ final class AppModel {
         guard !files.isEmpty else { return }
         queue.revisit(files)
         resetPromptState()
+        syncAutoHide()
     }
 
     private func scheduleRuleNoticeExpiry() {
@@ -309,12 +325,20 @@ final class AppModel {
         }
     }
 
+    /// The prompt's timeout: like Esc for every file on the stack. They stay pending, reachable from the list.
+    func dismissPromptStack() {
+        queue.dismiss(ids: queue.items.map(\.id))
+        requestedFileId = nil
+        resetPromptState()
+    }
+
     /// Moves the prompt on right away instead of waiting for the file observation to catch up.
     private func finishDecision(_ ids: [FileID]) async {
         await refreshState()  // the recorded choice may change the next preselection
         queue.dismiss(ids: ids)
-        if queue.current == nil { promptRequested = false }
+        if queue.current == nil { requestedFileId = nil }
         resetPromptState()
+        syncAutoHide()
     }
 
     /// Opens the prompt for a waiting file picked from the list, even one closed with Esc and even in Quiet
@@ -323,14 +347,16 @@ final class AppModel {
         let previous = queue.current?.id
         queue.restore(ids: [id], pending: pending)
         if queue.current?.id != previous { resetPromptState() }
-        promptRequested = queue.current?.id == id
+        requestedFileId = queue.current?.id == id ? id : nil
+        syncAutoHide()
     }
 
     /// Esc: closes the prompt without deciding. In Quiet mode it stays closed for the rest of the stack too.
     func dismissPrompt() {
         queue.dismiss(applyToAll: applyToAll)
-        promptRequested = false
+        requestedFileId = nil
         resetPromptState()
+        syncAutoHide()
     }
 
     // MARK: File actions
@@ -384,6 +410,7 @@ final class AppModel {
 
     func dismissReminders() {
         reminders.dismiss(ids: reminders.due.map(\.id))
+        syncAutoHide()
     }
 
     // MARK: Folders & settings

@@ -1,3 +1,4 @@
+import DropKeeperCore
 import Foundation
 
 enum DurationLabel {
@@ -13,6 +14,19 @@ enum DurationLabel {
             return String(localized: "\(hours) h", comment: "Timeline stop in hours, e.g. 1 h")
         }
         return String(localized: "\(minutes) min", comment: "Timeline stop in minutes, e.g. 30 min")
+    }
+
+    /// Value label of the notification timeout slider: "5 s", "1 min", "Never".
+    static func notificationTimeout(_ seconds: TimeInterval) -> String {
+        if seconds == Settings.notificationTimeoutNever {
+            return String(
+                localized: "Never", comment: "Notification timeout: the prompt and reminder never hide by themselves")
+        }
+        if seconds < 60 {
+            let value = Int(seconds)
+            return String(localized: "\(value) s", comment: "Notification timeout in seconds, e.g. 30 s")
+        }
+        return short(seconds)
     }
 
     /// Time left until a deadline, rounded up to the minute and never below one: "5 min", "1 h".

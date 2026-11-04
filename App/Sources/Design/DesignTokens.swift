@@ -138,6 +138,8 @@ enum TK {
         static let deletedNoticeSeconds: Double = 2.5
         static let ruleNoticeSeconds: Double = 6
         static let urgentThresholdSeconds = 10
+        /// How often the prompt's hide bar and caption refresh.
+        static let hideTick: Double = 1
     }
 }
 

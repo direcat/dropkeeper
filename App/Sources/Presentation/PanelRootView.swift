@@ -40,14 +40,23 @@ struct PanelRootView: View {
         }
     }
 
+    /// The bar and the caption follow the model's countdown, so the view ticks by itself: once a second while the
+    /// countdown runs (the bar is a coarse indicator, and a slow tick keeps the CPU idle).
     private func prompt(for file: TrackedFile) -> some View {
+        SwiftUI.TimelineView(.periodic(from: .now, by: TK.Motion.hideTick)) { _ in
+            promptView(for: file)
+        }
+    }
+
+    private func promptView(for file: TrackedFile) -> some View {
         PromptView(
             file: file, stackCount: model.queue.isRevisiting ? 1 : model.queue.items.count,
             duplicateOf: file.duplicateOf, timeline: $model.timeline,
-            applyToAll: $model.applyToAll, now: model.now, hideProgress: nil, hideSeconds: nil,
+            applyToAll: $model.applyToAll, now: model.now, hideProgress: model.promptHideProgress,
+            hideSeconds: model.promptHideSeconds,
             onDone: { Task { await model.decide(for: file.id) } },
             onKeep: { Task { await model.keepPrompted(for: file.id) } },
-            onClose: { model.dismissPrompt() },
+            onClose: { model.dismissPrompt() }, onKeyActivity: { model.noteKeyActivity() },
             onOpen: { FileOpener.open(FinderReveal.target(for: file.path)) },
             onDeleteDuplicate: { Task { await model.deleteDuplicate(for: file.id) } })
     }

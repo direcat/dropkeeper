@@ -459,6 +459,51 @@
         "fr" : { "stringUnit" : { "state" : "translated", "value" : "Se masque dans %lld s · reste dans la liste" } }
       }
     },
+    "%lld s" : {
+      "comment" : "Notification timeout in seconds, e.g. 30 s",
+      "localizations" : {
+        "cs" : { "stringUnit" : { "state" : "translated", "value" : "%lld s" } },
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "%lld s" } },
+        "es" : { "stringUnit" : { "state" : "translated", "value" : "%lld s" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "%lld s" } }
+      }
+    },
+    "Never" : {
+      "comment" : "Notification timeout: the prompt and reminder never hide by themselves",
+      "localizations" : {
+        "cs" : { "stringUnit" : { "state" : "translated", "value" : "Nikdy" } },
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Nie" } },
+        "es" : { "stringUnit" : { "state" : "translated", "value" : "Nunca" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Jamais" } }
+      }
+    },
+    "Notifications" : {
+      "comment" : "Settings section title",
+      "localizations" : {
+        "cs" : { "stringUnit" : { "state" : "translated", "value" : "Oznámení" } },
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Mitteilungen" } },
+        "es" : { "stringUnit" : { "state" : "translated", "value" : "Notificaciones" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Notifications" } }
+      }
+    },
+    "Hide notifications after" : {
+      "comment" : "Settings slider: how long the prompt and the reminder stay before hiding",
+      "localizations" : {
+        "cs" : { "stringUnit" : { "state" : "translated", "value" : "Skrýt oznámení po" } },
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Mitteilungen ausblenden nach" } },
+        "es" : { "stringUnit" : { "state" : "translated", "value" : "Ocultar notificaciones tras" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Masquer les notifications après" } }
+      }
+    },
+    "The new-file prompt and the reminder before deletion hide by themselves. The file keeps waiting, its default action or deletion still happens on time, and it stays in the menu bar list." : {
+      "comment" : "Caption under the notification timeout slider",
+      "localizations" : {
+        "cs" : { "stringUnit" : { "state" : "translated", "value" : "Výzva k novému souboru a upozornění před smazáním se skryjí samy. Soubor dál čeká, jeho výchozí akce nebo smazání proběhnou včas a soubor zůstane v seznamu v liště." } },
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Die Abfrage zu einer neuen Datei und die Erinnerung vor dem Löschen blenden sich von selbst aus. Die Datei wartet weiter, ihre Standardaktion oder das Löschen erfolgt pünktlich, und sie bleibt in der Liste der Menüleiste." } },
+        "es" : { "stringUnit" : { "state" : "translated", "value" : "El aviso de un archivo nuevo y el recordatorio antes de eliminar se ocultan solos. El archivo sigue esperando, su acción predeterminada o su eliminación ocurre a tiempo y permanece en la lista de la barra de menús." } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "L’invite pour un nouveau fichier et le rappel avant suppression se masquent d’eux-mêmes. Le fichier reste en attente, son action par défaut ou sa suppression a lieu à l’heure prévue, et il reste dans la liste de la barre des menus." } }
+      }
+    },
     "Done" : {
       "comment" : "Onboarding primary button",
       "localizations" : {

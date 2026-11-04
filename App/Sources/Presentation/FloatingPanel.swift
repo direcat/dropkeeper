@@ -29,5 +29,19 @@ final class FloatingPanel: NSPanel {
 /// The panel never becomes key on its own, so the first click in it would only make it key. Taking the first
 /// mouse lets that click reach the content (e.g. a timeline stop), not just buttons.
 final class FirstMouseHostingView<Content: View>: NSHostingView<Content> {
+    /// Called when the pointer enters (true) or leaves (false) the view, whichever app is active.
+    var onPointerChange: ((Bool) -> Void)?
+
     override func acceptsFirstMouse(for event: NSEvent?) -> Bool { true }
+
+    override func updateTrackingAreas() {
+        super.updateTrackingAreas()
+        for area in trackingAreas where area.owner === self { removeTrackingArea(area) }
+        addTrackingArea(
+            NSTrackingArea(
+                rect: .zero, options: [.mouseEnteredAndExited, .activeAlways, .inVisibleRect], owner: self))
+    }
+
+    override func mouseEntered(with event: NSEvent) { onPointerChange?(true) }
+    override func mouseExited(with event: NSEvent) { onPointerChange?(false) }
 }

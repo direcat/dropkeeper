@@ -68,6 +68,7 @@ final class PanelCoordinator {
         lastContent = content
         guard content != .hidden else {
             lockedAnchor = nil
+            model.resumePanelTimers()  // no exit event arrives for a panel that goes away under the pointer
             hide()
             return
         }
@@ -78,6 +79,9 @@ final class PanelCoordinator {
             hostingView = hosting
         } else {
             hostingView = FirstMouseHostingView(rootView: root)
+            hostingView.onPointerChange = { [weak self] inside in
+                if inside { self?.model.pausePanelTimers() } else { self?.model.resumePanelTimers() }
+            }
             // The coordinator sizes the panel itself. Keep the intrinsic size (fittingSize needs it) but
             // drop SwiftUI's window min/max constraints.
             hostingView.sizingOptions = [.intrinsicContentSize]
@@ -130,6 +134,8 @@ final class PanelCoordinator {
             panel.setFrame(frame, display: true)
             panel.alphaValue = 0
             panel.orderFrontRegardless()
+            // A panel that appears under the pointer gets no enter event: hold the countdowns from the start.
+            if frame.contains(NSEvent.mouseLocation) { model.pausePanelTimers() }
             NSAnimationContext.runAnimationGroup { context in
                 context.duration = 0.15
                 panel.animator().alphaValue = 1

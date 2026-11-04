@@ -88,6 +88,20 @@ private struct GeneralTab: View {
                     Text("Don't open the prompt by itself. A dot on the menu bar icon shows waiting files.")
                 }
             }
+            Section("Notifications") {
+                StepSlider(
+                    "Hide notifications after", values: Settings.notificationTimeoutOptions,
+                    selection: $store.draft.notificationTimeout, label: { DurationLabel.notificationTimeout($0) })
+                Text(
+                    """
+                    The new-file prompt and the reminder before deletion hide by themselves. \
+                    The file keeps waiting, its default action or deletion still happens on time, \
+                    and it stays in the menu bar list.
+                    """
+                )
+                .font(.system(size: TK.TextSize.formCaption))
+                .foregroundStyle(.secondary)
+            }
         }
     }
 

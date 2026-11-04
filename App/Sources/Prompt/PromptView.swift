@@ -16,6 +16,8 @@ struct PromptView: View {
     let onDone: () -> Void
     let onKeep: () -> Void
     let onClose: () -> Void
+    /// A key press the prompt handled (restarts the auto-hide countdown).
+    let onKeyActivity: () -> Void
     let onOpen: () -> Void
     let onDeleteDuplicate: () -> Void
     @FocusState private var focused: Bool
@@ -60,11 +62,18 @@ struct PromptView: View {
         .onAppear { focused = true }
         .onKeyPress(.leftArrow) {
             withAnimation(TimelineView.selectionAnimation(reduceMotion: reduceMotion)) { timeline.moveLeft() }
+            onKeyActivity()
             return .handled
         }
         .onKeyPress(.rightArrow) {
             withAnimation(TimelineView.selectionAnimation(reduceMotion: reduceMotion)) { timeline.moveRight() }
+            onKeyActivity()
             return .handled
+        }
+        // Tab, Space and the like: not handled here, but they show the user is still at the prompt.
+        .onKeyPress(phases: .down) { _ in
+            onKeyActivity()
+            return .ignored
         }
     }
 
@@ -150,6 +159,8 @@ struct PromptView: View {
             }
             .accessibilityElement(children: .ignore)
             .accessibilityLabel(Text(caption ?? ""))
+            .accessibilityHidden(caption == nil)
+            .animation(reduceMotion ? nil : .linear(duration: TK.Motion.hideTick), value: hideProgress)
         }
     }
 }
@@ -208,7 +219,7 @@ struct PromptButtonStyle: ButtonStyle {
     PromptView(
         file: file, stackCount: 3, duplicateOf: "Quarterly report final.pdf", timeline: $timeline,
         applyToAll: $applyToAll, now: now, hideProgress: 0.7, hideSeconds: 21,
-        onDone: {}, onKeep: {}, onClose: {}, onOpen: {}, onDeleteDuplicate: {}
+        onDone: {}, onKeep: {}, onClose: {}, onKeyActivity: {}, onOpen: {}, onDeleteDuplicate: {}
     )
     .background(TK.Palette.cardTint)
 }
