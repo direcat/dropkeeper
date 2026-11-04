@@ -72,6 +72,10 @@ private func prompt(hideProgress: Double?, hideSeconds: Int?) -> PromptView {
     #expect(PromptView.metadata(for: rootFile).hasSuffix(FileManager.default.displayName(atPath: "/")))
 }
 
+@Test func reminderShowsActionsInOrder() {
+    #expect(ReminderBarView.Action.displayOrder.map(\.title) == ["Delete now", "Keep", "Extend"])
+}
+
 @MainActor
 @Test func noticeRenders() {
     #expect(render(NoticeView(files: [scheduledFile(expiresIn: 0, id: "a.pdf")], canUndo: true, onUndo: {})) != nil)

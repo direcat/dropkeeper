@@ -81,16 +81,11 @@ struct PromptView: View {
             }
             Spacer(minLength: TK.Space.s)
             Button(action: onClose) {
-                Image(systemName: "xmark")
-                    .font(.system(size: TK.TextSize.formCaption, weight: .semibold))
-                    .frame(width: TK.Size.closeButton, height: TK.Size.closeButton)
-                    .background(TK.Palette.fill, in: Circle())
-                    .contentShape(Circle())
+                RoundCloseGlyph()
             }
             .buttonStyle(.plain)
             .keyboardShortcut(.cancelAction)
             .focusEffectDisabled(false)
-            .foregroundStyle(TK.Palette.textSecondary)
             .accessibilityLabel(Text("Close"))
         }
     }

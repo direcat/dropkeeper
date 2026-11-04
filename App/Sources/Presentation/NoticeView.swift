@@ -16,38 +16,32 @@ struct NoticeView: View {
     }
 
     var body: some View {
-        HStack(spacing: TK.Space.m) {
-            // The file is already in the Trash, so its icon comes from there (permanent deletes keep the glyph).
-            FinderIcon(path: shown.first?.trashPath ?? "", kind: shown.first?.kind ?? .other)
-            VStack(alignment: .leading, spacing: 2) {
-                Text(Self.title(for: shown))
-                    .font(.system(size: TK.TextSize.title, weight: .semibold))
-                    .strikethrough()
-                    .foregroundStyle(TK.Palette.textSecondary)
-                    .lineLimit(1)
-                    .truncationMode(.middle)
-                (canUndo ? Text("Moved to Trash") : Text("Deleted"))
-                    .font(.system(size: TK.TextSize.small))
-                    .foregroundStyle(TK.Palette.textPrimary)
-            }
-            Spacer()
-            if canUndo {
-                Button(action: onUndo) {
-                    Text("Undo")
-                        .padding(.horizontal, TK.Space.s)
-                        .padding(.vertical, TK.Space.xs)
-                        .contentShape(Rectangle())
+        GlassCard(radius: TK.Radius.compactCard) {
+            HStack(spacing: TK.Space.m) {
+                // The file is already in the Trash, so its icon comes from there (permanent deletes keep the glyph).
+                FinderIcon(path: shown.first?.trashPath ?? "", kind: shown.first?.kind ?? .other)
+                VStack(alignment: .leading, spacing: 2) {
+                    Text(Self.title(for: shown))
+                        .font(.system(size: TK.TextSize.title, weight: .semibold))
+                        .strikethrough()
+                        .foregroundStyle(TK.Palette.textSecondary)
+                        .lineLimit(1)
+                        .truncationMode(.middle)
+                    (canUndo ? Text("Moved to Trash") : Text("Deleted"))
+                        .font(.system(size: TK.TextSize.small))
+                        .foregroundStyle(TK.Palette.textSecondary)
                 }
-                .buttonStyle(.plain)
-                .focusable(false)
-                .font(.system(size: TK.TextSize.title, weight: .medium))
-                .foregroundStyle(TK.Palette.accentText)
-                // Keep the visible text aligned with the panel padding despite the larger hit area.
-                .padding(.trailing, -TK.Space.s)
+                Spacer()
+                if canUndo {
+                    Button(action: onUndo) { Text("Undo") }
+                        .buttonStyle(PanelTextButtonStyle(tint: TK.Palette.accentText))
+                        .focusable(false)
+                }
             }
+            .padding(.horizontal, TK.Space.l)
+            .padding(.vertical, TK.Space.m)
+            .frame(width: TK.Size.panelWidth)
         }
-        .padding(TK.Space.l)
-        .frame(width: TK.Size.panelWidth)
         .onChange(of: files, initial: true) { _, new in
             if !new.isEmpty { lastFiles = new }
         }
@@ -61,5 +55,4 @@ struct NoticeView: View {
         displayName: "Installer.dmg", kind: .installer, sizeBytes: 84_000_000, state: .trashed,
         firstSeen: now, expiresAt: now, trashPath: "/tmp/.Trash/Installer.dmg", failureCount: 0, updatedAt: now)
     NoticeView(files: [file], canUndo: true, onUndo: {})
-        .background(TK.Palette.cardTint)
 }

@@ -81,8 +81,8 @@ enum TK {
         static let button: CGFloat = 11
         static let fileGlyph: CGFloat = 8
     }
-    /// Text sizes in points. The panel tokens are the original 11/12/13 pt plus 2; the form tokens serve the
-    /// Settings and Onboarding windows (system body is 13 pt there, captions 10 and 12).
+    /// Text sizes in points. The panel tokens are the original 11/12/13 pt plus 2; the form tokens are
+    /// for form-like text (Settings, Onboarding, captions and hints in the panel).
     enum TextSize {
         static let small: CGFloat = 13
         static let body: CGFloat = 14
@@ -94,6 +94,8 @@ enum TK {
     enum Size {
         static let panelWidth: CGFloat = 380
         static let ring: CGFloat = 40
+        /// The file icon inside the progress ring.
+        static let ringIcon: CGFloat = 28
         static let ringLine: CGFloat = 3.5
         /// The inner stroke of a glass card.
         static let cardStroke: CGFloat = 0.5

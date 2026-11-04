@@ -16,8 +16,9 @@ struct NoticeStackContent: Equatable {
     }
 }
 
-/// The bars above the prompt, top to bottom: pre-expiry reminder, rule notice, "Moved to Trash" notice.
-/// None of them takes keyboard focus, so the prompt below keeps its focus, selection and Return.
+/// The cards above the prompt, top to bottom: pre-expiry reminder, rule notice, "Moved to Trash" notice.
+/// Each is its own glass card. None of them takes keyboard focus, so the prompt below keeps its focus, selection
+/// and Return.
 struct NoticeStackView: View {
     let model: AppModel
     /// The panel shows only this stack: its last content then stays on screen while the panel fades out.
@@ -31,7 +32,7 @@ struct NoticeStackView: View {
 
     var body: some View {
         let shown = NoticeStackContent.resolve(current: current, last: last, holdsLast: holdsNotice)
-        VStack(spacing: 0) {
+        VStack(spacing: TK.Space.s) {
             if !shown.reminders.isEmpty {
                 ReminderBarView(
                     files: shown.reminders,
@@ -41,7 +42,6 @@ struct NoticeStackView: View {
                     onDismiss: { model.dismissReminders() })
             }
             if !shown.rules.isEmpty {
-                if !shown.reminders.isEmpty { separator }
                 RuleNoticeView(
                     applications: shown.rules, rules: model.settings.rules, onChange: { model.changeRuleNotice() },
                     onHover: { inside in
@@ -49,7 +49,6 @@ struct NoticeStackView: View {
                     })
             }
             if !shown.trashed.isEmpty {
-                if !shown.reminders.isEmpty || !shown.rules.isEmpty { separator }
                 NoticeView(
                     files: shown.trashed, canUndo: model.settings.deleteMode == .trash,
                     onUndo: { Task { await model.undoNotice() } })
@@ -58,9 +57,5 @@ struct NoticeStackView: View {
         .onChange(of: current, initial: true) { _, new in
             if !new.isEmpty { last = new }
         }
-    }
-
-    private var separator: some View {
-        Rectangle().fill(TK.Palette.hairline).frame(height: 1)
     }
 }

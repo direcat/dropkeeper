@@ -46,46 +46,22 @@
         "fr" : { "stringUnit" : { "state" : "translated", "value" : "Supprimer maintenant" } }
       }
     },
-    "Deleted in %@" : {
-      "comment" : "Reminder bar subtitle with the time left, e.g. Deleted in 5 min",
+    "%@ rule · delete in %@" : {
+      "comment" : "Rule notice detail: rule name, time until deletion",
       "localizations" : {
-        "cs" : { "stringUnit" : { "state" : "translated", "value" : "Smazání za %@" } },
-        "de" : { "stringUnit" : { "state" : "translated", "value" : "Löschung in %@" } },
-        "es" : { "stringUnit" : { "state" : "translated", "value" : "Se eliminará en %@" } },
-        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Suppression dans %@" } }
+        "cs" : { "stringUnit" : { "state" : "translated", "value" : "Pravidlo %@ · smazání za %@" } },
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Regel %@ · Löschung in %@" } },
+        "es" : { "stringUnit" : { "state" : "translated", "value" : "Regla %@ · se eliminará en %@" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Règle %@ · suppression dans %@" } }
       }
     },
-    "%@ — deleted in %@ (%@)" : {
-      "comment" : "Rule notice: file name or file count, time until deletion, rule name",
+    "Scheduled by rules" : {
+      "comment" : "Rule notice detail when files from different rules were scheduled together",
       "localizations" : {
-        "cs" : { "stringUnit" : { "state" : "translated", "value" : "%@ — smazání za %@ (%@)" } },
-        "de" : { "stringUnit" : { "state" : "translated", "value" : "%@ — Löschung in %@ (%@)" } },
-        "es" : { "stringUnit" : { "state" : "translated", "value" : "%@ — se eliminará en %@ (%@)" } },
-        "fr" : { "stringUnit" : { "state" : "translated", "value" : "%@ — suppression dans %@ (%@)" } }
-      }
-    },
-    "%lld files — scheduled by rules" : {
-      "comment" : "Rule notice when files from different rules were scheduled together: file count",
-      "localizations" : {
-        "en" : { "variations" : { "plural" : {
-          "one" : { "stringUnit" : { "state" : "translated", "value" : "%lld file — scheduled by rules" } },
-          "other" : { "stringUnit" : { "state" : "translated", "value" : "%lld files — scheduled by rules" } } } } },
-        "cs" : { "variations" : { "plural" : {
-          "one" : { "stringUnit" : { "state" : "translated", "value" : "%lld soubor — naplánován pravidly" } },
-          "few" : { "stringUnit" : { "state" : "translated", "value" : "%lld soubory — naplánovány pravidly" } },
-          "many" : { "stringUnit" : { "state" : "translated", "value" : "%lld souboru — naplánováno pravidly" } },
-          "other" : { "stringUnit" : { "state" : "translated", "value" : "%lld souborů — naplánováno pravidly" } } } } },
-        "de" : { "variations" : { "plural" : {
-          "one" : { "stringUnit" : { "state" : "translated", "value" : "%lld Datei — von Regeln geplant" } },
-          "other" : { "stringUnit" : { "state" : "translated", "value" : "%lld Dateien — von Regeln geplant" } } } } },
-        "es" : { "variations" : { "plural" : {
-          "one" : { "stringUnit" : { "state" : "translated", "value" : "%lld archivo — programado por reglas" } },
-          "many" : { "stringUnit" : { "state" : "translated", "value" : "%lld archivos — programados por reglas" } },
-          "other" : { "stringUnit" : { "state" : "translated", "value" : "%lld archivos — programados por reglas" } } } } },
-        "fr" : { "variations" : { "plural" : {
-          "one" : { "stringUnit" : { "state" : "translated", "value" : "%lld fichier — planifié par des règles" } },
-          "many" : { "stringUnit" : { "state" : "translated", "value" : "%lld fichiers — planifiés par des règles" } },
-          "other" : { "stringUnit" : { "state" : "translated", "value" : "%lld fichiers — planifiés par des règles" } } } } }
+        "cs" : { "stringUnit" : { "state" : "translated", "value" : "Naplánováno pravidly" } },
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Von Regeln geplant" } },
+        "es" : { "stringUnit" : { "state" : "translated", "value" : "Programado por reglas" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Planifié par des règles" } }
       }
     },
     "Change" : {
@@ -604,7 +580,7 @@
       }
     },
     "Deleting in %@" : {
-      "comment" : "VoiceOver value of the menu bar icon during the last-seconds countdown, e.g. Deleting in 0:07",
+      "comment" : "Time until deletion: reminder card subtitle and VoiceOver value of the menu bar icon in the last seconds, e.g. Deleting in 4 min",
       "localizations" : {
         "cs" : { "stringUnit" : { "state" : "translated", "value" : "Smazání za %@" } },
         "de" : { "stringUnit" : { "state" : "translated", "value" : "Wird gelöscht in %@" } },

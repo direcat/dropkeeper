@@ -42,7 +42,7 @@ struct PendingListView: View {
                 .frame(height: min(CGFloat(rows.count), 5) * TK.Size.listRow)
             }
             if showsFooter {
-                Rectangle().fill(TK.Palette.hairline).frame(height: 1)
+                Rectangle().fill(TK.Palette.hairline).frame(height: TK.Size.hairline)
                 HStack {
                     Button("Settings") { actions.openSettings() }
                         .keyboardShortcut(",", modifiers: .command)

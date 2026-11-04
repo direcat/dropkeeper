@@ -1,3 +1,4 @@
+import DropKeeperCore
 import SwiftUI
 
 struct PanelRootView: View {
@@ -5,10 +6,28 @@ struct PanelRootView: View {
     let content: PanelContent
 
     var body: some View {
-        GlassCard {
-            VStack(spacing: 0) {
-                banner
-                main
+        // Notice cards are their own glass cards, stacked above the prompt's card.
+        VStack(spacing: TK.Space.s) {
+            switch content {
+            case .prompt:
+                if model.queue.current != nil, model.isNoticeVisible {
+                    NoticeStackView(model: model, holdsNotice: false)
+                }
+                if let file = model.queue.current {
+                    GlassCard {
+                        VStack(spacing: 0) {
+                            banner
+                            prompt(for: file)
+                        }
+                    }
+                }
+            case .notice:
+                if model.panelError.message != nil { GlassCard { banner } }
+                NoticeStackView(model: model, holdsNotice: true)
+            case .error:
+                GlassCard { banner }
+            case .hidden:
+                EmptyView()
             }
         }
     }
@@ -21,29 +40,15 @@ struct PanelRootView: View {
         }
     }
 
-    @ViewBuilder
-    private var main: some View {
-        switch content {
-        case .prompt:
-            if let file = model.queue.current {
-                if model.isNoticeVisible {
-                    NoticeStackView(model: model, holdsNotice: false)
-                    Rectangle().fill(TK.Palette.hairline).frame(height: 1)
-                }
-                PromptView(
-                    file: file, stackCount: model.queue.isRevisiting ? 1 : model.queue.items.count,
-                    duplicateOf: file.duplicateOf, timeline: $model.timeline,
-                    applyToAll: $model.applyToAll, now: model.now, hideProgress: nil, hideSeconds: nil,
-                    onDone: { Task { await model.decide(for: file.id) } },
-                    onKeep: { Task { await model.keepPrompted(for: file.id) } },
-                    onClose: { model.dismissPrompt() },
-                    onOpen: { FileOpener.open(FinderReveal.target(for: file.path)) },
-                    onDeleteDuplicate: { Task { await model.deleteDuplicate(for: file.id) } })
-            }
-        case .notice:
-            NoticeStackView(model: model, holdsNotice: true)
-        case .hidden, .error:
-            EmptyView()
-        }
+    private func prompt(for file: TrackedFile) -> some View {
+        PromptView(
+            file: file, stackCount: model.queue.isRevisiting ? 1 : model.queue.items.count,
+            duplicateOf: file.duplicateOf, timeline: $model.timeline,
+            applyToAll: $model.applyToAll, now: model.now, hideProgress: nil, hideSeconds: nil,
+            onDone: { Task { await model.decide(for: file.id) } },
+            onKeep: { Task { await model.keepPrompted(for: file.id) } },
+            onClose: { model.dismissPrompt() },
+            onOpen: { FileOpener.open(FinderReveal.target(for: file.path)) },
+            onDeleteDuplicate: { Task { await model.deleteDuplicate(for: file.id) } })
     }
 }
