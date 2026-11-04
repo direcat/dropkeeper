@@ -44,6 +44,8 @@ enum TK {
             light: Color(hex: 0xF4F1EF).opacity(0.80), dark: Color(hex: 0x26262A).opacity(0.78))
         static let accent = dynamic(light: Petrol.p500, dark: Petrol.p400)
         static let accentText = dynamic(light: Petrol.p700, dark: Petrol.p300)
+        /// The timeline knob stays white in both appearances.
+        static let knob = Color.white
         static let onAccent = dynamic(light: Color.white, dark: Neutral.ink)
         static let warning = Color(hex: 0xEBA941)
         static let destructive = dynamic(light: Color(hex: 0xD9534F), dark: Color(hex: 0xFF6B6B))
@@ -76,12 +78,12 @@ enum TK {
         static let group: CGFloat = 14
         static let segment: CGFloat = 12
         static let control: CGFloat = 10
+        static let button: CGFloat = 11
         static let fileGlyph: CGFloat = 8
     }
     /// Text sizes in points. The panel tokens are the original 11/12/13 pt plus 2; the form tokens serve the
     /// Settings and Onboarding windows (system body is 13 pt there, captions 10 and 12).
     enum TextSize {
-        static let caption: CGFloat = 12
         static let small: CGFloat = 13
         static let body: CGFloat = 14
         static let title: CGFloat = 15
@@ -99,19 +101,30 @@ enum TK {
         static let listRow: CGFloat = 48
         static let timelineDot: CGFloat = 10
         static let timelineKnob: CGFloat = 22
-        /// The translucent accent ring around the knob, and its opacity.
+        /// The translucent accent ring around the knob.
         static let timelineKnobHalo: CGFloat = 4
-        static let timelineKnobHaloOpacity = 0.25
         static let timelineTrackWidth: CGFloat = 4
         /// The Finder icon in the prompt header and the round close button.
         static let promptIcon: CGFloat = 44
         static let closeButton: CGFloat = 24
         /// The auto-hide progress bar under the prompt buttons.
         static let hideBar: CGFloat = 3
+        /// A hairline divider between panel sections.
+        static let hairline: CGFloat = 1
         static let settingsWindow = CGSize(width: 680, height: 560)
         static let ruleEditor = CGSize(width: 480, height: 400)
         /// Room for the longest value label beside a Settings step slider.
         static let stepSliderLabel: CGFloat = 90
+    }
+    /// Opacities of decorations that are not colors of their own.
+    enum Opacity {
+        static let knobHalo = 0.25
+    }
+    /// The soft shadow under the timeline knob.
+    enum Shadow {
+        static let knobOpacity = 0.3
+        static let knobRadius: CGFloat = 2
+        static let knobOffset: CGFloat = 1
     }
     enum Motion {
         static let open = Animation.spring(response: 0.35, dampingFraction: 0.82)

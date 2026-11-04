@@ -55,6 +55,10 @@ private func prompt(hideProgress: Double?, hideSeconds: Int?) -> PromptView {
     let with = try #require(render(prompt(hideProgress: 0.5, hideSeconds: 15)))
     let without = try #require(render(prompt(hideProgress: nil, hideSeconds: nil)))
     #expect(with.height > without.height)  // the bar and the caption add a row
+    let barOnly = try #require(render(prompt(hideProgress: 0.5, hideSeconds: nil)))
+    #expect(barOnly.height > without.height)  // the bar alone is enough
+    let captionOnly = try #require(render(prompt(hideProgress: nil, hideSeconds: 15)))
+    #expect(captionOnly.height == without.height)  // seconds alone draw nothing
     #expect(PromptView.hideCaption(seconds: 15) == "Hides in 15 s · stays in the list")
     #expect(PromptView.hideCaption(seconds: nil) == nil)
 }
@@ -63,6 +67,9 @@ private func prompt(hideProgress: Double?, hideSeconds: Int?) -> PromptView {
 @Test func promptMetadataIsSizeAndFolderName() {
     let file = scheduledFile(expiresIn: 0, id: "report.pdf")  // path /tmp/report.pdf, 1 byte
     #expect(PromptView.metadata(for: file) == "\(ByteCountFormatter.string(fromByteCount: 1, countStyle: .file)) · tmp")
+    var rootFile = file
+    rootFile.path = "/report.pdf"
+    #expect(PromptView.metadata(for: rootFile).hasSuffix(FileManager.default.displayName(atPath: "/")))
 }
 
 @MainActor
@@ -81,16 +88,6 @@ private func prompt(hideProgress: Double?, hideSeconds: Int?) -> PromptView {
     #expect((0..<4).map(model.isHighlighted) == [true, true, false, false])
     model.select(3)
     #expect((0..<4).map(model.isHighlighted) == [false, false, false, true])
-}
-
-@Test func timelineLabelCentersOverDotUnlessItWouldOverflow() {
-    // Short label near the right edge stays centered over the dot.
-    #expect(ClampedCenterLayout.clampedCenter(368, labelWidth: 30, width: 388) == 368)
-    // Wide label is shifted inward just enough to fit.
-    #expect(ClampedCenterLayout.clampedCenter(368, labelWidth: 130, width: 388) == 323)
-    #expect(ClampedCenterLayout.clampedCenter(20, labelWidth: 100, width: 388) == 50)
-    // Wider than the track: centered in it.
-    #expect(ClampedCenterLayout.clampedCenter(20, labelWidth: 400, width: 388) == 194)
 }
 
 @MainActor

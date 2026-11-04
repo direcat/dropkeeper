@@ -22,7 +22,7 @@ struct TimelineView: View {
         GeometryReader { geometry in
             let stopX = positions(width: geometry.size.width)
             ZStack(alignment: .topLeading) {
-                ClampedCenterLayout(centerX: geometry.size.width / 2) { selectedLabel }
+                selectedLabel
                     .frame(width: geometry.size.width, height: labelRowHeight)
                     .position(x: geometry.size.width / 2, y: labelRowY)
                 lines(stopX)
@@ -97,13 +97,15 @@ struct TimelineView: View {
                 .frame(width: TK.Size.timelineDot, height: TK.Size.timelineDot)
                 .opacity(selected ? 0 : 1)
             Circle()
-                .fill(Color.white)
+                .fill(TK.Palette.knob)
                 .frame(width: TK.Size.timelineKnob, height: TK.Size.timelineKnob)
-                .shadow(color: .black.opacity(0.3), radius: 2, y: 1)
+                .shadow(
+                    color: .black.opacity(TK.Shadow.knobOpacity), radius: TK.Shadow.knobRadius, y: TK.Shadow.knobOffset
+                )
                 .overlay {
                     Circle()
                         .strokeBorder(
-                            TK.Palette.accent.opacity(TK.Size.timelineKnobHaloOpacity),
+                            TK.Palette.accent.opacity(TK.Opacity.knobHalo),
                             lineWidth: TK.Size.timelineKnobHalo
                         )
                         .padding(-TK.Size.timelineKnobHalo)
@@ -155,35 +157,6 @@ struct TimelineView: View {
     /// Animation for moving the selected stop (tap, drag, arrows, VoiceOver); a plain fade under Reduce Motion.
     static func selectionAnimation(reduceMotion: Bool) -> Animation {
         reduceMotion ? TK.Motion.reduced : TK.Motion.select
-    }
-}
-
-/// Places its single subview centered on `centerX`, shifted inward only as far as needed to stay inside the bounds.
-struct ClampedCenterLayout: Layout {
-    var centerX: CGFloat
-
-    var animatableData: CGFloat {
-        get { centerX }
-        set { centerX = newValue }
-    }
-
-    nonisolated static func clampedCenter(_ centerX: CGFloat, labelWidth: CGFloat, width: CGFloat) -> CGFloat {
-        let half = labelWidth / 2
-        guard labelWidth < width else { return width / 2 }
-        return min(max(centerX, half), width - half)
-    }
-
-    func sizeThatFits(proposal: ProposedViewSize, subviews: Subviews, cache: inout ()) -> CGSize {
-        let size = subviews.first?.sizeThatFits(.unspecified) ?? .zero
-        return CGSize(width: proposal.width ?? size.width, height: proposal.height ?? size.height)
-    }
-
-    func placeSubviews(in bounds: CGRect, proposal: ProposedViewSize, subviews: Subviews, cache: inout ()) {
-        guard let subview = subviews.first else { return }
-        let size = subview.sizeThatFits(.unspecified)
-        let labelX = Self.clampedCenter(centerX, labelWidth: size.width, width: bounds.width)
-        subview.place(
-            at: CGPoint(x: bounds.minX + labelX, y: bounds.midY), anchor: .center, proposal: ProposedViewSize(size))
     }
 }
 

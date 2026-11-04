@@ -37,7 +37,7 @@ struct PromptView: View {
                 .focusEffectDisabled(false)
             }
             TimelineView(model: $timeline, now: now)
-            Rectangle().fill(TK.Palette.hairline).frame(height: TK.Size.cardStroke)
+            Rectangle().fill(TK.Palette.hairline).frame(height: TK.Size.hairline)
             HStack {
                 Button("Keep", action: onKeep)
                     .buttonStyle(PromptButtonStyle(primary: false))
@@ -82,7 +82,7 @@ struct PromptView: View {
             Spacer(minLength: TK.Space.s)
             Button(action: onClose) {
                 Image(systemName: "xmark")
-                    .font(.system(size: TK.TextSize.caption, weight: .semibold))
+                    .font(.system(size: TK.TextSize.formCaption, weight: .semibold))
                     .frame(width: TK.Size.closeButton, height: TK.Size.closeButton)
                     .background(TK.Palette.fill, in: Circle())
                     .contentShape(Circle())
@@ -122,7 +122,11 @@ struct PromptView: View {
     /// "49 KB · Downloads": the size and the name of the folder the file lies in.
     static func metadata(for file: TrackedFile) -> String {
         let size = file.sizeBytes.map { ByteCountFormatter.string(fromByteCount: $0, countStyle: .file) }
-        let folder = URL(fileURLWithPath: file.path).deletingLastPathComponent().lastPathComponent
+        let directory = URL(fileURLWithPath: file.path).deletingLastPathComponent()
+        // A file directly under the root has "/" as its folder: show the volume's display name instead.
+        let folder =
+            directory.path == "/"
+            ? FileManager.default.displayName(atPath: "/") : directory.lastPathComponent
         return [size, folder.isEmpty ? nil : folder].compactMap(\.self).joined(separator: " · ")
     }
 
@@ -132,7 +136,8 @@ struct PromptView: View {
 
     @ViewBuilder
     private var hideIndicator: some View {
-        if let hideProgress, let caption = Self.hideCaption(seconds: hideSeconds) {
+        if let hideProgress {
+            let caption = Self.hideCaption(seconds: hideSeconds)
             VStack(spacing: TK.Space.s) {
                 Capsule().fill(TK.Palette.fill)
                     .frame(height: TK.Size.hideBar)
@@ -142,12 +147,14 @@ struct PromptView: View {
                                 .frame(width: geometry.size.width * min(max(hideProgress, 0), 1))
                         }
                     }
-                Text(caption)
-                    .font(.system(size: TK.TextSize.caption))
-                    .foregroundStyle(TK.Palette.textTertiary)
+                if let caption {
+                    Text(caption)
+                        .font(.system(size: TK.TextSize.formCaption))
+                        .foregroundStyle(TK.Palette.textTertiary)
+                }
             }
             .accessibilityElement(children: .ignore)
-            .accessibilityLabel(Text(caption))
+            .accessibilityLabel(Text(caption ?? ""))
         }
     }
 }
@@ -182,13 +189,13 @@ struct PromptButtonStyle: ButtonStyle {
 
     func makeBody(configuration: Configuration) -> some View {
         configuration.label
-            .font(.system(size: TK.TextSize.title, weight: .medium))
+            .font(.system(size: TK.TextSize.small, weight: .semibold))
             .padding(.horizontal, TK.Space.m)
             .padding(.vertical, TK.Space.s)
             .foregroundStyle(primary ? TK.Palette.onAccent : TK.Palette.textPrimary)
             .background(
                 primary ? TK.Palette.accent : TK.Palette.fill,
-                in: RoundedRectangle(cornerRadius: TK.Radius.control)
+                in: RoundedRectangle(cornerRadius: TK.Radius.button)
             )
             .opacity(configuration.isPressed ? 0.8 : 1)
     }
