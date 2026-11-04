@@ -15,13 +15,13 @@ struct PanelErrorBanner: View {
             Spacer(minLength: 0)
         }
         .font(.system(size: TK.TextSize.body))
-        .foregroundStyle(TK.Notch.textPrimary)
+        .foregroundStyle(TK.Palette.textPrimary)
         .padding(.horizontal, TK.Space.m)
         .padding(.vertical, TK.Space.s)
-        .background(TK.Notch.surfaceRaised, in: RoundedRectangle(cornerRadius: TK.Radius.control))
+        .background(TK.Palette.fill, in: RoundedRectangle(cornerRadius: TK.Radius.control))
         .padding([.horizontal, .top], TK.Space.l)
         .padding(.bottom, standalone ? TK.Space.l : 0)
-        .frame(width: TK.Size.notchPanelWidth)
+        .frame(width: TK.Size.panelWidth)
         .accessibilityElement(children: .combine)
         .onAppear { AccessibilityNotification.Announcement(message).post() }
     }

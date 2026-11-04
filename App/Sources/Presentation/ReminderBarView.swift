@@ -17,14 +17,14 @@ struct ReminderBarView: View {
                 VStack(alignment: .leading, spacing: 2) {
                     Text(NoticeView.title(for: files))
                         .font(.system(size: TK.TextSize.title, weight: .semibold))
-                        .foregroundStyle(TK.Notch.textPrimary)
+                        .foregroundStyle(TK.Palette.textPrimary)
                         .lineLimit(1)
                         .truncationMode(.middle)
                     // Counts down while the bar is open (the soonest expiry decides).
                     SwiftUI.TimelineView(.periodic(from: .now, by: 1)) { context in
                         Text("Deleted in \(remaining(at: context.date))")
                             .font(.system(size: TK.TextSize.small))
-                            .foregroundStyle(TK.Notch.urgent)
+                            .foregroundStyle(TK.Palette.warning)
                     }
                 }
                 Spacer(minLength: TK.Space.s)
@@ -36,7 +36,7 @@ struct ReminderBarView: View {
                 }
                 .buttonStyle(.plain)
                 .focusable(false)
-                .foregroundStyle(TK.Notch.textSecondary)
+                .foregroundStyle(TK.Palette.textSecondary)
                 .accessibilityLabel(Text("Dismiss reminder"))
             }
             HStack(spacing: TK.Space.s) {
@@ -47,7 +47,7 @@ struct ReminderBarView: View {
             }
         }
         .padding(TK.Space.l)
-        .frame(width: TK.Size.notchPanelWidth)
+        .frame(width: TK.Size.panelWidth)
     }
 
     private func button(_ label: Text, primary: Bool, action: @escaping () -> Void) -> some View {

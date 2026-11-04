@@ -57,7 +57,6 @@ final class PanelCoordinator {
         _ = model.ruleNotice.items.count
         _ = model.reminders.due.count
         _ = model.panelError.message
-        _ = model.scheduled.count
         _ = model.settings.quietMode
     }
 
@@ -95,7 +94,7 @@ final class PanelCoordinator {
     }
 
     private func frame(for content: PanelContent, previous: PanelContent, fitting: CGSize) -> CGRect? {
-        let size = CGSize(width: TK.Size.notchPanelWidth, height: max(fitting.height, 32))
+        let size = CGSize(width: TK.Size.panelWidth, height: max(fitting.height, 32))
         let screens = ScreenDescriptor.current()
         let anchor = PanelDecision.anchor(
             previous: previous, next: content, locked: lockedAnchor,

@@ -27,7 +27,7 @@ struct PromptView: View {
                 Toggle(isOn: $applyToAll) {
                     Text("Apply to all \(stackCount) new files")
                         .font(.system(size: TK.TextSize.small))
-                        .foregroundStyle(TK.Notch.textSecondary)
+                        .foregroundStyle(TK.Palette.textSecondary)
                 }
                 .toggleStyle(.checkbox)
                 .focusEffectDisabled(false)
@@ -45,7 +45,7 @@ struct PromptView: View {
             }
         }
         .padding(TK.Space.l)
-        .frame(width: TK.Size.notchPanelWidth)
+        .frame(width: TK.Size.panelWidth)
         .focusable()
         // The container only receives the arrow keys; its own ring is hidden, controls keep the system ring (§9).
         .focusEffectDisabled()
@@ -70,7 +70,7 @@ struct PromptView: View {
                     name: file.displayName, font: .system(size: TK.TextSize.title, weight: .semibold), action: onOpen)
                 Text(metadata)
                     .font(.system(size: TK.TextSize.small))
-                    .foregroundStyle(TK.Notch.textSecondary)
+                    .foregroundStyle(TK.Palette.textSecondary)
             }
             Spacer(minLength: TK.Space.s)
             Button(action: onClose) {
@@ -81,7 +81,7 @@ struct PromptView: View {
             .buttonStyle(.plain)
             .keyboardShortcut(.cancelAction)
             .focusEffectDisabled(false)
-            .foregroundStyle(TK.Notch.textSecondary)
+            .foregroundStyle(TK.Palette.textSecondary)
             .accessibilityLabel(Text("Close"))
         }
     }
@@ -90,7 +90,7 @@ struct PromptView: View {
         HStack(spacing: TK.Space.m) {
             Text("Same as \(name)")
                 .font(.system(size: TK.TextSize.small))
-                .foregroundStyle(TK.Notch.textSecondary)
+                .foregroundStyle(TK.Palette.textSecondary)
                 .lineLimit(1)
                 .truncationMode(.middle)
             Spacer(minLength: TK.Space.s)
@@ -104,7 +104,7 @@ struct PromptView: View {
             // Mouse-only, like the notice bars: keyboard focus and Return stay with the prompt.
             .focusable(false)
             .font(.system(size: TK.TextSize.small, weight: .medium))
-            .foregroundStyle(TK.Notch.accentText)
+            .foregroundStyle(TK.Palette.accentText)
             // Keep the visible text aligned with the panel padding despite the larger hit area.
             .padding(.trailing, -TK.Space.s)
         }
@@ -129,7 +129,7 @@ struct FileNameLink: View {
             Text(name)
                 .font(font)
                 .underline(hovering)
-                .foregroundStyle(hovering ? TK.Notch.accentText : TK.Notch.textPrimary)
+                .foregroundStyle(hovering ? TK.Palette.accentText : TK.Palette.textPrimary)
                 .lineLimit(1)
                 .truncationMode(.middle)
         }
@@ -150,9 +150,9 @@ struct PromptButtonStyle: ButtonStyle {
             .font(.system(size: TK.TextSize.title, weight: .medium))
             .padding(.horizontal, TK.Space.m)
             .padding(.vertical, 6)
-            .foregroundStyle(primary ? TK.Notch.onAccent : TK.Notch.textPrimary)
+            .foregroundStyle(primary ? TK.Palette.onAccent : TK.Palette.textPrimary)
             .background(
-                primary ? TK.Notch.accentFill : TK.Notch.surfaceRaised,
+                primary ? TK.Palette.accent : TK.Palette.fill,
                 in: RoundedRectangle(cornerRadius: TK.Radius.control)
             )
             .opacity(configuration.isPressed ? 0.8 : 1)
@@ -173,5 +173,5 @@ struct PromptButtonStyle: ButtonStyle {
         applyToAll: $applyToAll, now: now,
         onDone: {}, onKeep: {}, onClose: {}, onOpen: {}, onDeleteDuplicate: {}
     )
-    .background(TK.Notch.surface)
+    .background(TK.Palette.cardTint)
 }

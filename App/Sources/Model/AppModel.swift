@@ -411,6 +411,7 @@ final class AppModel {
         let loginChanged = newSettings.launchAtLogin != settings.launchAtLogin
         await perform { try await $0.updateSettings(newSettings) }
         await refreshState()
+        AppearanceController.apply(settings.appearance)
         scheduleClock()  // the reminder settings may have changed what is due
         if loginChanged { applyLoginItem(settings.launchAtLogin) }
         let fresh = TimelineModel(durations: settings.timelineStops, preselect: resolvedChoice)

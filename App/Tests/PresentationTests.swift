@@ -8,7 +8,7 @@ import Testing
 @Test func openPanelKeepsItsMenuBarAnchorWhileTheStatusItemMoves() {
     let opened = CGRect(x: 1501, y: 0, width: 24, height: 24)
     let shifted = CGRect(x: 1543, y: 0, width: 24, height: 24)
-    // Hover re-renders the same prompt after other menu bar items moved the status item.
+    // A re-render of the same prompt happens after other menu bar items moved the status item.
     #expect(PanelDecision.anchor(previous: .prompt, next: .prompt, locked: opened, current: shifted) == opened)
     #expect(PanelDecision.anchor(previous: .prompt, next: .notice, locked: opened, current: shifted) == opened)
     // First render, or the panel was hidden: take the current anchor.
@@ -20,7 +20,7 @@ import Testing
     let visible = CGRect(x: 0, y: 0, width: 1512, height: 950)
     let anchor = CGRect(x: 1480, y: 950, width: 24, height: 32)
     let frame = PanelGeometry.menuBarPanelFrame(
-        anchor: anchor, visibleFrame: visible, size: CGSize(width: 420, height: 132))
+        anchor: anchor, visibleFrame: visible, size: CGSize(width: TK.Size.panelWidth, height: 132))
     #expect(frame.maxX == 1504)  // 8 pt margin
     #expect(frame.maxY == 944)  // 6 pt under the menu bar item
 }

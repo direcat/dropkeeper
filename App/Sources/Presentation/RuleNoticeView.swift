@@ -15,7 +15,7 @@ struct RuleNoticeView: View {
             FinderIcon(path: applications.first?.file.path ?? "", kind: applications.first?.file.kind ?? .other)
             Text(line)
                 .font(.system(size: TK.TextSize.small))
-                .foregroundStyle(TK.Notch.textPrimary)
+                .foregroundStyle(TK.Palette.textPrimary)
                 .lineLimit(2)
                 .truncationMode(.middle)
             Spacer(minLength: TK.Space.s)
@@ -28,12 +28,12 @@ struct RuleNoticeView: View {
             .buttonStyle(.plain)
             .focusable(false)
             .font(.system(size: TK.TextSize.title, weight: .medium))
-            .foregroundStyle(TK.Notch.accentText)
+            .foregroundStyle(TK.Palette.accentText)
             // Keep the visible text aligned with the panel padding despite the larger hit area.
             .padding(.trailing, -TK.Space.s)
         }
         .padding(TK.Space.l)
-        .frame(width: TK.Size.notchPanelWidth)
+        .frame(width: TK.Size.panelWidth)
         .onHover(perform: onHover)
         .accessibilityElement(children: .combine)
     }

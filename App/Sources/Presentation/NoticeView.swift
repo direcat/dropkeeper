@@ -23,12 +23,12 @@ struct NoticeView: View {
                 Text(Self.title(for: shown))
                     .font(.system(size: TK.TextSize.title, weight: .semibold))
                     .strikethrough()
-                    .foregroundStyle(TK.Notch.textSecondary)
+                    .foregroundStyle(TK.Palette.textSecondary)
                     .lineLimit(1)
                     .truncationMode(.middle)
                 (canUndo ? Text("Moved to Trash") : Text("Deleted"))
                     .font(.system(size: TK.TextSize.small))
-                    .foregroundStyle(TK.Notch.textPrimary)
+                    .foregroundStyle(TK.Palette.textPrimary)
             }
             Spacer()
             if canUndo {
@@ -41,13 +41,13 @@ struct NoticeView: View {
                 .buttonStyle(.plain)
                 .focusable(false)
                 .font(.system(size: TK.TextSize.title, weight: .medium))
-                .foregroundStyle(TK.Notch.accentText)
+                .foregroundStyle(TK.Palette.accentText)
                 // Keep the visible text aligned with the panel padding despite the larger hit area.
                 .padding(.trailing, -TK.Space.s)
             }
         }
         .padding(TK.Space.l)
-        .frame(width: TK.Size.notchPanelWidth)
+        .frame(width: TK.Size.panelWidth)
         .onChange(of: files, initial: true) { _, new in
             if !new.isEmpty { lastFiles = new }
         }
@@ -61,5 +61,5 @@ struct NoticeView: View {
         displayName: "Installer.dmg", kind: .installer, sizeBytes: 84_000_000, state: .trashed,
         firstSeen: now, expiresAt: now, trashPath: "/tmp/.Trash/Installer.dmg", failureCount: 0, updatedAt: now)
     NoticeView(files: [file], canUndo: true, onUndo: {})
-        .background(TK.Notch.surface)
+        .background(TK.Palette.cardTint)
 }

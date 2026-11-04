@@ -10,7 +10,7 @@ private let base = Date(timeIntervalSince1970: 1_800_000_000)
 @MainActor
 private func render(_ view: some View) -> CGImage? {
     let renderer = ImageRenderer(content: view.environment(\.colorScheme, .dark))
-    renderer.proposedSize = ProposedViewSize(width: 420, height: nil)
+    renderer.proposedSize = ProposedViewSize(width: TK.Size.panelWidth, height: nil)
     return renderer.cgImage
 }
 
@@ -23,7 +23,7 @@ private func render(_ view: some View) -> CGImage? {
         applyToAll: .constant(false), now: base, onDone: {}, onKeep: {}, onClose: {}, onOpen: {},
         onDeleteDuplicate: {})
     let image = try #require(render(view))
-    #expect(image.width >= 420)
+    #expect(image.width >= Int(TK.Size.panelWidth))
 }
 
 @MainActor

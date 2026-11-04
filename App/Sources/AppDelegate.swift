@@ -71,6 +71,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
                 }
             }
         #endif
+        AppearanceController.apply(model.settings.appearance)
         systemEvents = SystemEvents(
             onWake: { [model] in Task { await model.handleWake() } },
             onClockChange: { [model] in Task { await model.handleClockChange() } })

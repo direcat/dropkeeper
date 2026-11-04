@@ -31,7 +31,9 @@ struct TimelineView: View {
                     Text(label(for: model.stops[index]))
                         .font(.system(size: TK.TextSize.small, weight: .medium))
                         .monospacedDigit()
-                        .foregroundStyle(index == model.selectedIndex ? TK.Notch.textPrimary : TK.Notch.textSecondary)
+                        .foregroundStyle(
+                            index == model.selectedIndex ? TK.Palette.textPrimary : TK.Palette.textSecondary
+                        )
                         .fixedSize()
                         .position(x: stopX[index], y: stopLabelRowY)
                 }
@@ -73,13 +75,13 @@ struct TimelineView: View {
             path.move(to: CGPoint(x: stopX[0], y: dotRowY))
             path.addLine(to: CGPoint(x: stopX[lastDuration], y: dotRowY))
         }
-        .stroke(TK.Notch.hairline, lineWidth: TK.Size.timelineTrackWidth)
+        .stroke(TK.Palette.hairline, lineWidth: TK.Size.timelineTrackWidth)
         if case .duration = model.selected {
             Path { path in
                 path.move(to: CGPoint(x: stopX[0], y: dotRowY))
                 path.addLine(to: CGPoint(x: stopX[model.selectedIndex], y: dotRowY))
             }
-            .stroke(TK.Notch.accent, lineWidth: TK.Size.timelineTrackWidth)
+            .stroke(TK.Palette.accent, lineWidth: TK.Size.timelineTrackWidth)
         }
     }
 
@@ -87,12 +89,12 @@ struct TimelineView: View {
         let selected = index == model.selectedIndex
         let size = selected ? TK.Size.timelineDotSelected : TK.Size.timelineDot
         return Circle()
-            .fill(model.isHighlighted(index) ? TK.Notch.accent : TK.Notch.hairline)
+            .fill(model.isHighlighted(index) ? TK.Palette.accent : TK.Palette.hairline)
             .frame(width: size, height: size)
             // Halo around the selected dot, so it stands out from the highlighted ones before it.
             .overlay {
                 Circle()
-                    .strokeBorder(TK.Notch.accent, lineWidth: TK.Size.timelineHaloWidth)
+                    .strokeBorder(TK.Palette.accent, lineWidth: TK.Size.timelineHaloWidth)
                     .padding(-(TK.Size.timelineHaloGap + TK.Size.timelineHaloWidth))
                     .opacity(selected ? 0.4 : 0)
             }
@@ -107,12 +109,12 @@ struct TimelineView: View {
             Text(TimeLabels.deletion(at: date, now: now))
                 .font(.system(size: TK.TextSize.title, weight: .semibold))
                 .monospacedDigit()
-                .foregroundStyle(TK.Notch.accentText)
+                .foregroundStyle(TK.Palette.accentText)
                 .fixedSize()
         } else {
             Text("Kept")
                 .font(.system(size: TK.TextSize.title, weight: .semibold))
-                .foregroundStyle(TK.Notch.textSecondary)
+                .foregroundStyle(TK.Palette.textSecondary)
                 .fixedSize()
         }
     }

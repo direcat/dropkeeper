@@ -28,18 +28,32 @@ enum TK {
         static let n900 = Color(hex: 0x212525)
         static let ink = Color(hex: 0x1D1F20)
     }
-    /// Notch is always black hardware – fixed palette, independent of appearance.
-    enum Notch {
-        static let surface = Color.black
-        static let surfaceRaised = Neutral.n900
-        static let textPrimary = Color.white
-        static let textSecondary = Neutral.n400
-        static let hairline = Neutral.n800
-        static let accent = Petrol.p400
-        static let accentText = Petrol.p300
-        static let accentFill = Petrol.p500
-        static let onAccent = Color.black
-        static let urgent = Color(hex: 0xEBA941)
+    /// Appearance-aware colors: each resolves to its light or dark value from the effective appearance of the
+    /// view (Auto follows the system; Settings can force Light or Dark).
+    enum Palette {
+        static let textPrimary = dynamic(light: Color(hex: 0x1D1D1F), dark: Color(hex: 0xF5F5F7))
+        static let textSecondary = dynamic(light: Color(hex: 0x6E6E73), dark: Color(hex: 0xA1A1A6))
+        static let textTertiary = dynamic(light: Color(hex: 0xA1A1A6), dark: Color(hex: 0x6E6E73))
+        static let fill = dynamic(light: Color.black.opacity(0.06), dark: Color.white.opacity(0.08))
+        static let fillStrong = dynamic(
+            light: Color(hex: 0x767680).opacity(0.14), dark: Color(hex: 0x767680).opacity(0.28))
+        static let hairline = dynamic(light: Color.black.opacity(0.07), dark: Color.white.opacity(0.08))
+        static let cardTint = dynamic(
+            light: Color(hex: 0xF4F1EF).opacity(0.80), dark: Color(hex: 0x26262A).opacity(0.78))
+        static let accent = dynamic(light: Petrol.p500, dark: Petrol.p400)
+        static let accentText = dynamic(light: Petrol.p700, dark: Petrol.p300)
+        static let onAccent = dynamic(light: Color.white, dark: Neutral.ink)
+        static let warning = Color(hex: 0xEBA941)
+        static let destructive = dynamic(light: Color(hex: 0xD9534F), dark: Color(hex: 0xFF6B6B))
+
+        private static func dynamic(light: Color, dark: Color) -> Color {
+            let lightColor = NSColor(light)
+            let darkColor = NSColor(dark)
+            return Color(
+                nsColor: NSColor(name: nil) { appearance in
+                    appearance.bestMatch(from: [.aqua, .darkAqua]) == .darkAqua ? darkColor : lightColor
+                })
+        }
     }
     enum FileType {
         static let image = Color(hex: 0x9274C3)
@@ -55,8 +69,11 @@ enum TK {
         static let xs: CGFloat = 4, s: CGFloat = 8, m: CGFloat = 12, l: CGFloat = 16, xl: CGFloat = 24
     }
     enum Radius {
-        static let control: CGFloat = 8
-        static let notchBottom: CGFloat = 20
+        static let card: CGFloat = 24
+        static let compactCard: CGFloat = 18
+        static let group: CGFloat = 14
+        static let segment: CGFloat = 12
+        static let control: CGFloat = 10
         static let fileGlyph: CGFloat = 8
     }
     /// Text sizes in points. The panel tokens are the original 11/12/13 pt plus 2; the form tokens serve the
@@ -70,7 +87,11 @@ enum TK {
         static let formCaption: CGFloat = 12
     }
     enum Size {
-        static let notchPanelWidth: CGFloat = 420
+        static let panelWidth: CGFloat = 380
+        static let ring: CGFloat = 40
+        static let ringLine: CGFloat = 3.5
+        /// The inner stroke of a glass card.
+        static let cardStroke: CGFloat = 0.5
         static let fileGlyph: CGFloat = 40
         static let listRow: CGFloat = 48
         static let timelineDot: CGFloat = 10
@@ -84,11 +105,15 @@ enum TK {
         /// Room for the longest value label beside a Settings step slider.
         static let stepSliderLabel: CGFloat = 90
     }
+    enum Shadow {
+        static let cardRadius: CGFloat = 25
+        static let cardOffset: CGFloat = 9
+        static let cardOpacity = 0.28
+    }
     enum Motion {
         static let open = Animation.spring(response: 0.35, dampingFraction: 0.82)
         static let close = Animation.easeIn(duration: 0.22)
         static let select = Animation.spring(response: 0.25, dampingFraction: 0.85)
-        static let pulse = Animation.easeInOut(duration: 0.5)
         static let reduced = Animation.easeInOut(duration: 0.15)
         static let deletedNoticeSeconds: Double = 2.5
         static let ruleNoticeSeconds: Double = 6

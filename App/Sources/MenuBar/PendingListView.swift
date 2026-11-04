@@ -16,8 +16,12 @@ struct PendingListView: View {
     var showsFooter = true
 
     var body: some View {
+        GlassCard { list }
+    }
+
+    private var list: some View {
         let rows = PendingRows.ordered(pending: model.pending, scheduled: model.scheduled, failed: model.failed)
-        VStack(spacing: 0) {
+        return VStack(spacing: 0) {
             if let message = model.panelError.message {
                 PanelErrorBanner(message: message)
                     .padding(.bottom, TK.Space.s)
@@ -25,7 +29,7 @@ struct PendingListView: View {
             if rows.isEmpty {
                 Text("No files scheduled")
                     .font(.system(size: TK.TextSize.title))
-                    .foregroundStyle(TK.Notch.textSecondary)
+                    .foregroundStyle(TK.Palette.textSecondary)
                     .frame(maxWidth: .infinity, minHeight: TK.Size.listRow)
             } else {
                 ScrollView {
@@ -38,7 +42,7 @@ struct PendingListView: View {
                 .frame(height: min(CGFloat(rows.count), 5) * TK.Size.listRow)
             }
             if showsFooter {
-                Rectangle().fill(TK.Notch.hairline).frame(height: 1)
+                Rectangle().fill(TK.Palette.hairline).frame(height: 1)
                 HStack {
                     Button("Settings") { actions.openSettings() }
                         .keyboardShortcut(",", modifiers: .command)
@@ -48,15 +52,13 @@ struct PendingListView: View {
                 }
                 .buttonStyle(.plain)
                 .font(.system(size: TK.TextSize.title))
-                .foregroundStyle(TK.Notch.textSecondary)
+                .foregroundStyle(TK.Palette.textSecondary)
                 // Same insets and height as the file rows above.
                 .padding(.horizontal, TK.Space.m)
                 .frame(height: TK.Size.listRow)
             }
         }
-        .frame(width: TK.Size.notchPanelWidth)
-        .background(TK.Notch.surface)
-        .environment(\.colorScheme, .dark)
+        .frame(width: TK.Size.panelWidth)
     }
 }
 
@@ -78,7 +80,7 @@ private struct PendingRow: View {
         }
         .padding(.horizontal, TK.Space.m)
         .frame(height: TK.Size.listRow)
-        .background(hovering ? TK.Notch.surfaceRaised : .clear)
+        .background(hovering ? TK.Palette.fill : .clear)
         .contentShape(Rectangle())
         .onHover { hovering = $0 }
         .onTapGesture { if file.state == .pending { actions.review(file.id) } }
@@ -89,16 +91,16 @@ private struct PendingRow: View {
     private var status: some View {
         switch file.state {
         case .pending:
-            Text("Waiting").font(.system(size: TK.TextSize.body)).foregroundStyle(TK.Notch.textSecondary)
+            Text("Waiting").font(.system(size: TK.TextSize.body)).foregroundStyle(TK.Palette.textSecondary)
         case .failed:
-            Text("Couldn't move").font(.system(size: TK.TextSize.body)).foregroundStyle(TK.Notch.textSecondary)
+            Text("Couldn't move").font(.system(size: TK.TextSize.body)).foregroundStyle(TK.Palette.textSecondary)
         default:
             if let expiresAt = file.expiresAt {
                 Text(TimeLabels.remaining(until: expiresAt, now: model.now))
                     .font(.system(size: TK.TextSize.body))
                     .monospacedDigit()
                     .foregroundStyle(
-                        expiresAt.timeIntervalSince(model.now) < 600 ? TK.Notch.accentText : TK.Notch.textSecondary)
+                        expiresAt.timeIntervalSince(model.now) < 600 ? TK.Palette.accentText : TK.Palette.textSecondary)
             }
         }
     }
@@ -107,7 +109,7 @@ private struct PendingRow: View {
         Menu {
             menuItems
         } label: {
-            Image(systemName: "ellipsis").foregroundStyle(TK.Notch.textSecondary)
+            Image(systemName: "ellipsis").foregroundStyle(TK.Palette.textSecondary)
         }
         .menuStyle(.borderlessButton)
         .menuIndicator(.hidden)

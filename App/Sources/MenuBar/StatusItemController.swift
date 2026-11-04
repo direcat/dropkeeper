@@ -66,7 +66,6 @@ final class StatusItemController: NSObject, NSPopoverDelegate {
         popover.behavior = .transient
         popover.delegate = self
         popover.animates = true
-        popover.appearance = NSAppearance(named: .darkAqua)
         let hosting = NSHostingController(rootView: PendingListView(model: model, actions: actions))
         // Without this the popover is laid out at NSPopover's default 320×320 and then shrinks,
         // leaving it hanging far below the menu bar icon.
@@ -116,7 +115,7 @@ final class StatusItemController: NSObject, NSPopoverDelegate {
                 string: " \(count)",
                 attributes: [.font: NSFont.systemFont(ofSize: 11, weight: .bold).rounded()])
         case .countdown(let seconds):
-            let urgent = NSColor(TK.Notch.urgent)
+            let urgent = NSColor(TK.Palette.warning)
             let font = NSFont.monospacedSystemFont(ofSize: 12, weight: .semibold)
             let alpha = StatusPulse.dotAlpha(
                 now: model.now, reduceMotion: NSWorkspace.shared.accessibilityDisplayShouldReduceMotion)

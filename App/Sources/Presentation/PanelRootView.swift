@@ -5,13 +5,12 @@ struct PanelRootView: View {
     let content: PanelContent
 
     var body: some View {
-        VStack(spacing: 0) {
-            banner
-            main
+        GlassCard {
+            VStack(spacing: 0) {
+                banner
+                main
+            }
         }
-        .background(TK.Notch.surface)
-        .clipShape(RoundedRectangle(cornerRadius: TK.Radius.notchBottom))
-        .environment(\.colorScheme, .dark)
     }
 
     /// The list shows the error itself, so it also has it in the menu bar popover.
@@ -29,7 +28,7 @@ struct PanelRootView: View {
             if let file = model.queue.current {
                 if model.isNoticeVisible {
                     NoticeStackView(model: model, holdsNotice: false)
-                    Rectangle().fill(TK.Notch.hairline).frame(height: 1)
+                    Rectangle().fill(TK.Palette.hairline).frame(height: 1)
                 }
                 PromptView(
                     file: file, stackCount: model.queue.isRevisiting ? 1 : model.queue.items.count,

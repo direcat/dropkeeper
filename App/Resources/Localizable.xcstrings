@@ -595,7 +595,7 @@
       }
     },
     "%lld files scheduled" : {
-      "comment" : "VoiceOver label of the closed notch",
+      "comment" : "VoiceOver label of the menu bar icon",
       "localizations" : {
         "en" : { "variations" : { "plural" : {
           "one" : { "stringUnit" : { "state" : "translated", "value" : "%lld file scheduled" } },
@@ -619,7 +619,7 @@
       }
     },
     "Deleting in %@" : {
-      "comment" : "VoiceOver value of the closed notch during the last-seconds countdown, e.g. Deleting in 0:07",
+      "comment" : "VoiceOver value of the menu bar icon during the last-seconds countdown, e.g. Deleting in 0:07",
       "localizations" : {
         "cs" : { "stringUnit" : { "state" : "translated", "value" : "Smazání za %@" } },
         "de" : { "stringUnit" : { "state" : "translated", "value" : "Wird gelöscht in %@" } },

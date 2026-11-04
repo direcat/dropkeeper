@@ -61,6 +61,6 @@ struct NoticeStackView: View {
     }
 
     private var separator: some View {
-        Rectangle().fill(TK.Notch.hairline).frame(height: 1)
+        Rectangle().fill(TK.Palette.hairline).frame(height: 1)
     }
 }
