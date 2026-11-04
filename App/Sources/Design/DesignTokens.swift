@@ -94,6 +94,8 @@ enum TK {
     enum Size {
         static let panelWidth: CGFloat = 380
         static let ring: CGFloat = 40
+        /// Trailing padding of a text-only button at the end of a card row, so its text meets the card padding.
+        static let textButtonInset: CGFloat = -TK.Space.m + TK.Space.xs
         /// The file icon inside the progress ring.
         static let ringIcon: CGFloat = 28
         static let ringLine: CGFloat = 3.5

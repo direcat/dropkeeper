@@ -27,7 +27,10 @@ struct RuleNoticeView: View {
                 }
                 Spacer(minLength: TK.Space.s)
                 Button(action: onChange) { Text("Change") }
-                    .buttonStyle(PanelTextButtonStyle(tint: TK.Palette.accentText))
+                    .buttonStyle(
+                        PanelTextButtonStyle(
+                            tint: TK.Palette.accentText, trailingInset: TK.Size.textButtonInset)
+                    )
                     .focusable(false)
             }
             .padding(.horizontal, TK.Space.l)

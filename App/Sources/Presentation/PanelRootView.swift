@@ -36,7 +36,7 @@ struct PanelRootView: View {
     @ViewBuilder
     private var banner: some View {
         if let message = model.panelError.message, content == .prompt || content == .notice || content == .error {
-            PanelErrorBanner(message: message, standalone: content == .error)
+            PanelErrorBanner(message: message, standalone: content != .prompt)
         }
     }
 

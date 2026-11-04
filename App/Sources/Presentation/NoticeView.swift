@@ -34,7 +34,10 @@ struct NoticeView: View {
                 Spacer()
                 if canUndo {
                     Button(action: onUndo) { Text("Undo") }
-                        .buttonStyle(PanelTextButtonStyle(tint: TK.Palette.accentText))
+                        .buttonStyle(
+                            PanelTextButtonStyle(
+                                tint: TK.Palette.accentText, trailingInset: TK.Size.textButtonInset)
+                        )
                         .focusable(false)
                 }
             }

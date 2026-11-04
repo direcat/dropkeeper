@@ -5,11 +5,13 @@ import SwiftUI
 /// focus and Return stay with the prompt (VoiceOver reaches the buttons by their labels).
 struct ReminderBarView: View {
     /// The actions, left to right.
-    enum Action: CaseIterable {
+    enum Action {
         case deleteNow, keep, extend
 
+        /// The actions, left to right.
         static let displayOrder: [Action] = [.deleteNow, .keep, .extend]
 
+        /// The generic label; `extend` becomes "Extend by 30 min" when the files share one timer length.
         var title: String {
             switch self {
             case .deleteNow: String(localized: "Delete now")
@@ -72,11 +74,11 @@ struct ReminderBarView: View {
     private func button(for action: Action) -> some View {
         switch action {
         case .deleteNow:
-            Button(action: onDelete) { label(Text("Delete now")) }
+            Button(action: onDelete) { label(Text(action.title)) }
                 .buttonStyle(PanelTextButtonStyle(tint: TK.Palette.destructive))
                 .focusable(false)
         case .keep:
-            Button(action: onKeep) { label(Text("Keep")) }
+            Button(action: onKeep) { label(Text(action.title)) }
                 .buttonStyle(PromptButtonStyle(primary: false))
                 .focusable(false)
         case .extend:
@@ -91,7 +93,7 @@ struct ReminderBarView: View {
     /// "Extend by 30 min" while every file has the same timer length (the first one's), else just "Extend".
     private var extendLabel: Text {
         let lengths = Set(files.compactMap(\.timerLength))
-        guard lengths.count == 1, let length = lengths.first else { return Text("Extend") }
+        guard lengths.count == 1, let length = lengths.first else { return Text(Action.extend.title) }
         return Text("Extend by \(DurationLabel.short(length))")
     }
 
