@@ -135,7 +135,8 @@ import Testing
     }
 
     @Test func decisionSet() {
-        #expect(Resolution.allCases.filter(\.isDecision) == [.userKept, .defaultKept, .restored, .expired, .deletedNow])
+        let decisions = Resolution.allCases.filter(\.isDecision)
+        #expect(decisions == [.userKept, .defaultKept, .restored, .expired, .deletedNow])
         #expect(Resolution.decisionValues == ["userKept", "defaultKept", "restored", "expired", "deletedNow"])
     }
 }
