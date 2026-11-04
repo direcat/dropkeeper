@@ -16,6 +16,9 @@ public struct StabilityTracker: Sendable {
 
     public var isEmpty: Bool { entries.isEmpty }
 
+    /// Paths currently being tracked, sorted.
+    public var paths: [String] { entries.keys.sorted() }
+
     public mutating func observe(_ path: String, size: Int64, now: Date) {
         if let existing = entries[path], existing.size == size { return }
         entries[path] = Entry(size: size, lastChange: now)

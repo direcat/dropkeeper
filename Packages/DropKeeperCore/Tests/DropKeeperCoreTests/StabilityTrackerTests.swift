@@ -51,3 +51,10 @@ import Testing
     tracker.observe("/fake/D/a.pdf", size: 10, now: start.addingTimeInterval(0.9))
     #expect(tracker.poll(now: start.addingTimeInterval(1), fs: fs).count == 1)
 }
+
+@Test func trackerListsPaths() {
+    var tracker = StabilityTracker()
+    tracker.observe("/b", size: 1, now: .now)
+    tracker.observe("/a", size: 1, now: .now)
+    #expect(tracker.paths == ["/a", "/b"])
+}

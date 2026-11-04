@@ -154,8 +154,10 @@ public actor DropKeeperEngine {
             try store.setMeta(.lastEventId, String(env.currentEventId()))
         }
         refreshFolderStatuses()
-        // Downloads still stabilizing at quit (or missed by the replay) are found by the fallback scan,
-        // bounded by the previous heartbeat. Without a previous heartbeat nothing is admitted.
+        restoreStabilizingPaths()
+        // Downloads missed by the replay are found by the fallback scan, bounded by the previous heartbeat.
+        // Without a previous heartbeat nothing is admitted. Files still stabilizing at quit were saved by
+        // `stop()` and are restored above, since the heartbeat written at quit would exclude them here.
         if let scanBound {
             scanForNewItems(in: folders.filter { $0.status == .ok }, since: scanBound, now: env.time.now())
         }
@@ -172,6 +174,7 @@ public actor DropKeeperEngine {
     /// rule outcome is still pending is not lost.
     public func stop(drainTimeout: Duration = .seconds(2)) async {
         if isRunning { await drainDuplicateChecks(timeout: drainTimeout) }
+        saveStabilizingPaths()
         writeHeartbeat()
         isRunning = false
         eventTask?.cancel()
@@ -386,6 +389,32 @@ extension DropKeeperEngine {
 
     func metaDate(_ key: MetaKey) -> Date? {
         (try? store.meta(key)).flatMap(ISODate.parse)
+    }
+
+    /// Persists the paths still in the stability tracker so the next launch can pick them up.
+    private func saveStabilizingPaths() {
+        let paths = tracker.paths
+        let value =
+            paths.isEmpty ? nil : (try? JSONEncoder().encode(paths)).flatMap { String(data: $0, encoding: .utf8) }
+        try? store.setMeta(.stabilizingPaths, value)
+    }
+
+    /// Re-observes the paths saved at the previous quit that still exist, sit in a watched folder, are
+    /// candidates and have no record yet; the normal tracker poll then applies rules and duplicate checks.
+    private func restoreStabilizingPaths() {
+        guard let raw = try? store.meta(.stabilizingPaths) else { return }
+        try? store.setMeta(.stabilizingPaths, nil)
+        guard let paths = try? JSONDecoder().decode([String].self, from: Data(raw.utf8)) else { return }
+        let now = env.time.now()
+        for path in paths {
+            guard let stat = env.fs.stat(path),
+                let folder = folder(containing: path),
+                DownloadDetector.isCandidate(
+                    path: path, folderPath: folder.path, ignoredPatterns: settings.ignoredPatterns),
+                trackedRecord(at: path, stat: stat) == nil
+            else { continue }
+            tracker.observe(path, size: stat.size, now: now)
+        }
     }
 
     private func writeHeartbeat() {

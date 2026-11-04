@@ -192,6 +192,58 @@ import Testing
         #expect(states[moved] == .kept)
     }
 
+    /// First engine quits while a download is still stabilizing (event seen, no tick); returns its path.
+    private func quitWhileStabilizing(store: FileStore) async throws -> String {
+        let first = try EngineHarness(store: store)
+        try await first.startWithDownloads()
+        let path = EngineHarness.downloads + "/growing.zip"
+        first.fs.createFile(path, size: 100, added: first.time.now())
+        await first.event(path, [.created, .isFile])
+        first.time.advance(by: 2)
+        await first.engine.stop()
+        return path
+    }
+
+    @Test func reviewFocusDownloadGrowingAtQuitIsPromptedNextLaunch() async throws {
+        let store = try FileStore.inMemory()
+        let path = try await quitWhileStabilizing(store: store)
+        #expect(try store.meta(.stabilizingPaths) != nil)
+
+        let second = try EngineHarness(store: store) { fs in
+            fs.createFile(path, size: 100, added: TestTimeSource.base)
+        }
+        second.time.advance(by: 60)
+        try await second.engine.start()
+        #expect(try second.store.meta(.stabilizingPaths) == nil)
+        await second.advance(1)
+        #expect(try second.files([.pending]).map(\.path) == [path])
+    }
+
+    @Test func stabilizingFileThatVanishedLeavesNoRecord() async throws {
+        let store = try FileStore.inMemory()
+        _ = try await quitWhileStabilizing(store: store)
+
+        let second = try EngineHarness(store: store)
+        second.time.advance(by: 60)
+        try await second.engine.start()
+        await second.advance(1)
+        #expect(try second.files().isEmpty)
+        #expect(try second.store.meta(.stabilizingPaths) == nil)
+    }
+
+    @Test func unreadableStabilizingPathsAreIgnoredAndRemoved() async throws {
+        let store = try FileStore.inMemory()
+        let first = try EngineHarness(store: store)
+        try await first.startWithDownloads()
+        await first.engine.stop()
+        try store.setMeta(.stabilizingPaths, "not json")
+
+        let second = try EngineHarness(store: store)
+        try await second.engine.start()
+        #expect(try second.store.meta(.stabilizingPaths) == nil)
+        #expect(try second.files().isEmpty)
+    }
+
     @Test func unavailableFolderPausesExpiry() async throws {
         let harness = try EngineHarness()
         try await harness.startWithDownloads()
