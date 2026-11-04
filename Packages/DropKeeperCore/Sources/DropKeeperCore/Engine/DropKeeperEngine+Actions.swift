@@ -172,6 +172,10 @@ extension DropKeeperEngine {
         rescheduleTimer()
     }
 
+    public func statistics() throws -> Statistics {
+        try store.statistics()
+    }
+
     /// Deletes all history records (kept, trashed, gone, failed); active records stay.
     /// The time is remembered so files that outlive their records are not re-detected (see `orphanBound`).
     public func clearHistory() throws -> Int {

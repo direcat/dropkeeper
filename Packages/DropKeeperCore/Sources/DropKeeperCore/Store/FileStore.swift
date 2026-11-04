@@ -220,13 +220,19 @@ public final class FileStore: Sendable {
         return ValueObservation.tracking { try request.fetchAll($0) }.values(in: writer)
     }
 
+    /// Records without a resolution (pre-1.2 or recovered) count as decisions; bookkeeping resolutions do not.
+    private static var isDecision: SQLExpression {
+        typealias Keys = TrackedFile.CodingKeys
+        return Keys.resolution == nil || Resolution.decisionValues.contains(Keys.resolution)
+    }
+
     private func historyRequest(limit: Int) -> QueryInterfaceRequest<TrackedFile> {
         typealias Keys = TrackedFile.CodingKeys
         let states = [FileState.kept, FileState.trashed].map(\.rawValue)
         return
             TrackedFile
             .filter(states.contains(Keys.state))
-            .filter(Keys.resolution == nil || Resolution.decisionValues.contains(Keys.resolution))
+            .filter(Self.isDecision)
             .order(Keys.updatedAt.desc, Keys.id)
             .limit(limit)
     }
@@ -240,6 +246,34 @@ public final class FileStore: Sendable {
     public func observeHistory(limit: Int) -> AsyncValueObservation<[TrackedFile]> {
         let request = historyRequest(limit: limit)
         return ValueObservation.tracking { try request.fetchAll($0) }.values(in: writer)
+    }
+
+    /// Counters over all stored records, computed in one aggregate query.
+    public func statistics() throws -> Statistics {
+        typealias Keys = TrackedFile.CodingKeys
+        let trashed = FileState.trashed.rawValue
+        let kept = FileState.kept.rawValue
+        let isDecision = Self.isDecision
+        let sql: SQL = """
+            SELECT
+                COALESCE(SUM(CASE WHEN \(Column(Keys.state)) = \(trashed) AND \(Column(Keys.trashPath)) IS NOT NULL
+                    AND (\(isDecision)) THEN 1 END), 0),
+                COALESCE(SUM(CASE WHEN \(Column(Keys.state)) = \(trashed) AND \(Column(Keys.trashPath)) IS NULL
+                    AND (\(isDecision)) THEN 1 END), 0),
+                COALESCE(SUM(CASE WHEN \(Column(Keys.state)) = \(kept) AND (\(isDecision)) THEN 1 END), 0),
+                COALESCE(SUM(CASE WHEN \(Column(Keys.viaRule)) = 1 THEN 1 END), 0),
+                COALESCE(SUM(CASE WHEN \(Column(Keys.state)) = \(trashed) AND \(Column(Keys.duplicateOf)) IS NOT NULL
+                    AND \(Column(Keys.resolution)) = \(Resolution.deletedNow.rawValue) THEN 1 END), 0),
+                COALESCE(SUM(CASE WHEN \(Column(Keys.state)) = \(trashed) AND (\(isDecision))
+                    THEN COALESCE(\(Column(Keys.sizeBytes)), 0) END), 0)
+            FROM \(TrackedFile.self)
+            """
+        return try writer.read { db in
+            let row = try Row.fetchOne(db, SQLRequest<Row>(literal: sql)) ?? Row()
+            return Statistics(
+                movedToTrash: row[0], deletedPermanently: row[1], kept: row[2], scheduledByRules: row[3],
+                duplicatesDeleted: row[4], bytesFreed: row[5])
+        }
     }
 
     // MARK: Settings & meta
