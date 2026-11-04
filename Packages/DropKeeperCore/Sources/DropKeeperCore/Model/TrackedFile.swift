@@ -98,3 +98,21 @@ extension TrackedFile {
         )
     }
 }
+
+extension TrackedFile {
+    /// What happened to an item, as shown in the history.
+    public enum HistoryOutcome: Equatable, Sendable {
+        case movedToTrash(canPutBack: Bool)
+        case deletedPermanently
+        case kept
+    }
+
+    /// Whether the trash copy still exists is checked by `undoTrash` on use.
+    public var historyOutcome: HistoryOutcome? {
+        switch state {
+        case .trashed: trashPath != nil ? .movedToTrash(canPutBack: true) : .deletedPermanently
+        case .kept: .kept
+        default: nil
+        }
+    }
+}

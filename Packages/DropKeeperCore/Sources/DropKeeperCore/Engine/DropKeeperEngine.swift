@@ -126,6 +126,29 @@ public actor DropKeeperEngine {
         }
     }
 
+    /// Number of decisions shown in the history by default.
+    public static let historyLimit = 10
+
+    /// Stream of the most recent decisions, newest first; same shape and lifetime rules as `fileUpdates(in:)`.
+    public nonisolated func historyUpdates(
+        limit: Int = DropKeeperEngine.historyLimit
+    ) -> AsyncThrowingStream<[TrackedFile], any Error> {
+        let observation = env.store.observeHistory(limit: limit)
+        return AsyncThrowingStream(bufferingPolicy: .bufferingNewest(1)) { continuation in
+            let task = Task {
+                do {
+                    for try await files in observation {
+                        continuation.yield(files)
+                    }
+                    continuation.finish()
+                } catch {
+                    continuation.finish(throwing: error)
+                }
+            }
+            continuation.onTermination = { _ in task.cancel() }
+        }
+    }
+
     // MARK: Lifecycle
 
     public func start() throws {

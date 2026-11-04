@@ -220,6 +220,28 @@ public final class FileStore: Sendable {
         return ValueObservation.tracking { try request.fetchAll($0) }.values(in: writer)
     }
 
+    private func historyRequest(limit: Int) -> QueryInterfaceRequest<TrackedFile> {
+        typealias Keys = TrackedFile.CodingKeys
+        let states = [FileState.kept, FileState.trashed].map(\.rawValue)
+        return
+            TrackedFile
+            .filter(states.contains(Keys.state))
+            .filter(Keys.resolution == nil || Resolution.decisionValues.contains(Keys.resolution))
+            .order(Keys.updatedAt.desc, Keys.id)
+            .limit(limit)
+    }
+
+    /// The most recent decisions (kept or trashed items, bookkeeping resolutions hidden), newest first.
+    /// Records without a resolution (pre-1.2 or recovered) are included.
+    public func history(limit: Int) throws -> [TrackedFile] {
+        try writer.read { try self.historyRequest(limit: limit).fetchAll($0) }
+    }
+
+    public func observeHistory(limit: Int) -> AsyncValueObservation<[TrackedFile]> {
+        let request = historyRequest(limit: limit)
+        return ValueObservation.tracking { try request.fetchAll($0) }.values(in: writer)
+    }
+
     // MARK: Settings & meta
 
     public func settings() throws -> Settings {
