@@ -199,6 +199,8 @@ import Testing
         let path = EngineHarness.downloads + "/growing.zip"
         first.fs.createFile(path, size: 100, added: first.time.now())
         await first.event(path, [.created, .isFile])
+        // Load-bearing: the heartbeat has second resolution; without this advance the fallback scan would
+        // admit the file on its own and the test would pass even without the saved paths.
         first.time.advance(by: 2)
         await first.engine.stop()
         return path
@@ -207,7 +209,8 @@ import Testing
     @Test func reviewFocusDownloadGrowingAtQuitIsPromptedNextLaunch() async throws {
         let store = try FileStore.inMemory()
         let path = try await quitWhileStabilizing(store: store)
-        #expect(try store.meta(.stabilizingPaths) != nil)
+        let saved = try #require(try store.meta(.stabilizingPaths))
+        #expect(try JSONDecoder().decode([String].self, from: Data(saved.utf8)) == [path])
 
         let second = try EngineHarness(store: store) { fs in
             fs.createFile(path, size: 100, added: TestTimeSource.base)
@@ -217,6 +220,39 @@ import Testing
         #expect(try second.store.meta(.stabilizingPaths) == nil)
         await second.advance(1)
         #expect(try second.files([.pending]).map(\.path) == [path])
+    }
+
+    @Test func stopWithoutRunningSessionKeepsSavedStabilizingPaths() async throws {
+        let store = try FileStore.inMemory()
+        try store.setMeta(.stabilizingPaths, #"["/fake/Users/me/Downloads/growing.zip"]"#)
+        let harness = try EngineHarness(store: store)
+        await harness.engine.stop()
+        #expect(try store.meta(.stabilizingPaths) == #"["/fake/Users/me/Downloads/growing.zip"]"#)
+    }
+
+    @Test func stabilizingPathOfUnavailableFolderIsKeptUntilItReturns() async throws {
+        let store = try FileStore.inMemory()
+        let path = try await quitWhileStabilizing(store: store)
+        let saved = try #require(try store.meta(.stabilizingPaths))
+
+        let second = try EngineHarness(store: store) { fs in
+            fs.createFile(path, size: 100, added: TestTimeSource.base)
+            fs.deniedDirectories = [EngineHarness.downloads]
+        }
+        second.time.advance(by: 60)
+        try await second.engine.start()
+        #expect(try store.meta(.stabilizingPaths) == saved)
+        await second.engine.stop()
+        #expect(try store.meta(.stabilizingPaths) == saved)
+
+        let third = try EngineHarness(store: store) { fs in
+            fs.createFile(path, size: 100, added: TestTimeSource.base)
+        }
+        third.time.advance(by: 120)
+        try await third.engine.start()
+        #expect(try store.meta(.stabilizingPaths) == nil)
+        await third.advance(1)
+        #expect(try third.files([.pending]).map(\.path) == [path])
     }
 
     @Test func stabilizingFileThatVanishedLeavesNoRecord() async throws {

@@ -72,6 +72,8 @@ public actor DropKeeperEngine {
     private var eventTask: Task<Void, Never>?
     private var timerTask: Task<Void, Never>?
     var isRunning = false
+    /// Saved stabilizing paths whose folder was unavailable at launch; written back on the next save.
+    private var deferredStabilizingPaths: [String] = []
     /// Lower bound for the fallback scan: the heartbeat from the previous session.
     var scanBound: Date?
     /// When each folder (by id) stopped being `.ok` during this session; bounds its rescan on return.
@@ -174,7 +176,8 @@ public actor DropKeeperEngine {
     /// rule outcome is still pending is not lost.
     public func stop(drainTimeout: Duration = .seconds(2)) async {
         if isRunning { await drainDuplicateChecks(timeout: drainTimeout) }
-        saveStabilizingPaths()
+        // A stop without a running session (failed or never-run start) must not wipe the saved paths.
+        if isRunning { saveStabilizingPaths() }
         writeHeartbeat()
         isRunning = false
         eventTask?.cancel()
@@ -393,28 +396,40 @@ extension DropKeeperEngine {
 
     /// Persists the paths still in the stability tracker so the next launch can pick them up.
     private func saveStabilizingPaths() {
-        let paths = tracker.paths
+        let paths = tracker.paths + deferredStabilizingPaths.filter { !tracker.paths.contains($0) }
         let value =
             paths.isEmpty ? nil : (try? JSONEncoder().encode(paths)).flatMap { String(data: $0, encoding: .utf8) }
         try? store.setMeta(.stabilizingPaths, value)
     }
 
-    /// Re-observes the paths saved at the previous quit that still exist, sit in a watched folder, are
-    /// candidates and have no record yet; the normal tracker poll then applies rules and duplicate checks.
+    /// Re-observes the paths saved at the previous quit that still exist, sit in an available watched folder,
+    /// are candidates and have no record yet; the normal tracker poll then applies rules and duplicate checks.
+    /// Paths whose folder is not available yet (e.g. a volume that is not mounted) are kept for a later launch.
     private func restoreStabilizingPaths() {
+        deferredStabilizingPaths = []
         guard let raw = try? store.meta(.stabilizingPaths) else { return }
-        try? store.setMeta(.stabilizingPaths, nil)
-        guard let paths = try? JSONDecoder().decode([String].self, from: Data(raw.utf8)) else { return }
+        guard let paths = try? JSONDecoder().decode([String].self, from: Data(raw.utf8)) else {
+            try? store.setMeta(.stabilizingPaths, nil)
+            return
+        }
         let now = env.time.now()
         for path in paths {
+            guard let folder = folders.first(where: { $0.contains(path) }) else { continue }
+            guard folder.status == .ok else {
+                deferredStabilizingPaths.append(path)
+                continue
+            }
             guard let stat = env.fs.stat(path),
-                let folder = folder(containing: path),
                 DownloadDetector.isCandidate(
                     path: path, folderPath: folder.path, ignoredPatterns: settings.ignoredPatterns),
                 trackedRecord(at: path, stat: stat) == nil
             else { continue }
             tracker.observe(path, size: stat.size, now: now)
         }
+        let value =
+            deferredStabilizingPaths.isEmpty
+            ? nil : (try? JSONEncoder().encode(deferredStabilizingPaths)).flatMap { String(data: $0, encoding: .utf8) }
+        try? store.setMeta(.stabilizingPaths, value)
     }
 
     private func writeHeartbeat() {
