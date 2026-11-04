@@ -196,3 +196,36 @@ private func sampleFolder(_ path: String = "/fake/D") -> WatchedFolder {
     #expect(file.resolution == nil && file.viaRule == false)
     #expect(!result.recoveredFromCorruption)
 }
+
+@Test func unknownResolutionValueDecodesAsNil() throws {
+    let dir = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString, isDirectory: true)
+    try FileManager.default.createDirectory(at: dir, withIntermediateDirectories: true)
+    defer { try? FileManager.default.removeItem(at: dir) }
+    let url = dir.appendingPathComponent("dropkeeper.sqlite")
+    let store = try FileStore.open(at: url).store
+    try store.insert(sampleFile(id: "NEW", state: .kept))
+    // A row written by a newer version, with a resolution this version does not know.
+    let other = try DatabaseQueue(path: url.path)
+    try other.write { db in
+        try db.execute(sql: "UPDATE tracked_file SET resolution = 'futureCase' WHERE id = 'NEW'")
+    }
+    try other.close()
+    let files = try store.files(in: [.kept])
+    #expect(files.map(\.id) == ["NEW"])
+    #expect(files.first?.resolution == nil)
+}
+
+@Test func unknownStateValueThrowsInsteadOfCrashing() throws {
+    let dir = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString, isDirectory: true)
+    try FileManager.default.createDirectory(at: dir, withIntermediateDirectories: true)
+    defer { try? FileManager.default.removeItem(at: dir) }
+    let url = dir.appendingPathComponent("dropkeeper.sqlite")
+    let store = try FileStore.open(at: url).store
+    try store.insert(sampleFile(id: "BAD", state: .kept))
+    let other = try DatabaseQueue(path: url.path)
+    try other.write { db in
+        try db.execute(sql: "UPDATE tracked_file SET state = 'futureState' WHERE id = 'BAD'")
+    }
+    try other.close()
+    #expect(throws: (any Error).self) { try store.file(id: "BAD") }
+}

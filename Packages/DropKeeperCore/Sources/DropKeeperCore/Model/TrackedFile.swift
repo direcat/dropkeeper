@@ -56,6 +56,30 @@ public struct TrackedFile: Codable, Sendable, Equatable, Identifiable, Fetchable
         self.viaRule = viaRule
     }
 
+    /// Decodes column by column with throwing accessors, so malformed data fails the fetch instead of crashing.
+    public init(row: Row) throws {
+        id = try row.decode(FileID.self, forColumn: CodingKeys.id.rawValue)
+        folderId = try row.decode(Int64?.self, forColumn: CodingKeys.folderId.rawValue)
+        path = try row.decode(String.self, forColumn: CodingKeys.path.rawValue)
+        inode = try row.decode(Int64.self, forColumn: CodingKeys.inode.rawValue)
+        volumeId = try row.decode(String.self, forColumn: CodingKeys.volumeId.rawValue)
+        displayName = try row.decode(String.self, forColumn: CodingKeys.displayName.rawValue)
+        kind = try row.decode(FileKind.self, forColumn: CodingKeys.kind.rawValue)
+        sizeBytes = try row.decode(Int64?.self, forColumn: CodingKeys.sizeBytes.rawValue)
+        state = try row.decode(FileState.self, forColumn: CodingKeys.state.rawValue)
+        firstSeen = try row.decode(Date.self, forColumn: CodingKeys.firstSeen.rawValue)
+        expiresAt = try row.decode(Date?.self, forColumn: CodingKeys.expiresAt.rawValue)
+        trashPath = try row.decode(String?.self, forColumn: CodingKeys.trashPath.rawValue)
+        failureCount = try row.decode(Int.self, forColumn: CodingKeys.failureCount.rawValue)
+        updatedAt = try row.decode(Date.self, forColumn: CodingKeys.updatedAt.rawValue)
+        scheduleDuration = try row.decode(TimeInterval?.self, forColumn: CodingKeys.scheduleDuration.rawValue)
+        duplicateOf = try row.decode(String?.self, forColumn: CodingKeys.duplicateOf.rawValue)
+        // An unknown value (e.g. written by a newer version) reads as no resolution instead of failing the fetch.
+        resolution = try row.decode(String?.self, forColumn: CodingKeys.resolution.rawValue)
+            .flatMap(Resolution.init(rawValue:))
+        viaRule = try row.decode(Bool.self, forColumn: CodingKeys.viaRule.rawValue)
+    }
+
     public enum CodingKeys: String, CodingKey, ColumnExpression {
         case id
         case folderId = "folder_id"
