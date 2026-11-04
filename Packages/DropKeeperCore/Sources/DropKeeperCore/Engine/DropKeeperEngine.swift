@@ -110,8 +110,13 @@ public actor DropKeeperEngine {
     /// Only the newest value is buffered. The observation runs until the stream is iterated to its end, or its
     /// iterating task is cancelled, or the stream is dropped — iterate it or drop it to stop the observation.
     public nonisolated func fileUpdates(in states: [FileState]) -> AsyncThrowingStream<[TrackedFile], any Error> {
-        let observation = observeFiles(in: states)
-        return AsyncThrowingStream(bufferingPolicy: .bufferingNewest(1)) { continuation in
+        stream(observeFiles(in: states))
+    }
+
+    private nonisolated func stream(
+        _ observation: AsyncValueObservation<[TrackedFile]>
+    ) -> AsyncThrowingStream<[TrackedFile], any Error> {
+        AsyncThrowingStream(bufferingPolicy: .bufferingNewest(1)) { continuation in
             let task = Task {
                 do {
                     for try await files in observation {
@@ -129,24 +134,12 @@ public actor DropKeeperEngine {
     /// Number of decisions shown in the history by default.
     public static let historyLimit = 10
 
-    /// Stream of the most recent decisions, newest first; same shape and lifetime rules as `fileUpdates(in:)`.
+    /// Stream of the most recent decisions, newest first. Same shape and lifetime rules as `fileUpdates(in:)`:
+    /// iterate it to its end or drop it to stop the observation.
     public nonisolated func historyUpdates(
         limit: Int = DropKeeperEngine.historyLimit
     ) -> AsyncThrowingStream<[TrackedFile], any Error> {
-        let observation = env.store.observeHistory(limit: limit)
-        return AsyncThrowingStream(bufferingPolicy: .bufferingNewest(1)) { continuation in
-            let task = Task {
-                do {
-                    for try await files in observation {
-                        continuation.yield(files)
-                    }
-                    continuation.finish()
-                } catch {
-                    continuation.finish(throwing: error)
-                }
-            }
-            continuation.onTermination = { _ in task.cancel() }
-        }
+        stream(env.store.observeHistory(limit: limit))
     }
 
     // MARK: Lifecycle
