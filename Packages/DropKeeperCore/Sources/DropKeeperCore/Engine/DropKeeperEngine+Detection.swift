@@ -132,6 +132,7 @@ extension DropKeeperEngine {
             if let rule {
                 // Scheduled before the insert: one write, so the record is never observable as pending.
                 actions.schedule(&file, duration: rule.duration, now: now, tagEnabled: settings.finderTagEnabled)
+                file.viaRule = true
                 guard insert(file) else { continue }
                 applications.append(RuleApplication(file: file, ruleId: rule.id, ruleName: rule.name))
             } else {
@@ -189,8 +190,10 @@ extension DropKeeperEngine {
             // The duplicate stays pending for the user to decide; the rule's duration applies after the grace period.
             file.duplicateOf = duplicate
             file.scheduleDuration = current?.duration
+            file.viaRule = current != nil
         } else if let current {
             actions.schedule(&file, duration: current.duration, now: now, tagEnabled: settings.finderTagEnabled)
+            file.viaRule = true
         }
         guard insert(file) else { return }
         if file.state == .scheduled, let current {

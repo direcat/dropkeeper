@@ -44,7 +44,7 @@ extension DropKeeperEngine {
         if recordChoice { storeLastChoice(.keep) }
         try forEach(ids) { id in
             guard var file = try store.file(id: id), file.state.isActive || file.state == .failed else { return }
-            actions.keep(&file, now: now)
+            actions.keep(&file, now: now, resolution: .userKept)
             try store.update(file)
         }
     }
@@ -56,6 +56,7 @@ extension DropKeeperEngine {
         try forEach(ids) { id in
             guard var file = try store.file(id: id), file.state == .trashed, file.trashPath != nil else { return }
             try trasher.undo(&file, now: now)
+            file.resolution = .restored
             // The restored file still carries the expiry xattr and Finder tag from before disposal.
             actions.clearMarks(at: file.path)
             if let stat = env.fs.stat(file.path) {
@@ -117,6 +118,7 @@ extension DropKeeperEngine {
             guard trasher.dispose(&file, mode: settings.deleteMode, now: now) == .disposed else {
                 throw DeleteNowError.notDisposed
             }
+            file.resolution = .deletedNow
             try store.update(file)
             trashed.append(file)
         }
@@ -129,7 +131,7 @@ extension DropKeeperEngine {
         let now = env.time.now()
         var failed: [FileID] = []
         for var file in try store.files(in: [.pending, .scheduled, .failed], folderId: id) {
-            actions.keep(&file, now: now)
+            actions.keep(&file, now: now, resolution: .folderRemoved)
             do {
                 try store.update(file)
             } catch {

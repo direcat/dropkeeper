@@ -304,7 +304,9 @@ public actor DropKeeperEngine {
     /// One disposal attempt for an expired scheduled record; collects successes into `trashed`.
     private func dispose(_ file: inout TrackedFile, now: Date, trashed: inout [TrackedFile]) {
         switch trasher.dispose(&file, mode: settings.deleteMode, now: now) {
-        case .disposed: trashed.append(file)
+        case .disposed:
+            file.resolution = .expired
+            trashed.append(file)
         case .failed: notify.yield(.failed(file))
         case .retryScheduled: break
         }
@@ -318,7 +320,7 @@ public actor DropKeeperEngine {
         }
         switch settings.resolve(lastChoice: storedLastChoice()) {
         case .keep:
-            actions.keep(&file, now: now)
+            actions.keep(&file, now: now, resolution: .defaultKept)
         case .expireAfter(let duration):
             actions.schedule(&file, duration: duration, now: now, tagEnabled: settings.finderTagEnabled)
         }

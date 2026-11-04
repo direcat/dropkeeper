@@ -24,13 +24,17 @@ public struct TrackedFile: Codable, Sendable, Equatable, Identifiable, Fetchable
     public var scheduleDuration: TimeInterval?
     /// Display name of the identical existing file this one duplicates, if any.
     public var duplicateOf: String?
+    /// How the record was finished; nil while it is active and for history from before 1.2.
+    public var resolution: Resolution?
+    /// True when a rule scheduled the file.
+    public var viaRule: Bool
 
     /// Public memberwise initializer (declared explicitly so it is visible outside the module).
     public init(
         id: FileID, folderId: Int64?, path: String, inode: Int64, volumeId: String, displayName: String,
         kind: FileKind, sizeBytes: Int64?, state: FileState, firstSeen: Date, expiresAt: Date?,
         trashPath: String?, failureCount: Int, updatedAt: Date, scheduleDuration: TimeInterval? = nil,
-        duplicateOf: String? = nil
+        duplicateOf: String? = nil, resolution: Resolution? = nil, viaRule: Bool = false
     ) {
         self.id = id
         self.folderId = folderId
@@ -48,6 +52,8 @@ public struct TrackedFile: Codable, Sendable, Equatable, Identifiable, Fetchable
         self.updatedAt = updatedAt
         self.scheduleDuration = scheduleDuration
         self.duplicateOf = duplicateOf
+        self.resolution = resolution
+        self.viaRule = viaRule
     }
 
     public enum CodingKeys: String, CodingKey, ColumnExpression {
@@ -66,6 +72,8 @@ public struct TrackedFile: Codable, Sendable, Equatable, Identifiable, Fetchable
         case updatedAt = "updated_at"
         case scheduleDuration = "schedule_duration"
         case duplicateOf = "duplicate_of"
+        case resolution
+        case viaRule = "via_rule"
     }
 }
 

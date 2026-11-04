@@ -173,3 +173,26 @@ private func sampleFolder(_ path: String = "/fake/D") -> WatchedFolder {
     #expect(file.duplicateOf == nil)
     #expect(!result.recoveredFromCorruption)
 }
+
+@Test func v2DatabaseMigratesToV3WithNilResolution() throws {
+    let dir = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString, isDirectory: true)
+    try FileManager.default.createDirectory(at: dir, withIntermediateDirectories: true)
+    defer { try? FileManager.default.removeItem(at: dir) }
+    let url = dir.appendingPathComponent("dropkeeper.sqlite")
+    // Build a current store, then rewind it to the v2 shape: no resolution / via_rule columns, no "v3" row.
+    try FileStore.open(at: url).store.insert(sampleFile(id: "OLD", state: .kept))
+    let legacy = try DatabaseQueue(path: url.path)
+    try legacy.write { db in
+        try db.execute(sql: "ALTER TABLE tracked_file DROP COLUMN resolution")
+        try db.execute(sql: "ALTER TABLE tracked_file DROP COLUMN via_rule")
+        try db.execute(sql: "DELETE FROM grdb_migrations WHERE identifier = 'v3'")
+        let columns = try String.fetchAll(db, sql: "SELECT name FROM pragma_table_info('tracked_file')")
+        #expect(!columns.contains("resolution") && !columns.contains("via_rule"))
+    }
+    try legacy.close()
+    let result = try FileStore.open(at: url)
+    let file = try #require(try result.store.file(id: "OLD"))
+    #expect(file.state == .kept)
+    #expect(file.resolution == nil && file.viaRule == false)
+    #expect(!result.recoveredFromCorruption)
+}

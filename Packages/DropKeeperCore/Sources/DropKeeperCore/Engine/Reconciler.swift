@@ -35,6 +35,7 @@ public struct Reconciler: Sendable {
             return place(&file, at: newPath, folders: folders, now: now, identityChanged: false)
         }
         file.state = .gone
+        file.resolution = .removedOutside
         file.expiresAt = nil
         file.updatedAt = now
         return .gone
@@ -59,6 +60,7 @@ public struct Reconciler: Sendable {
         }
         if file.state == .trashed || file.state == .gone {
             file.state = .kept
+            file.resolution = .reappeared
             file.expiresAt = nil
             file.trashPath = nil
             changed = true
@@ -77,6 +79,7 @@ public struct Reconciler: Sendable {
         guard let folder = folders.first(where: { $0.contains(path) }) else {
             if file.state.isActive {
                 file.state = .kept
+                file.resolution = .movedOut
                 file.expiresAt = nil
                 file.updatedAt = now
                 return .kept

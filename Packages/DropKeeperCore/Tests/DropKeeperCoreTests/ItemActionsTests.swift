@@ -27,7 +27,7 @@ private func makeFile(_ fs: FakeFileSystem, _ path: String = "/fake/D/a.pdf") ->
     var file = makeFile(fs)
     let actions = ItemActions(fs: fs)
     actions.schedule(&file, duration: 60, now: TestTimeSource.base, tagEnabled: true)
-    actions.keep(&file, now: TestTimeSource.base)
+    actions.keep(&file, now: TestTimeSource.base, resolution: .userKept)
     #expect(file.state == .kept)
     #expect(file.expiresAt == nil)
     #expect(fs.xattr(ItemActions.expiryAttribute, at: file.path) == nil)
@@ -41,7 +41,7 @@ private func makeFile(_ fs: FakeFileSystem, _ path: String = "/fake/D/a.pdf") ->
     let actions = ItemActions(fs: fs)
     actions.schedule(&file, duration: 3600, now: TestTimeSource.base, tagEnabled: false)
     #expect(file.scheduleDuration == 3600)
-    actions.keep(&file, now: TestTimeSource.base)
+    actions.keep(&file, now: TestTimeSource.base, resolution: .userKept)
     #expect(file.scheduleDuration == nil)
 }
 

@@ -22,6 +22,7 @@ public struct ItemActions: Sendable {
         file.state = .scheduled
         file.expiresAt = expiry
         file.scheduleDuration = duration
+        file.resolution = nil
         file.failureCount = 0
         file.updatedAt = now
         try? fs.writeXattr(Self.idAttribute, value: file.id, at: file.path)
@@ -41,8 +42,9 @@ public struct ItemActions: Sendable {
         try? fs.writeXattr(Self.expiryAttribute, value: ISODate.format(extended), at: file.path)
     }
 
-    public func keep(_ file: inout TrackedFile, now: Date) {
+    public func keep(_ file: inout TrackedFile, now: Date, resolution: Resolution) {
         file.state = .kept
+        file.resolution = resolution
         file.expiresAt = nil
         file.scheduleDuration = nil
         file.failureCount = 0

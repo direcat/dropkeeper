@@ -122,6 +122,12 @@ public final class FileStore: Sendable {
                 table.add(column: "duplicate_of", .text)
             }
         }
+        migrator.registerMigration("v3") { db in
+            try db.alter(table: "tracked_file") { table in
+                table.add(column: "resolution", .text)
+                table.add(column: "via_rule", .boolean).notNull().defaults(to: false)
+            }
+        }
         return migrator
     }
 
