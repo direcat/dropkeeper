@@ -66,6 +66,8 @@ struct SettingsRow<Title: View, Control: View>: View {
     let title: Title
     let caption: LocalizedStringKey?
     let control: Control
+    /// Only `.disabled` changes this; a control greying out in an inactive window is the system's own business.
+    @Environment(\.isEnabled) private var isEnabled
 
     init(
         caption: LocalizedStringKey? = nil, @ViewBuilder title: () -> Title, @ViewBuilder control: () -> Control
@@ -86,6 +88,7 @@ struct SettingsRow<Title: View, Control: View>: View {
                         .fixedSize(horizontal: false, vertical: true)
                 }
             }
+            .opacity(isEnabled ? 1 : TK.Opacity.disabled)
             Spacer(minLength: 0)
             control
         }

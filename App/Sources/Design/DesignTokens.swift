@@ -166,6 +166,8 @@ enum TK {
         static let knobHalo = 0.25
         /// A muted row (a file that could not be deleted).
         static let muted = 0.6
+        /// The title and caption of a disabled Settings row (its control greys out by itself).
+        static let disabled = 0.5
     }
     /// The soft shadow under the timeline knob.
     enum Shadow {
