@@ -53,7 +53,7 @@ final class ListPanelController {
         hostingView.sizingOptions = [.intrinsicContentSize]
         hostingView.onIntrinsicSizeChange = { [weak self] in
             // Invalidation happens during layout: resize on the next turn.
-            DispatchQueue.main.async { MainActor.assumeIsolated { self?.layout() } }
+            DispatchQueue.main.async { MainActor.assumeIsolated { _ = self?.layout() } }
         }
         panel.contentView = hostingView
         hosting = hostingView
