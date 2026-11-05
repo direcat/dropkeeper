@@ -166,7 +166,9 @@ func ordinaryPatternsAreNotMatchAll(raw: String) {
 }
 
 @Test func emptySpaceFreedReadsAsNumber() {
-    #expect(StatisticsText.rows(.zero).last?.value.contains("0") == true)
+    let value = StatisticsText.rows(.zero).last?.value ?? ""
+    #expect(value.hasPrefix("0"))
+    #expect(value != "Zero KB")
 }
 
 @Test func appearanceTitlesFollowTheCases() {

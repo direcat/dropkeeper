@@ -24,7 +24,7 @@ enum StatisticsText {
 private func bytes(_ count: Int64) -> String {
     let formatter = ByteCountFormatter()
     formatter.countStyle = .file
-    formatter.allowsNonnumericFormatting = false  // "0 KB", not "Zero KB"
+    formatter.allowsNonnumericFormatting = false  // "0 bytes", not "Zero KB"
     return formatter.string(fromByteCount: count)
 }
 

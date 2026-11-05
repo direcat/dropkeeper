@@ -140,6 +140,8 @@ enum TK {
         static let hideBar: CGFloat = 3
         /// A hairline divider between panel sections.
         static let hairline: CGFloat = 1
+        /// The divider between Settings rows and under the tab bar.
+        static let separator: CGFloat = 0.5
         static let settingsWindow = CGSize(width: 680, height: 560)
         static let ruleEditor = CGSize(width: 480, height: 400)
         /// Room for the longest value label beside a Settings step slider, and the slider itself.

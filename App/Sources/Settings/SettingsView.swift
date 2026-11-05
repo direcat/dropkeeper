@@ -81,7 +81,7 @@ struct SettingsRootView: View {
     var body: some View {
         VStack(spacing: 0) {
             tabBar
-            Rectangle().fill(TK.Palette.hairline).frame(height: TK.Size.hairline)
+            Rectangle().fill(TK.Palette.hairline).frame(height: TK.Size.separator)
             SettingsTabView(tab: store.activeTab, model: model, store: store)
                 .id(store.activeTab)
         }

@@ -50,7 +50,7 @@ struct SettingsGroup<Content: View>: View {
                 ForEach(rows) { row in
                     row
                     if row.id != rows.last?.id {
-                        Rectangle().fill(TK.Palette.hairline).frame(height: TK.Size.hairline)
+                        Rectangle().fill(TK.Palette.hairline).frame(height: TK.Size.separator)
                     }
                 }
             }
