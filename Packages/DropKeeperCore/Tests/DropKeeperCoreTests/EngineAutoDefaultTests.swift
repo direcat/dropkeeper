@@ -176,7 +176,7 @@ import Testing
         #expect(!harness.fs.exists(EngineHarness.downloads + "/x (1).pdf"))
     }
 
-    @Test func aScheduledOriginalIsNeverTheOneThatSurvivesAlone() async throws {
+    @Test func copyOfAScheduledOriginalIsNotDeleted() async throws {
         // The original is still scheduled for deletion, so deleting the copy now could lose the last one.
         let harness = try await harness(rules: [
             Rule(name: "Images", match: .category(.images), folderPath: EngineHarness.downloads, duration: 3600)

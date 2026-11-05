@@ -44,8 +44,8 @@ final class ListPanelController {
     func show() {
         guard !isShown, let frame = anchorFrame() else { return }
         anchor = frame
-        // Activating the app makes ⌘, and ⌘Q from the main menu work while the card is key.
-        AppActivation.activate()
+        // The card never activates the app (the user's app keeps its focus and gets it back when the card closes);
+        // its own ⌘, and ⌘Q are handled by the key monitor.
         model.isListOpen = true
         // A fresh view each time, so the card opens on Upcoming.
         let root = PendingListView(model: model, actions: actions)
@@ -112,17 +112,12 @@ final class ListPanelController {
         {
             monitors.append(local)
         }
-        // Esc, while the card is key (an open menu takes it first).
+        // Esc, ⌘, ⌘Q and ⌘W, while the card is key (an open menu takes Esc first).
         if let keys = NSEvent.addLocalMonitorForEvents(
             matching: .keyDown,
             handler: { [weak self] event in
-                guard event.keyCode == Self.escapeKeyCode else { return event }
                 // AppKit calls local monitors on the main thread.
-                let handled = MainActor.assumeIsolated { () -> Bool in
-                    guard let self, event.window === self.panel else { return false }
-                    self.close()
-                    return true
-                }
+                let handled = MainActor.assumeIsolated { self?.handleKey(event) ?? false }
                 return handled ? nil : event
             })
         {
@@ -140,6 +135,23 @@ final class ListPanelController {
         monitors = []
         if let deactivationObserver { NotificationCenter.default.removeObserver(deactivationObserver) }
         deactivationObserver = nil
+    }
+
+    /// Keys the card handles itself, since the app is not active and its main menu does not see them.
+    private func handleKey(_ event: NSEvent) -> Bool {
+        guard event.window === panel else { return false }
+        if event.keyCode == Self.escapeKeyCode {
+            close()
+            return true
+        }
+        guard event.modifierFlags.intersection(.deviceIndependentFlagsMask) == .command else { return false }
+        switch event.charactersIgnoringModifiers {
+        case ",": actions.openSettings()
+        case "q": NSApp.terminate(nil)
+        case "w": close()
+        default: return false
+        }
+        return true
     }
 
     private func closeForClick(in window: NSWindow?) {

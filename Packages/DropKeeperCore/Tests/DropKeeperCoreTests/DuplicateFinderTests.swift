@@ -73,3 +73,15 @@ struct DuplicateFinderTests {
             DuplicateFinder.firstMatch(path: folder + "/new.dat", candidates: names, folderPath: folder, fs: fs) == nil)
     }
 }
+
+@Test func copyNamesAreRecognisedAndTheOriginalWinsAPair() {
+    #expect(DuplicateFinder.isCopyName("/d/x (1).pdf"))
+    #expect(DuplicateFinder.isCopyName("/d/x (12)"))
+    #expect(DuplicateFinder.isCopyName("/d/x.tar (1).gz"))
+    #expect(!DuplicateFinder.isCopyName("/d/x.pdf"))
+    #expect(!DuplicateFinder.isCopyName("/d/x ().pdf"))
+    #expect(!DuplicateFinder.isCopyName("/d/x (a).pdf"))
+    #expect(DuplicateFinder.isPreferredOriginal("/d/x.pdf", over: "/d/x (1).pdf"))
+    #expect(!DuplicateFinder.isPreferredOriginal("/d/x (1).pdf", over: "/d/x.pdf"))
+    #expect(DuplicateFinder.isPreferredOriginal("/d/x (1).pdf", over: "/d/x (2).pdf"))  // both copies: path order
+}
