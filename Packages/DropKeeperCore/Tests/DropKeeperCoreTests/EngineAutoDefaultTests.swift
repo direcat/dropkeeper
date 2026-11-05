@@ -251,13 +251,29 @@ import Testing
         #expect(try harness.file(named: "orig copy.png").state == .scheduled)
     }
 
-    @Test func copyIsKeptWhenTheOriginalVanishesDuringTheCheck() async throws {
+    @Test func copyIsKeptWhenTheOriginalVanishesAfterTheCompare() async throws {
         let harness = try await harness()
         let original = EngineHarness.downloads + "/report.png"
-        harness.fs.contentsEqualHook = { _, _ in try? harness.fs.removeItem(original) }
+        harness.fs.contentsEqualDoneHook = { _, _ in try? harness.fs.removeItem(original) }
         await dropDuplicate(harness, name: "report copy.png")
         let copy = try harness.file(named: "report copy.png")
         #expect(copy.state == .kept && copy.duplicateOf == nil)
+        #expect(harness.fs.exists(EngineHarness.downloads + "/report copy.png"))
+    }
+
+    @Test func copyIsKeptWhenTheOriginalIsReplacedAfterTheCompare() async throws {
+        let harness = try await harness()
+        let original = EngineHarness.downloads + "/report.png"
+        let fs = harness.fs
+        let time = harness.time
+        harness.fs.contentsEqualDoneHook = { _, _ in
+            try? fs.removeItem(original)
+            fs.createFile(original, content: Data("new bytes!".utf8), added: time.now())
+        }
+        await dropDuplicate(harness, name: "report copy.png")
+        let copy = try harness.file(named: "report copy.png")
+        #expect(copy.state == .kept && copy.duplicateOf == nil)
+        #expect(harness.fs.exists(EngineHarness.downloads + "/report copy.png"))
     }
 
     @Test func copyOfAGoneOriginalTakesTheDefaultPath() async throws {

@@ -25,6 +25,7 @@ final class FakeFileSystem: FileSystem {
         var trashedPaths: [String] = []
         var removedPaths: [String] = []
         var contentsEqualHook: (@Sendable (String, String) -> Void)?
+        var contentsEqualDoneHook: (@Sendable (String, String) -> Void)?
     }
 
     private let state = Mutex(State())
@@ -102,6 +103,11 @@ final class FakeFileSystem: FileSystem {
     var contentsEqualHook: (@Sendable (String, String) -> Void)? {
         get { state.withLock { $0.contentsEqualHook } }
         set { state.withLock { $0.contentsEqualHook = newValue } }
+    }
+    /// Runs after every `contentsEqual` that found equal bytes, outside the lock, before it returns.
+    var contentsEqualDoneHook: (@Sendable (String, String) -> Void)? {
+        get { state.withLock { $0.contentsEqualDoneHook } }
+        set { state.withLock { $0.contentsEqualDoneHook = newValue } }
     }
     var trashedPaths: [String] { state.withLock { $0.trashedPaths } }
     var removedPaths: [String] { state.withLock { $0.removedPaths } }
@@ -205,12 +211,14 @@ final class FakeFileSystem: FileSystem {
 
     func contentsEqual(_ first: String, _ second: String) -> Bool {
         contentsEqualHook?(first, second)
-        return state.withLock { state in
+        let equal = state.withLock { state in
             guard let left = state.entries[first]?.content,
                 let right = state.entries[second]?.content
             else { return false }
             return left == right
         }
+        if equal { contentsEqualDoneHook?(first, second) }
+        return equal
     }
 
     func canonicalPath(_ path: String) -> String { path }

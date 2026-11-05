@@ -169,9 +169,10 @@ extension DropKeeperEngine {
     /// scheduled original only counts when the copy would be scheduled for deletion anyway (`copyGoesAnyway`: a rule
     /// matches it, or the default is a timer) and the original is not about to expire; otherwise deleting the copy
     /// now could leave nothing when the original expires.
-    private func isSafeOriginal(_ name: String, in folder: WatchedFolder, copyGoesAnyway: Bool) -> Bool {
-        let path = folder.path + "/" + name
-        guard duplicateChecks[path] == nil, let stat = env.fs.stat(path) else { return false }
+    private func isSafeOriginal(_ match: DuplicateMatch, in folder: WatchedFolder, copyGoesAnyway: Bool) -> Bool {
+        let path = folder.path + "/" + match.name
+        // Unchanged since the comparison started: a replaced or rewritten original no longer matches the copy.
+        guard duplicateChecks[path] == nil, let stat = env.fs.stat(path), stat == match.stat else { return false }
         guard let record = trackedRecord(at: path, stat: stat), record.state == .scheduled else { return true }
         guard copyGoesAnyway, let expiresAt = record.expiresAt else { return false }
         return expiresAt > env.time.now().addingTimeInterval(Self.originalExpiryMargin)
@@ -179,11 +180,12 @@ extension DropKeeperEngine {
 
     /// The original to keep for a found duplicate. While the default action is applied right away the duplicate is
     /// deleted, so an original that is gone, new itself or about to go no longer counts (never delete the last copy).
-    private func confirmedDuplicate(_ name: String?, in folder: WatchedFolder, ruleMatched: Bool) -> String? {
-        guard let name, settings.appliesDefaultRightAway else { return name }
+    private func confirmedDuplicate(_ match: DuplicateMatch?, in folder: WatchedFolder, ruleMatched: Bool) -> String? {
+        guard let match else { return nil }
+        guard settings.appliesDefaultRightAway else { return match.name }
         var timerDefault = false
         if case .expireAfter = settings.resolve(lastChoice: storedLastChoice()) { timerDefault = true }
-        return isSafeOriginal(name, in: folder, copyGoesAnyway: ruleMatched || timerDefault) ? name : nil
+        return isSafeOriginal(match, in: folder, copyGoesAnyway: ruleMatched || timerDefault) ? match.name : nil
     }
 
     /// An original that expires within this long is treated as already gone.
@@ -203,34 +205,38 @@ extension DropKeeperEngine {
         let path = file.path
         let folderPath = folder.path
         let task = Task.detached(priority: .utility) { [weak self] in
+            // Each candidate's identity before the bytes are read: the match is only good while it is unchanged.
+            let before = Dictionary(
+                candidates.map { ($0, fs.stat(folderPath + "/" + $0)) }, uniquingKeysWith: { first, _ in first })
             let name = DuplicateFinder.firstMatch(path: path, candidates: candidates, folderPath: folderPath, fs: fs)
+            let match = name.map { DuplicateMatch(name: $0, stat: before[$0] ?? nil) }
             await self?.finishDuplicateCheck(
-                file: file, stat: stat, rule: rule, defersInsert: deferred, duplicate: name)
+                file: file, stat: stat, rule: rule, defersInsert: deferred, duplicate: match)
         }
         duplicateChecks[path] = DuplicateCheck(task: task, file: file, awaitsInsert: deferred)
     }
 
     func finishDuplicateCheck(
-        file: TrackedFile, stat: FileStat, rule: Rule?, defersInsert: Bool, duplicate: String?
+        file: TrackedFile, stat: FileStat, rule: Rule?, defersInsert: Bool, duplicate: DuplicateMatch?
     ) {
         duplicateChecks[file.path] = nil
         guard isRunning else { return }
         // Settings may have changed during the comparison.
-        let duplicate = settings.duplicateDetection ? duplicate : nil
+        let match = settings.duplicateDetection ? duplicate : nil
         guard defersInsert else {
             // Only a record that is still the same pending item gets the hint.
-            guard let name = duplicate, var current = try? store.file(id: file.id), current.state == .pending,
+            guard let name = match?.name, var current = try? store.file(id: file.id), current.state == .pending,
                 current.path == file.path
             else { return }
             current.duplicateOf = name
             update(current)
             return
         }
-        insertDeferred(file, stat: stat, rule: rule, duplicate: duplicate)
+        insertDeferred(file, stat: stat, rule: rule, duplicate: match)
     }
 
     /// Inserts a file whose insert waited for its duplicate check, resolved by what the check found.
-    private func insertDeferred(_ file: TrackedFile, stat: FileStat, rule: Rule?, duplicate: String?) {
+    private func insertDeferred(_ file: TrackedFile, stat: FileStat, rule: Rule?, duplicate: DuplicateMatch?) {
         let now = env.time.now()
         guard let folder = validatedFolder(for: file, stat: stat, now: now) else { return }
         // The rule may have been disabled or removed meanwhile: then the file is a plain pending item.

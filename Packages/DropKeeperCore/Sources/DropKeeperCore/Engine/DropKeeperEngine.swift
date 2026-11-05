@@ -81,6 +81,12 @@ public actor DropKeeperEngine {
     /// Off-actor duplicate comparisons in flight, by path; also keeps a file from being detected twice meanwhile.
     var duplicateChecks: [String: DuplicateCheck] = [:]
 
+    /// The original a new file matched, with its identity when the comparison started.
+    struct DuplicateMatch: Sendable {
+        let name: String
+        let stat: FileStat?
+    }
+
     struct DuplicateCheck {
         let task: Task<Void, Never>
         let file: TrackedFile
