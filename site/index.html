@@ -60,7 +60,7 @@
     </div>
 
     <figure class="screen">
-      <video id="demo" autoplay muted loop playsinline preload="metadata" poster="assets/demo-poster.jpg" width="920" height="540" aria-label="Demo: a downloaded file appears, the prompt drops out of the notch, a slider picks one day, and the file is later moved to the Trash with an Undo button.">
+      <video id="demo" autoplay muted loop playsinline preload="metadata" poster="assets/demo-poster.jpg" width="920" height="540" aria-label="Demo: a downloaded file appears, the prompt opens under the menu bar icon, a slider picks one day, and the file is later moved to the Trash with an Undo button.">
         <source src="assets/dropkeeper-demo.mp4" type="video/mp4">
       </video>
       <button type="button" class="pp" id="pp" aria-label="Pause the demo video" hidden>Pause</button>
@@ -76,7 +76,7 @@
       <ol class="track">
         <li>
           <h3>A file lands</h3>
-          <p>Download something into a watched folder and a small prompt opens, under the menu bar icon or from the notch.</p>
+          <p>Download something into a watched folder and a small prompt opens under the menu bar icon. Ignore it and it hides by itself; the file stays in the list.</p>
         </li>
         <li>
           <h3>You pick when it goes</h3>
@@ -119,8 +119,20 @@
           <dd>Expired files go to the Trash and the notice has an Undo button. Nothing is gone until you empty the Trash.</dd>
         </div>
         <div>
-          <dt>Notch or menu bar</dt>
-          <dd>The prompt works on any display setup: under the menu bar icon, or optionally from the notch.</dd>
+          <dt>Under the menu bar icon</dt>
+          <dd>The prompt is a small floating card that works on any display setup. It hides after a time you choose, 30 seconds by default, and the file stays in the list.</dd>
+        </div>
+        <div>
+          <dt>History</dt>
+          <dd>The last 10 decisions are in the list. A file that went to the Trash can be put back.</dd>
+        </div>
+        <div>
+          <dt>Statistics</dt>
+          <dd>Files handled, kept or moved to the Trash, and the space freed, since the oldest entry in your history. All of it is computed on your Mac.</dd>
+        </div>
+        <div>
+          <dt>Light, Dark or Auto</dt>
+          <dd>Follow the system or pick an appearance of your own in Settings.</dd>
         </div>
         <div>
           <dt>Several folders</dt>

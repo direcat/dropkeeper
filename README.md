@@ -11,7 +11,10 @@ Keep what matters. Let the rest disappear. When a file lands in a watched folder
 
 - **100 % offline** — no analytics, no tracking, no update checks, no network access at all. Enforced in CI.
 - **Free and open source** (MIT).
-- **Works on any display setup** — a prompt under the menu bar icon, or (optional) from the notch.
+- **A prompt under the menu bar icon** — a small floating card that works on any display setup. It hides by itself after a time you choose (30 seconds by default) and the file stays in the list.
+- **History** — the last 10 decisions in the list, with Put back for files that went to the Trash.
+- **Statistics** — files handled, kept or moved to the Trash, and the space freed, in Settings.
+- **Light, Dark or Auto** — follows the system or stays as you set it.
 - **Rules** — match by file type, name pattern or folder (installers, screenshots, images, archives, invitations) and skip the prompt; first match wins.
 - **Reminders** — a heads-up before a file goes (5 minutes by default): extend it, keep it or delete it now.
 - **Duplicate detection** — a file that matches one in the same folder is flagged, with a one-click Delete duplicate.
@@ -20,7 +23,7 @@ Keep what matters. Let the rest disappear. When a file lands in a watched folder
 - **Speaks your language** — English, Czech, German, Spanish and French, switchable in Settings.
 - Apple Silicon, macOS 15 Sequoia or later.
 
-![DropKeeper demo: a downloaded file appears, the prompt drops out of the notch, a slider picks one day, and the file is later moved to the Trash with an Undo button](assets/demo/dropkeeper-demo.gif)
+![DropKeeper demo: a downloaded file appears, the prompt opens under the menu bar icon, a slider picks one day, and the file is later moved to the Trash with an Undo button](assets/demo/dropkeeper-demo.gif)
 
 ### Screenshots
 
@@ -34,7 +37,7 @@ Keep what matters. Let the rest disappear. When a file lands in a watched folder
 
 ## How it works
 
-A new file lands in a watched folder, a small prompt opens, and you pick when it should go: 30 minutes, an hour, a day, ten days — or keep it. When the time is up, DropKeeper moves the file to the Trash (Undo is one click away). Rename it or move it into a subfolder and it is still tracked; move it out of the watched folders and it is kept. Files that were there before you installed DropKeeper are never touched.
+A new file lands in a watched folder, a small prompt opens under the menu bar icon, and you pick when it should go: 30 minutes, an hour, a day, ten days — or keep it. When the time is up, DropKeeper moves the file to the Trash (Undo is one click away). Rename it or move it into a subfolder and it is still tracked; move it out of the watched folders and it is kept. Files that were there before you installed DropKeeper are never touched.
 
 ## Install
 

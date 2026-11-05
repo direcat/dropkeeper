@@ -18,21 +18,14 @@ Quit it from the menu bar item (or Ctrl-C in the terminal) when done.
 Release builds ignore these arguments.
 
 ## Presentation
-The default is "Under the menu bar icon" (the notch is opt-in). All notch checks below require switching Settings > Show new downloads to "Automatically" or "In the notch" first.
+The prompt always appears under the menu bar icon, as its own floating card (no popover arrow); one card at a time.
 
-- [ ] Notched MacBook, lid open, no external display: the prompt grows out of the notch and the closed notch shows the mark + count while files are scheduled.
-- [ ] File name fully visible below the notch (prompt, notice, hover list and error: nothing sits behind the cutout).
-- [ ] Hovering the closed notch opens the list; moving away closes it after a moment.
-- [ ] Hover while the panel resizes (closed notch → list) does not flicker.
-- [ ] Lid closed with an external display: the prompt appears under the menu bar icon.
-- [ ] Automatic follows the pointer: with an external display as primary and the lid open, a new download prompts in the notch when the pointer is on the laptop screen, and under the menu bar icon when the pointer is on the external display.
+- [ ] Lid closed with an external display, and any Mac model: the prompt appears under the menu bar icon.
 - [ ] An open prompt, notice or error does not jump to the other display when the pointer crosses displays.
-- [ ] Automatic with the lid open: the closed notch (mark + count) stays on the laptop screen wherever the pointer is; hovering it opens the list.
-- [ ] With "In the notch": prompt in the notch regardless of the pointer. With "Under the menu bar icon": always under the icon, no closed notch.
-- [ ] Mac without a notch: the prompt appears under the menu bar icon.
 - [ ] Changing displays while a prompt is open moves the prompt to the right place.
 - [ ] Full-screen app in front: the prompt and notice still appear.
 - [ ] Typing in another app is not interrupted when a prompt appears; after clicking the prompt, ←/→, Return and Esc work.
+- [ ] Opening the list while a prompt is showing hides the prompt; there is only ever one card on screen.
 
 ## Flows
 - [ ] Clicking a file name in the prompt or the list opens the file in its default app; Open in the row menu does the same and is disabled when the file and its folder are gone.
@@ -44,9 +37,9 @@ The default is "Under the menu bar icon" (the notch is opt-in). All notch checks
 - [ ] A file expires while a prompt is open: after the prompt closes, the notice shows for 2.5 s with Undo.
 - [ ] Expiry: the file goes to the Trash, the notice shows for 2.5 s, and Undo puts it back.
 - [ ] Two expiries within 2.5 s: one merged notice; Undo restores both.
-- [ ] List row menu → Move to Trash: the file goes to the Trash at once and the notice with Undo appears; in permanent-delete mode the item reads "Delete Permanently", asks for confirmation (Cancel keeps the file), and the notice has no Undo; disabled when the file is gone. Also try Delete from the notch hover list (not only the menu bar popover); the confirmation alert must come to the front.
+- [ ] List row menu → Move to Trash: the file goes to the Trash at once and the notice with Undo appears; in permanent-delete mode the item reads "Delete Permanently", asks for confirmation (Cancel keeps the file), and the notice has no Undo; disabled when the file is gone. Also try Delete from the list (not only the prompt); the confirmation alert must come to the front.
 - [ ] Permanent-delete mode: confirmation on switching; the notice says "Deleted" and has no Undo.
-- [ ] Last 10 seconds: an amber countdown in the menu bar (and the closed notch).
+- [ ] Last 10 seconds: an amber countdown in the menu bar.
 - [ ] Sleep the Mac past an expiry: after wake the file is trashed within seconds.
 - [ ] Remove Downloads access in System Settings: warning icon in the menu bar and in Settings; "Check again" clears it after granting access.
 - [ ] Launch at login toggles in System Settings → General → Login Items.
@@ -55,7 +48,7 @@ The default is "Under the menu bar icon" (the notch is opt-in). All notch checks
 - [ ] If the engine can't start, an alert says so and DropKeeper quits (no silent menu bar item).
 
 ## 1.1 features
-- [ ] Unified panel, menu bar and notch: a reminder, a rule notice and "Moved to Trash" show as bars above the prompt (the prompt keeps focus; Return and the arrow keys still act on the prompt); bars stack without flicker and the panel resizes smoothly.
+- [ ] Unified panel under the menu bar icon: a reminder, a rule notice and "Moved to Trash" show as bars above the prompt (the prompt keeps focus; Return and the arrow keys still act on the prompt); bars stack without flicker and the panel resizes smoothly.
 - [ ] Quiet mode: reminders and rule notices still show (they do not open a prompt by themselves) and the menu bar dot behaves as before.
 - [ ] Rules: enable Installers, download a matching file; it skips the prompt, a notice names the rule and Change reopens the prompt. First match wins; Move up / Move down change the outcome; a disabled rule never matches.
 - [ ] Rules on Desktop: with Desktop watched, a screenshot matches Screenshots on Desktop; with Desktop not watched, the rule row in the Rules tab shows an orange hint that the folder isn't watched and the rule does nothing.
@@ -67,11 +60,24 @@ The default is "Under the menu bar icon" (the notch is opt-in). All notch checks
 - [ ] Upgrade 1.0 to 1.1: with a 1.0 database and defaults that have ignored extensions (e.g. pdf), launch 1.1; they appear in Ignored files as `*.pdf` together with the default patterns (`~$*`, `#*#`, `*~`), and every other setting is unchanged.
 - [ ] Ignored patterns: a file named `~$report.docx` or `notes.txt~` in a watched folder gets no prompt.
 
+## 1.2 features
+- [ ] Hide notifications after: with the default 30 s the prompt shows "Hides in N s · stays in the list", hides on its own and the file stays in the list. Never keeps it open; 5 s hides it quickly.
+- [ ] Pointer resting over the prompt while reading: it never hides while hovered; leaving starts the remaining time, not a full new one.
+- [ ] Keyboard-only user picks a time with the arrows after 25 s: the countdown restarts on the key press; with VoiceOver running nothing auto-hides.
+- [ ] Open the list while a prompt is showing, then close it: the panel hides while the list is open and does not reappear for files already decided from the list; a still-pending file shows its prompt again only if it was not timed out or dismissed.
+- [ ] Appearance Dark while macOS is Light (and back to Auto): panel, list, Settings and onboarding all switch immediately, without a restart.
+- [ ] History shows the last 10 decisions; Put back restores a trashed file and the row disappears. Put back for a file whose Trash copy was already emptied shows the error in the panel ("couldn't put back"), the row stays and nothing crashes.
+- [ ] A file put back from the Finder Trash by hand (not via Put back) does not appear in History.
+- [ ] Statistics (Settings > Data) show the counts and space freed since the oldest entry in history; removing a watched folder with many files adds nothing to History or to Kept.
+- [ ] Rules reorder by dragging as well as with Move up / Move down.
+- [ ] Upgrade from 1.1 (also with the old display-mode setting set to a non-default choice): every setting is kept, the notification timeout is 30 s, Appearance is Auto, and a 1.1 database opens with its old history rows still shown in History and Statistics.
+- [ ] Quit while a download is still growing, let it finish, start DropKeeper: it prompts for that file once; a file that vanished meanwhile leaves no trace.
+
 ## Accessibility and appearance
 - [ ] VoiceOver: the timeline reads "Delete in 1 hour, at …" and can be adjusted with VoiceOver gestures.
 - [ ] VoiceOver: the time sliders in Settings read their label and value and can be adjusted; the rule rows' Move up and Move down actions are announced and work.
 - [ ] Reduce Motion: panels fade instead of growing.
-- [ ] Light and dark appearance: Settings and onboarding look right; the notch UI is always black.
+- [ ] Light and dark appearance: Settings and onboarding look right; the panel, the list, Settings and onboarding follow the Appearance setting (see below).
 
 ## Languages
 - [ ] English, Czech, German, Spanish and French: no truncated or untranslated text.
