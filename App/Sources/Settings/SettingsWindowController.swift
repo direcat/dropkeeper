@@ -70,8 +70,7 @@ final class SettingsWindowController {
         model.clearError()
         // Becoming active refreshes the folders (AppDelegate); only an already active app needs it here.
         let wasActive = NSApp.isActive
-        NSApp.activate()
-        window?.makeKeyAndOrderFront(nil)
+        if let window { FrontWindow.present(window) }
         if wasActive { Task { await model.refreshFolders() } }
     }
 

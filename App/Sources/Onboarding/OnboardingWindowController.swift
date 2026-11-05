@@ -15,8 +15,7 @@ final class OnboardingWindowController {
 
     func show() {
         if let window {
-            NSApp.activate()
-            window.makeKeyAndOrderFront(nil)
+            FrontWindow.present(window)
             return
         }
         let downloads = OnboardingFolder.target(
@@ -38,8 +37,7 @@ final class OnboardingWindowController {
         window.isReleasedWhenClosed = false
         window.center()
         self.window = window
-        NSApp.activate()
-        window.makeKeyAndOrderFront(nil)
+        FrontWindow.present(window)
     }
 }
 
