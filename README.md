@@ -17,7 +17,7 @@ Keep what matters. Let the rest disappear. When a file lands in a watched folder
 - **Light, Dark or Auto** — follows the system or stays as you set it.
 - **Rules** — match by file type, name pattern or folder (installers, screenshots, images, archives, invitations) and skip the prompt; first match wins.
 - **Reminders** — a heads-up before a file goes (5 minutes by default): extend it, keep it or delete it now.
-- **Duplicate detection** — a file that matches one in the same folder is flagged, with a one-click Delete duplicate.
+- **Duplicate detection** — a file that matches one in the same folder is flagged, with a one-click Delete duplicate (or deleted right away when Quiet mode applies the default action automatically).
 - **Ignored files** — name patterns (like `~$*` for Office owner files) that DropKeeper never touches.
 - **Several watched folders** — Downloads by default, add Desktop or any other folder.
 - **Speaks your language** — English, Czech, German, Spanish and French, switchable in Settings.
