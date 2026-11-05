@@ -64,3 +64,15 @@ private func dueFile(_ id: String) -> TrackedFile {
     #expect(PanelDecision.showStep(isOnScreen: true, isFadingOut: false, frameChanged: true) == .restore)
     #expect(PanelDecision.showStep(isOnScreen: true, isFadingOut: false, frameChanged: false) == .none)
 }
+
+@Test func panelSlidesDownFromAboveAndResizesOnlyInPlace() {
+    let final = CGRect(x: 100, y: 500, width: 320, height: 200)
+    let start = PanelGeometry.slideStartFrame(for: final, offset: 18)
+    #expect(start == CGRect(x: 100, y: 518, width: 320, height: 200))
+    let taller = CGRect(x: 100, y: 450, width: 320, height: 250)  // same top edge
+    let otherAnchor = CGRect(x: 900, y: 500, width: 320, height: 200)
+    let otherTop = CGRect(x: 100, y: 100, width: 320, height: 200)
+    #expect(PanelGeometry.resizesInPlace(from: final, to: taller))
+    #expect(!PanelGeometry.resizesInPlace(from: final, to: otherAnchor))
+    #expect(!PanelGeometry.resizesInPlace(from: final, to: otherTop))
+}

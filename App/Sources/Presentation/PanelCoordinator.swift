@@ -135,23 +135,23 @@ final class PanelCoordinator {
         case .none:
             return
         case .restore:
+            // A visible panel resizes in place; any other move (new anchor) jumps instead of travelling.
+            let animated = !reduceMotion && PanelGeometry.resizesInPlace(from: panel.frame, to: frame)
             NSAnimationContext.runAnimationGroup { context in
-                context.duration = reduceMotion ? 0 : 0.3
-                context.allowsImplicitAnimation = true
-                panel.animator().setFrame(frame, display: true)
+                context.duration = animated ? TK.Motion.panelResizeDuration : 0
+                context.allowsImplicitAnimation = animated
+                if animated {
+                    panel.animator().setFrame(frame, display: true)
+                } else {
+                    panel.setFrame(frame, display: true)
+                }
                 // Undoes a fade-out that is still running.
                 panel.animator().alphaValue = 1
             }
             syncPointer(frame: frame)
         case .fadeIn:
-            panel.setFrame(frame, display: true)
-            panel.alphaValue = 0
-            panel.orderFrontRegardless()
+            panel.slideIn(to: frame, reduceMotion: reduceMotion)
             syncPointer(frame: frame)
-            NSAnimationContext.runAnimationGroup { context in
-                context.duration = 0.15
-                panel.animator().alphaValue = 1
-            }
         }
     }
 
@@ -165,7 +165,7 @@ final class PanelCoordinator {
         guard panel.isVisible, !isFadingOut else { return }
         isFadingOut = true
         NSAnimationContext.runAnimationGroup { context in
-            context.duration = 0.22
+            context.duration = TK.Motion.panelFadeOutDuration
             panel.animator().alphaValue = 0
         } completionHandler: { [weak self] in
             MainActor.assumeIsolated { self?.finishHide() }

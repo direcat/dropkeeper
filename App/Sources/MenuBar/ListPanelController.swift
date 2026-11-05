@@ -59,14 +59,7 @@ final class ListPanelController {
         hosting = hostingView
         layout()
         let reduceMotion = NSWorkspace.shared.accessibilityDisplayShouldReduceMotion
-        panel.alphaValue = reduceMotion ? 1 : 0
-        panel.makeKeyAndOrderFront(nil)
-        if !reduceMotion {
-            NSAnimationContext.runAnimationGroup { context in
-                context.duration = 0.12
-                panel.animator().alphaValue = 1
-            }
-        }
+        panel.slideIn(to: panel.frame, reduceMotion: reduceMotion, makeKey: true)
         installMonitors()
         onChange?()
     }

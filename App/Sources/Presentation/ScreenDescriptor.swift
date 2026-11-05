@@ -24,4 +24,15 @@ enum PanelGeometry {
         let top = min(anchor.minY, visibleFrame.maxY) - 6
         return CGRect(x: originX, y: top - size.height, width: size.width, height: size.height)
     }
+
+    /// Where a panel starts when it slides down into `final`: the same frame, shifted up.
+    static func slideStartFrame(for final: CGRect, offset: CGFloat = TK.Motion.panelSlideOffset) -> CGRect {
+        final.offsetBy(dx: 0, dy: offset)
+    }
+
+    /// A visible panel only animates to a frame that keeps its left edge and top edge (a pure height change under
+    /// the same anchor); any other change jumps, so it never travels across the screen.
+    static func resizesInPlace(from old: CGRect, to new: CGRect) -> Bool {
+        abs(old.minX - new.minX) < 0.5 && abs(old.maxY - new.maxY) < 0.5
+    }
 }

@@ -26,6 +26,22 @@ final class FloatingPanel: NSPanel {
     override var canBecomeMain: Bool { false }
 }
 
+extension FloatingPanel {
+    /// Shows the panel under the menu bar: it is placed at its start frame while still invisible, then slides down
+    /// to `frame` while it fades in. Reduce Motion: no slide, a plain fade. Never animates from a stale frame.
+    func slideIn(to frame: CGRect, reduceMotion: Bool, makeKey: Bool = false) {
+        alphaValue = 0
+        setFrame(reduceMotion ? frame : PanelGeometry.slideStartFrame(for: frame), display: true)
+        if makeKey { makeKeyAndOrderFront(nil) } else { orderFrontRegardless() }
+        NSAnimationContext.runAnimationGroup { context in
+            context.duration = reduceMotion ? TK.Motion.panelFadeInDuration : TK.Motion.panelSlideDuration
+            context.timingFunction = CAMediaTimingFunction(name: .easeOut)
+            animator().alphaValue = 1
+            if !reduceMotion { animator().setFrame(frame, display: true) }
+        }
+    }
+}
+
 /// The panel never becomes key on its own, so the first click in it would only make it key. Taking the first
 /// mouse lets that click reach the content (e.g. a timeline stop), not just buttons.
 final class FirstMouseHostingView<Content: View>: NSHostingView<Content> {
