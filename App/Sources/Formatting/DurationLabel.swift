@@ -16,6 +16,18 @@ enum DurationLabel {
         return String(localized: "\(minutes) min", comment: "Timeline stop in minutes, e.g. 30 min")
     }
 
+    /// How long the history is kept: "1 month", "1 year", "Forever".
+    static func retention(_ retention: HistoryRetention) -> String {
+        switch retention {
+        case .oneMonth: String(localized: "1 month")
+        case .threeMonths: String(localized: "3 months")
+        case .sixMonths: String(localized: "6 months")
+        case .oneYear: String(localized: "1 year")
+        case .twoYears: String(localized: "2 years")
+        case .forever: String(localized: "Forever")
+        }
+    }
+
     /// Value label of the notification timeout slider: "5 s", "1 min", "Never".
     static func notificationTimeout(_ seconds: TimeInterval) -> String {
         if seconds == Settings.notificationTimeoutNever {

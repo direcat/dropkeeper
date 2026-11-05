@@ -9,6 +9,8 @@ import os
 final class AppModel {
     private(set) var pending: [TrackedFile] = []
     private(set) var scheduled: [TrackedFile] = []
+    /// The last decisions, newest first (the History tab).
+    var history: [TrackedFile] = []
     private(set) var failed: [TrackedFile] = []
     private(set) var settings = Settings()
     private(set) var folders: [WatchedFolder] = []
@@ -89,6 +91,7 @@ final class AppModel {
         needsOnboarding =
             bootstrap.isFirstLaunch || (folders.isEmpty && !defaults.bool(forKey: Self.onboardingCompletedKey))
         observeFiles(bootstrap.engine)
+        observeHistory(bootstrap.engine)
         observeNotifications(bootstrap.engine)
         // Only once: later launches must not undo a change the user made in System Settings.
         if !defaults.bool(forKey: Self.loginItemInitializedKey) {
@@ -135,6 +138,20 @@ final class AppModel {
                 do {
                     for try await files in updates {
                         self?.apply(files)
+                    }
+                } catch {
+                    self?.report(error)
+                }
+            })
+    }
+
+    private func observeHistory(_ engine: DropKeeperEngine) {
+        let updates = engine.historyUpdates()
+        tasks.append(
+            Task { [weak self] in
+                do {
+                    for try await files in updates {
+                        self?.history = files
                     }
                 } catch {
                     self?.report(error)
@@ -387,6 +404,9 @@ final class AppModel {
             notice.remove(ids: ids)
         }
     }
+
+    /// Takes a file back out of the Trash; it re-enters the history as kept.
+    func putBack(_ id: FileID) async { await perform(.undo) { try await $0.undoTrash(ids: [id]) } }
 
     func retry(_ ids: [FileID]) async { await perform(.retry) { try await $0.retry(ids: ids) } }
 

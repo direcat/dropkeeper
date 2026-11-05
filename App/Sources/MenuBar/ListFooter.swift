@@ -3,13 +3,12 @@ import SwiftUI
 
 /// The list's footer: when the next deletion happens, and the "•••" menu with Settings and Quit.
 struct ListFooter: View {
-    let scheduled: [TrackedFile]
-    let now: Date
+    let caption: String
     let actions: AppActions
 
     var body: some View {
         HStack {
-            Text(Self.caption(scheduled: scheduled, now: now))
+            Text(caption)
                 .font(.system(size: TK.TextSize.formCaption))
                 .foregroundStyle(TK.Palette.textSecondary)
             Spacer(minLength: TK.Space.s)
@@ -31,6 +30,16 @@ struct ListFooter: View {
             .fixedSize()
             .accessibilityLabel(Text("Settings and Quit"))
         }
+    }
+
+    /// "Last 10 · kept for 1 year", or "Last 10 · kept forever".
+    static func historyCaption(retention: HistoryRetention, limit: Int = DropKeeperEngine.historyLimit) -> String {
+        guard retention != .forever else {
+            return String(localized: "Last \(limit) · kept forever", comment: "History footer when nothing is purged")
+        }
+        let kept = DurationLabel.retention(retention)
+        return String(
+            localized: "Last \(limit) · kept for \(kept)", comment: "History footer, e.g. Last 10 · kept for 1 year")
     }
 
     /// "Next deletion in 6 min" from the soonest expiry, or "No files scheduled".

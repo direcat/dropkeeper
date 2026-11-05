@@ -28,7 +28,7 @@ enum TimeLabels {
                 .day(.defaultDigits).month(.abbreviated))
     }
 
-    private static func timeText(_ date: Date, calendar: Calendar) -> String {
+    static func timeText(_ date: Date, calendar: Calendar) -> String {
         let locale = calendar.locale ?? .current
         return date.formatted(
             Date.FormatStyle(locale: locale, calendar: calendar, timeZone: calendar.timeZone)

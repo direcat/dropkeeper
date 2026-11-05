@@ -337,21 +337,12 @@ private struct RulesTab: View {
 private struct DataTab: View {
     @Bindable var store: SettingsDraft
 
-    private static let retentionLabels: [HistoryRetention: String] = [
-        .oneMonth: String(localized: "1 month"),
-        .threeMonths: String(localized: "3 months"),
-        .sixMonths: String(localized: "6 months"),
-        .oneYear: String(localized: "1 year"),
-        .twoYears: String(localized: "2 years"),
-        .forever: String(localized: "Forever"),
-    ]
-
     var body: some View {
         Form {
             Section("Data") {
                 StepSlider(
                     "Keep history for", values: HistoryRetention.allCases, selection: $store.draft.historyRetention,
-                    label: { Self.retentionLabels[$0] ?? "" })
+                    label: DurationLabel.retention)
                 HStack {
                     Button("Clear history now") { store.confirmClear = true }
                     if let clearedCount = store.clearedCount {

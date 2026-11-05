@@ -113,8 +113,8 @@ enum TK {
         static let listIcon: CGFloat = 22
         /// The tallest the list's scrolling part grows before it scrolls.
         static let listMaxHeight: CGFloat = 340
-        /// The temporary body of the History tab, until its list arrives.
-        static let historyPlaceholder: CGFloat = 80
+        /// The Finder icon of a History row.
+        static let historyIcon: CGFloat = 28
         /// The round "•••" button on a list row.
         static let rowMenuButton: CGFloat = 24
         /// The round "•••" button in the list footer.

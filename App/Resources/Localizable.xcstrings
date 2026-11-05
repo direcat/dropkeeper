@@ -1669,6 +1669,78 @@
         "fr" : { "stringUnit" : { "state" : "translated", "value" : "Descendre" } }
       }
     },
+    "Today" : {
+      "comment" : "History day heading",
+      "localizations" : {
+        "cs" : { "stringUnit" : { "state" : "translated", "value" : "Dnes" } },
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Heute" } },
+        "es" : { "stringUnit" : { "state" : "translated", "value" : "Hoy" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Aujourd’hui" } }
+      }
+    },
+    "Yesterday" : {
+      "comment" : "History day heading",
+      "localizations" : {
+        "cs" : { "stringUnit" : { "state" : "translated", "value" : "Včera" } },
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Gestern" } },
+        "es" : { "stringUnit" : { "state" : "translated", "value" : "Ayer" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Hier" } }
+      }
+    },
+    "Deleted permanently" : {
+      "comment" : "History row: the file was deleted without the Trash",
+      "localizations" : {
+        "cs" : { "stringUnit" : { "state" : "translated", "value" : "Smazáno trvale" } },
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Endgültig gelöscht" } },
+        "es" : { "stringUnit" : { "state" : "translated", "value" : "Eliminado permanentemente" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Supprimé définitivement" } }
+      }
+    },
+    "Put back" : {
+      "comment" : "History row button: takes the file out of the Trash",
+      "localizations" : {
+        "cs" : { "stringUnit" : { "state" : "translated", "value" : "Vrátit zpět" } },
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Zurücklegen" } },
+        "es" : { "stringUnit" : { "state" : "translated", "value" : "Devolver" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Remettre" } }
+      }
+    },
+    "Put back %@" : {
+      "comment" : "VoiceOver label of the Put back button",
+      "localizations" : {
+        "cs" : { "stringUnit" : { "state" : "translated", "value" : "Vrátit zpět: %@" } },
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "%@ zurücklegen" } },
+        "es" : { "stringUnit" : { "state" : "translated", "value" : "Devolver %@" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Remettre %@" } }
+      }
+    },
+    "No history yet" : {
+      "comment" : "History tab when there is nothing to show",
+      "localizations" : {
+        "cs" : { "stringUnit" : { "state" : "translated", "value" : "Zatím žádná historie" } },
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Noch kein Verlauf" } },
+        "es" : { "stringUnit" : { "state" : "translated", "value" : "Aún no hay historial" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Pas encore d’historique" } }
+      }
+    },
+    "Last %lld · kept for %@" : {
+      "comment" : "History footer, e.g. Last 10 \u00b7 kept for 1 year",
+      "localizations" : {
+        "cs" : { "stringUnit" : { "state" : "translated", "value" : "Posledních %lld · uchováno %@" } },
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Letzte %lld · aufbewahrt für %@" } },
+        "es" : { "stringUnit" : { "state" : "translated", "value" : "Últimos %lld · se conserva %@" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "%lld derniers · conservé %@" } }
+      }
+    },
+    "Last %lld · kept forever" : {
+      "comment" : "History footer when nothing is purged",
+      "localizations" : {
+        "cs" : { "stringUnit" : { "state" : "translated", "value" : "Posledních %lld · uchováno navždy" } },
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Letzte %lld · unbegrenzt aufbewahrt" } },
+        "es" : { "stringUnit" : { "state" : "translated", "value" : "Últimos %lld · se conserva siempre" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "%lld derniers · conservé indéfiniment" } }
+      }
+    },
     "DropKeeper" : {
       "comment" : "App name, VoiceOver label of the menu bar item",
       "shouldTranslate" : false
