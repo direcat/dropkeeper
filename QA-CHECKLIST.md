@@ -71,7 +71,7 @@ The prompt always appears under the menu bar icon, as its own floating card (no 
 - [ ] Appearance Dark while macOS is Light (and back to Auto): panel, list, Settings and onboarding all switch immediately, without a restart.
 - [ ] History shows the last 10 decisions; Put back restores a trashed file and its row changes to Kept. Put back for a file whose Trash copy was already emptied shows the error in the panel ("couldn't put back"), the row stays and nothing crashes.
 - [ ] A file put back from the Finder Trash by hand (not via Put back) does not appear in History.
-- [ ] Statistics (Settings > Data) show the counts and space freed since the oldest entry in history; removing a watched folder with many files adds nothing to History or to Kept.
+- [ ] Statistics (Settings > Data) show the counts and space reclaimed since the oldest entry in history; removing a watched folder with many files adds nothing to History or to Kept.
 - [ ] Rules reorder by dragging as well as with Move up / Move down.
 - [ ] Upgrade from 1.1 (also with the old display-mode setting set to a non-default choice): every setting is kept, the notification timeout is 30 s, Appearance is Auto, and a 1.1 database opens with its old history rows still shown in History and Statistics.
 - [ ] Quit while a download is still growing, let it finish, start DropKeeper: it prompts for that file once; a file that vanished meanwhile leaves no trace.

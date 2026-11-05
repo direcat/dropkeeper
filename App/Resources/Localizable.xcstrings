@@ -1813,13 +1813,13 @@
         "fr" : { "stringUnit" : { "state" : "translated", "value" : "Doublons supprimés" } }
       }
     },
-    "Space freed" : {
-      "comment" : "Statistics row: disk space freed by deleted files",
+    "Space reclaimed" : {
+      "comment" : "Statistics row: disk space reclaimed by deleted files",
       "localizations" : {
-        "cs" : { "stringUnit" : { "state" : "translated", "value" : "Uvolněné místo" } },
-        "de" : { "stringUnit" : { "state" : "translated", "value" : "Freigegebener Speicher" } },
-        "es" : { "stringUnit" : { "state" : "translated", "value" : "Espacio liberado" } },
-        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Espace libéré" } }
+        "cs" : { "stringUnit" : { "state" : "translated", "value" : "Získané místo" } },
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Zurückgewonnener Speicher" } },
+        "es" : { "stringUnit" : { "state" : "translated", "value" : "Espacio recuperado" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Espace récupéré" } }
       }
     },
     "Since the oldest entry in your history." : {

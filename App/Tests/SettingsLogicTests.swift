@@ -144,7 +144,7 @@ func ordinaryPatternsAreNotMatchAll(raw: String) {
             movedToTrash: 2, deletedPermanently: 1, kept: 3, scheduledByRules: 4, duplicatesDeleted: 1,
             bytesFreed: 1_500_000))
     #expect(rows.first?.value == "6")
-    #expect(rows.map(\.label).contains("Space freed"))
+    #expect(rows.map(\.label).contains("Space reclaimed"))
     #expect(rows.count == 7)
     #expect(rows.last?.value == ByteCountFormatter.string(fromByteCount: 1_500_000, countStyle: .file))
 }

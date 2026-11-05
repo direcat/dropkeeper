@@ -8,7 +8,7 @@ All notable changes to DropKeeper are documented here. The format follows [Keep 
 - Setting "Hide notifications after" (5 seconds to 15 minutes, or Never; 30 seconds by default): the prompt and the reminder hide on their own and the file stays in the list. A "Hides in N s · stays in the list" bar shows the time left; it pauses while the pointer is over the prompt, a key press restarts it, and with VoiceOver running nothing hides by itself.
 - Appearance setting (Auto, Light or Dark) for the panel, the list, Settings and onboarding.
 - History: the last 10 decisions in the menu bar list, with Put back for files that went to the Trash.
-- Statistics in Settings > Data: files handled, moved to the Trash, deleted permanently, kept, scheduled by rules, duplicates deleted and space freed, counted since the oldest entry in history.
+- Statistics in Settings > Data: files handled, moved to the Trash, deleted permanently, kept, scheduled by rules, duplicates deleted and space reclaimed, counted since the oldest entry in history.
 - Rules can be reordered by dragging, as well as with Move up / Move down.
 
 ### Changed

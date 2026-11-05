@@ -13,7 +13,7 @@ Keep what matters. Let the rest disappear. When a file lands in a watched folder
 - **Free and open source** (MIT).
 - **A prompt under the menu bar icon** — a small floating card that works on any display setup. It hides by itself after a time you choose (30 seconds by default) and the file stays in the list.
 - **History** — the last 10 decisions in the list, with Put back for files that went to the Trash.
-- **Statistics** — files handled, kept or moved to the Trash, and the space freed, in Settings.
+- **Statistics** — files handled, kept or moved to the Trash, and the space reclaimed, in Settings.
 - **Light, Dark or Auto** — follows the system or stays as you set it.
 - **Rules** — match by file type, name pattern or folder (installers, screenshots, images, archives, invitations) and skip the prompt; first match wins.
 - **Reminders** — a heads-up before a file goes (5 minutes by default): extend it, keep it or delete it now.

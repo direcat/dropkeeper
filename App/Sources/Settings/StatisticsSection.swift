@@ -14,7 +14,7 @@ enum StatisticsText {
             (String(localized: "Scheduled by rules"), statistics.scheduledByRules.formatted()),
             (String(localized: "Duplicates deleted"), statistics.duplicatesDeleted.formatted()),
             (
-                String(localized: "Space freed"),
+                String(localized: "Space reclaimed"),
                 bytes(statistics.bytesFreed)
             ),
         ]
