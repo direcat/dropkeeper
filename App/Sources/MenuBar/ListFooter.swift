@@ -14,7 +14,7 @@ struct ListFooter: View {
                 .foregroundStyle(TK.Palette.textSecondary)
             Spacer(minLength: TK.Space.s)
             Menu {
-                Button("Settings…") { actions.openSettings() }
+                Button("Settings") { actions.openSettings() }
                     .keyboardShortcut(",", modifiers: .command)
                 Button("Quit DropKeeper") { actions.quit() }
                     .keyboardShortcut("q", modifiers: .command)

@@ -23,7 +23,7 @@
       "comment" : "List section: files that need a decision",
       "localizations" : {
         "cs" : { "stringUnit" : { "state" : "translated", "value" : "Čeká na vás" } },
-        "de" : { "stringUnit" : { "state" : "translated", "value" : "Warten auf dich" } },
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Wartet auf Entscheidung" } },
         "es" : { "stringUnit" : { "state" : "translated", "value" : "Esperando tu decisión" } },
         "fr" : { "stringUnit" : { "state" : "translated", "value" : "En attente de vous" } }
       }
@@ -80,15 +80,6 @@
         "de" : { "stringUnit" : { "state" : "translated", "value" : "Nächstes Löschen in %@" } },
         "es" : { "stringUnit" : { "state" : "translated", "value" : "Próxima eliminación en %@" } },
         "fr" : { "stringUnit" : { "state" : "translated", "value" : "Prochaine suppression dans %@" } }
-      }
-    },
-    "Settings…" : {
-      "comment" : "List menu item: open Settings",
-      "localizations" : {
-        "cs" : { "stringUnit" : { "state" : "translated", "value" : "Nastavení…" } },
-        "de" : { "stringUnit" : { "state" : "translated", "value" : "Einstellungen…" } },
-        "es" : { "stringUnit" : { "state" : "translated", "value" : "Ajustes…" } },
-        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Réglages…" } }
       }
     },
     "Settings and Quit" : {

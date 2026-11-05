@@ -113,6 +113,10 @@ enum TK {
         static let listIcon: CGFloat = 22
         /// The tallest the list's scrolling part grows before it scrolls.
         static let listMaxHeight: CGFloat = 340
+        /// The temporary body of the History tab, until its list arrives.
+        static let historyPlaceholder: CGFloat = 80
+        /// The round "•••" button on a list row.
+        static let rowMenuButton: CGFloat = 24
         /// The round "•••" button in the list footer.
         static let moreButton: CGFloat = 30
         static let timelineDot: CGFloat = 10
@@ -135,6 +139,8 @@ enum TK {
     /// Opacities of decorations that are not colors of their own.
     enum Opacity {
         static let knobHalo = 0.25
+        /// A muted row (a file that could not be deleted).
+        static let muted = 0.6
     }
     /// The soft shadow under the timeline knob.
     enum Shadow {

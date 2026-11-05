@@ -31,7 +31,7 @@ struct PendingListView: View {
                     UpcomingListView(model: model, actions: actions)
                 case .history:
                     // The history list arrives with its own view; until then the tab is an empty card section.
-                    Color.clear.frame(height: TK.Size.listIcon)
+                    Color.clear.frame(height: TK.Size.historyPlaceholder)
                 }
                 ListFooter(scheduled: model.scheduled, now: model.now, actions: actions)
                     .padding(.top, TK.Space.m)

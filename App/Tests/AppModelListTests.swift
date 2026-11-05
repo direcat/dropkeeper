@@ -119,4 +119,41 @@ private func dueFile(_ id: String) -> TrackedFile {
         model.isListOpen = false
         #expect(model.isPromptAvailable)
     }
+
+    @Test func fileDismissedBeforeTheListOpenedStaysHiddenAfterClose() {
+        let fixture = Fixture()
+        defer { fixture.cleanUp() }
+        let model = fixture.model
+        model.apply([pendingFile("a")])
+        model.dismissPrompt()
+        model.isListOpen = true
+        model.isListOpen = false
+        #expect(!model.isPromptAvailable)
+        #expect(model.pending.count == 1)  // still waiting, reachable from the list
+    }
+
+    @Test func fileTimedOutBeforeTheListOpenedStaysHiddenAfterClose() {
+        let fixture = Fixture()
+        defer { fixture.cleanUp() }
+        let model = fixture.model
+        model.apply([pendingFile("a")])
+        fixture.clock.now += 31
+        model.expireAutoHideTimers()
+        model.isListOpen = true
+        model.isListOpen = false
+        #expect(!model.isPromptAvailable)
+    }
+
+    @Test func fileArrivingWhileTheListIsOpenWaitsForClose() {
+        let fixture = Fixture()
+        defer { fixture.cleanUp() }
+        let model = fixture.model
+        model.isListOpen = true
+        model.apply([pendingFile("new")])
+        #expect(!model.isPromptAvailable)
+        #expect(model.promptTimer.remaining(now: fixture.clock.now) == nil)
+        model.isListOpen = false
+        #expect(model.isPromptAvailable)
+        #expect(model.promptTimer.remaining(now: fixture.clock.now) == 30)
+    }
 }

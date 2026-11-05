@@ -2,7 +2,7 @@ import AppKit
 import DropKeeperCore
 import SwiftUI
 
-enum ListSection: Equatable {
+enum ListSection: Hashable {
     case waiting, deletingSoon, couldNotDelete
 
     var title: String {
@@ -30,39 +30,33 @@ enum ListSections {
 struct UpcomingListView: View {
     let model: AppModel
     let actions: AppActions
-    @State private var contentHeight: CGFloat = 0
-
     var body: some View {
         let sections = ListSections.make(pending: model.pending, scheduled: model.scheduled, failed: model.failed)
-        if sections.isEmpty {
-            Text("No files scheduled")
-                .font(.system(size: TK.TextSize.title))
-                .foregroundStyle(TK.Palette.textSecondary)
-                .frame(maxWidth: .infinity, minHeight: TK.Size.fileGlyph + TK.Space.xl)
-        } else {
-            ScrollView {
-                VStack(alignment: .leading, spacing: 0) {
-                    ForEach(sections, id: \.0.title) { section, files in
-                        Text(section.title)
-                            .font(.system(size: TK.TextSize.formCaption, weight: .semibold))
-                            .foregroundStyle(TK.Palette.textSecondary)
-                            .padding(.horizontal, TK.Space.xs)
-                            .padding(.top, TK.Space.l)
-                            .padding(.bottom, TK.Space.s)
-                            .accessibilityAddTraits(.isHeader)
-                        ForEach(files) { file in
-                            ListRow(file: file, section: section, model: model, actions: actions)
-                        }
-                    }
-                }
-                .onGeometryChange(for: CGFloat.self) {
-                    $0.size.height
-                } action: {
-                    contentHeight = $0
+        // Nothing to list: the footer already says "No files scheduled".
+        if !sections.isEmpty {
+            // The plain list while it fits, a scrolling one once it outgrows the card.
+            ViewThatFits(in: .vertical) {
+                content(sections)
+                ScrollView { content(sections) }.scrollIndicators(.hidden)
+            }
+            .frame(maxHeight: TK.Size.listMaxHeight)
+        }
+    }
+
+    private func content(_ sections: [(ListSection, [TrackedFile])]) -> some View {
+        VStack(alignment: .leading, spacing: 0) {
+            ForEach(sections, id: \.0) { section, files in
+                Text(section.title)
+                    .font(.system(size: TK.TextSize.formCaption, weight: .semibold))
+                    .foregroundStyle(TK.Palette.textSecondary)
+                    .padding(.horizontal, TK.Space.xs)
+                    .padding(.top, TK.Space.l)
+                    .padding(.bottom, TK.Space.s)
+                    .accessibilityAddTraits(.isHeader)
+                ForEach(files) { file in
+                    ListRow(file: file, section: section, model: model, actions: actions)
                 }
             }
-            .scrollIndicators(.hidden)
-            .frame(height: min(contentHeight, TK.Size.listMaxHeight))
         }
     }
 }
@@ -130,7 +124,7 @@ private struct ListRow: View {
         case .couldNotDelete:
             FinderIcon(path: file.path, kind: file.kind, size: TK.Size.listIcon)
                 .frame(width: TK.Size.fileGlyph, height: TK.Size.fileGlyph)
-                .opacity(0.6)
+                .opacity(TK.Opacity.muted)
         }
     }
 
@@ -166,7 +160,7 @@ private struct ListRow: View {
         } label: {
             Image(systemName: "ellipsis")
                 .font(.system(size: TK.TextSize.formCaption, weight: .bold))
-                .frame(width: TK.Size.closeButton, height: TK.Size.closeButton)
+                .frame(width: TK.Size.rowMenuButton, height: TK.Size.rowMenuButton)
                 .background(TK.Palette.fill, in: Circle())
                 .contentShape(Circle())
                 .foregroundStyle(secondary)

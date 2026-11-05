@@ -149,8 +149,8 @@ final class ListPanelController {
     }
 
     private func closeForClick(in window: NSWindow?) {
-        if window === panel || window === anchorWindow() { return }
-        if let window, window.level.rawValue >= NSWindow.Level.popUpMenu.rawValue { return }
+        guard let window, window !== panel, window !== anchorWindow() else { return }
+        if window.level.rawValue >= NSWindow.Level.popUpMenu.rawValue { return }
         close()
     }
 
