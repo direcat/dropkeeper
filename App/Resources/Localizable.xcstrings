@@ -876,6 +876,24 @@
         "fr" : { "stringUnit" : { "state" : "translated", "value" : "Ne pas ouvrir l’invite d’elle-même. Un point sur l’icône de la barre des menus indique les fichiers en attente." } }
       }
     },
+    "Apply the default action automatically" : {
+      "comment" : "Settings toggle under Quiet mode",
+      "localizations" : {
+        "cs" : { "stringUnit" : { "state" : "translated", "value" : "Výchozí akci použít automaticky" } },
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Standardaktion automatisch anwenden" } },
+        "es" : { "stringUnit" : { "state" : "translated", "value" : "Aplicar la acción predeterminada automáticamente" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Appliquer l’action par défaut automatiquement" } }
+      }
+    },
+    "New files get the default action right away instead of waiting for you." : {
+      "comment" : "Settings: explanation of the automatic default action",
+      "localizations" : {
+        "cs" : { "stringUnit" : { "state" : "translated", "value" : "Nové soubory dostanou výchozí akci hned, místo aby čekaly na vás." } },
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Neue Dateien erhalten sofort die Standardaktion, statt auf Sie zu warten." } },
+        "es" : { "stringUnit" : { "state" : "translated", "value" : "Los archivos nuevos reciben la acción predeterminada de inmediato, en lugar de esperar tu decisión." } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Les nouveaux fichiers reçoivent tout de suite l’action par défaut au lieu d’attendre votre décision." } }
+      }
+    },
     "Watch folders" : {
       "comment" : "Settings section title",
       "localizations" : {

@@ -290,6 +290,37 @@ private final class LoginItemRecorder {
         await model.stop()
     }
 
+    /// Quiet mode with "Apply the default action automatically": a new file is scheduled by the default at once and
+    /// no prompt (or waiting file) ever appears.
+    @Test func autoAppliedDefaultOpensNoPrompt() async throws {
+        let root = try tempDir()
+        defer { try? FileManager.default.removeItem(at: root) }
+        let folder = root.appendingPathComponent("Downloads", isDirectory: true)
+        try FileManager.default.createDirectory(at: folder, withIntermediateDirectories: false)
+        let suite = "DropKeeperAppTests.\(UUID().uuidString)"
+        let defaults = try #require(UserDefaults(suiteName: suite))
+        defer { defaults.removePersistentDomain(forName: suite) }
+        let model = AppModel(defaults: defaults, applyLoginItem: { _ in })
+        #expect(
+            await model.start(
+                with: try EngineBootstrap.make(
+                    databaseURL: root.appendingPathComponent("db/dropkeeper.sqlite"), defaults: defaults)))
+        #expect(await model.addFolder(folder))
+        var settings = model.settings
+        settings.quietMode = true
+        settings.autoApplyDefault = true
+        settings.defaultChoice = .expireAfter(1800)
+        await model.update(settings)
+        try await Task.sleep(for: .milliseconds(300))
+        FileManager.default.createFile(
+            atPath: folder.appendingPathComponent("setup.dmg").path, contents: Data("x".utf8))
+        try await waitUntil { model.scheduled.count == 1 }
+        #expect(model.pending.isEmpty)
+        #expect(!model.isPromptAvailable)
+        #expect(model.queue.current == nil)
+        await model.stop()
+    }
+
     /// Quiet mode: a waiting file opens only when picked from the list, also after Esc, and a later download
     /// doesn't open by itself.
     @Test func quietModeOpensOnlyTheReviewedFile() async throws {

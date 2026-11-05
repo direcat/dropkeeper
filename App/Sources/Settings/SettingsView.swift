@@ -166,6 +166,13 @@ private struct GeneralTab: View {
                     "Quiet mode",
                     caption: "Don't open the prompt by itself. A dot on the menu bar icon shows waiting files.",
                     isOn: $store.draft.quietMode)
+                SettingsToggleRow(
+                    "Apply the default action automatically",
+                    caption: "New files get the default action right away instead of waiting for you.",
+                    isOn: $store.draft.autoApplyDefault
+                )
+                .padding(.leading, TK.Space.xl)
+                .disabled(!store.autoApplyAvailable)
             }
             SettingsGroup("Notifications") {
                 StepSlider(

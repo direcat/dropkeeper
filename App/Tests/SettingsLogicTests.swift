@@ -175,3 +175,14 @@ func ordinaryPatternsAreNotMatchAll(raw: String) {
     #expect(Appearance.allCases == [.auto, .light, .dark])
     #expect(Appearance.allCases.map(AppearanceLabel.title) == ["Auto", "Light", "Dark"])
 }
+
+@MainActor
+@Test func autoApplyDefaultOptionFollowsQuietMode() {
+    let model = AppModel(
+        defaults: UserDefaults(suiteName: "DropKeeperAppTests.\(UUID().uuidString)")!, applyLoginItem: { _ in })
+    let store = SettingsDraft(model: model)
+    store.draft.quietMode = false
+    #expect(!store.autoApplyAvailable)
+    store.draft.quietMode = true
+    #expect(store.autoApplyAvailable)
+}

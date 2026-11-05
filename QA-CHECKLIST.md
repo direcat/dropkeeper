@@ -34,6 +34,7 @@ The prompt always appears under the menu bar icon, as its own floating card (no 
 - [ ] Three files at once: one stack, "Apply to all" applies to all three.
 - [ ] Esc: the prompt closes; the file gets the default choice after the grace period.
 - [ ] Quiet mode: no prompt opens by itself; a dot appears on the menu bar icon; clicking a waiting file in the list (outside its name) or choosing Show prompt in its menu opens the prompt for that file.
+- [ ] Quiet mode + "Apply the default action automatically": a new download gets the default action at once (Keep: kept; a time: listed under Deleting soon) with no prompt and no dot; a matching rule still applies its own time; files already waiting get the default when the option is switched on. The option is greyed out while Quiet mode is off and does nothing then.
 - [ ] Close a prompt with Esc, then click that file ("Waiting") in the list outside its name: its prompt opens again. In Quiet mode the next download still doesn't open by itself.
 - [ ] A file whose timer is not longer than the reminder lead time (or with reminders off) expires while a prompt is open: after the prompt closes, the notice shows for 2.5 s with Undo.
 - [ ] Expiry after a reminder was shown (reminders on, timer longer than the lead time; dismissing the reminder or letting it hide counts): the file goes to the Trash with no notice; Put back in History restores it. Expiry with reminders off (or a timer not longer than the lead time): the notice shows for 2.5 s and Undo puts it back.

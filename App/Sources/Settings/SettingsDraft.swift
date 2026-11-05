@@ -13,6 +13,9 @@ final class SettingsDraft {
     /// Bumped when the history was cleared, so what is derived from it (the statistics) reloads.
     var historyRevision = 0
 
+    /// "Apply the default action automatically" is a sub-option of Quiet mode: it only works while that is on.
+    var autoApplyAvailable: Bool { draft.quietMode }
+
     var draft: DropKeeperCore.Settings {
         didSet {
             guard draft != model.settings else { return }
