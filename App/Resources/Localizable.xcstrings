@@ -1444,6 +1444,15 @@
         "fr" : { "stringUnit" : { "state" : "translated", "value" : "Ce motif correspondrait à tous les fichiers." } }
       }
     },
+    "A new download with exactly the same content as a file in the same folder is pointed out in the prompt, with an offer to delete the duplicate." : {
+      "comment" : "Settings caption under the duplicate detection toggle",
+      "localizations" : {
+        "cs" : { "stringUnit" : { "state" : "translated", "value" : "Nové stažení se stejným obsahem jako soubor ve stejné složce se v dotazu označí a nabídne se smazání duplikátu." } },
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Ein neuer Download mit genau demselben Inhalt wie eine Datei im selben Ordner wird in der Abfrage angezeigt, mit dem Angebot, das Duplikat zu löschen." } },
+        "es" : { "stringUnit" : { "state" : "translated", "value" : "Una descarga nueva con exactamente el mismo contenido que un archivo de la misma carpeta se señala en el aviso, con la opción de eliminar el duplicado." } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Un nouveau téléchargement au contenu identique à celui d'un fichier du même dossier est signalé dans la fenêtre, avec la possibilité de supprimer le doublon." } }
+      }
+    },
     "Detect duplicate downloads" : {
       "comment" : "Settings toggle: flag a download identical to a file already in a watched folder",
       "localizations" : {

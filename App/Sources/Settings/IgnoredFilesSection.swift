@@ -18,7 +18,13 @@ struct IgnoredFilesSection: View {
 
     var body: some View {
         SettingsGroup {
-            SettingsToggleRow("Detect duplicate downloads", isOn: $store.draft.duplicateDetection)
+            SettingsToggleRow(
+                "Detect duplicate downloads",
+                caption: """
+                    A new download with exactly the same content as a file in the same folder is pointed out in the \
+                    prompt, with an offer to delete the duplicate.
+                    """,
+                isOn: $store.draft.duplicateDetection)
         }
         SettingsGroup("Ignored files", footer: footer) {
             ForEach(store.draft.ignoredPatterns, id: \.self) { pattern in
