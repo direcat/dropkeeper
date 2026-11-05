@@ -29,6 +29,13 @@ final class FloatingPanel: NSPanel {
 
     var settledFrame: CGRect { frameTarget ?? frame }
 
+    /// Forgets any running frame animation (the panel is going away), so a stale target or completion can't act on
+    /// the next show.
+    func resetFrameAnimation() {
+        frameAnimation += 1
+        frameTarget = nil
+    }
+
     override var canBecomeKey: Bool { true }
     override var canBecomeMain: Bool { false }
 }

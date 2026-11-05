@@ -4,16 +4,6 @@ enum PanelContent: Equatable {
     case hidden, prompt, notice, error
 }
 
-/// What `show` does with the panel.
-enum PanelShowStep: Equatable {
-    /// Not on screen: place it and fade in.
-    case fadeIn
-    /// On screen: animate to the frame and back to full opacity (this also undoes a running fade-out).
-    case restore
-    /// Already shown at that frame.
-    case none
-}
-
 /// What happens to a visible panel's frame when a render wants another one.
 enum PanelFrameStep: Equatable {
     case keep, resize, slideIn
@@ -33,13 +23,6 @@ enum PanelDecision {
         if promptAvailable { return .prompt }
         if noticeVisible { return .notice }
         return errorVisible ? .error : .hidden
-    }
-
-    /// Skips only a panel that is fully shown at the same frame. The window's alpha can't tell: a fade-out
-    /// started in the same run-loop tick still reads 1.
-    static func showStep(isOnScreen: Bool, isFadingOut: Bool, frameChanged: Bool) -> PanelShowStep {
-        guard isOnScreen else { return .fadeIn }
-        return isFadingOut || frameChanged ? .restore : .none
     }
 
     /// A prompt, notice or error stays where it opened while it is followed by another of them, so the panel

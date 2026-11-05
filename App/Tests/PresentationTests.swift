@@ -57,14 +57,6 @@ private func dueFile(_ id: String) -> TrackedFile {
             promptAvailable: false, noticeVisible: model.isNoticeVisible, errorVisible: false) == .notice)
 }
 
-@Test func showNeverSkipsWhileTheHideFadeIsRunning() {
-    #expect(PanelDecision.showStep(isOnScreen: false, isFadingOut: false, frameChanged: false) == .fadeIn)
-    #expect(PanelDecision.showStep(isOnScreen: true, isFadingOut: true, frameChanged: false) == .restore)
-    #expect(PanelDecision.showStep(isOnScreen: true, isFadingOut: true, frameChanged: true) == .restore)
-    #expect(PanelDecision.showStep(isOnScreen: true, isFadingOut: false, frameChanged: true) == .restore)
-    #expect(PanelDecision.showStep(isOnScreen: true, isFadingOut: false, frameChanged: false) == .none)
-}
-
 @Test func panelSlidesDownFromAboveAndResizesOnlyInPlace() {
     let final = CGRect(x: 100, y: 500, width: 320, height: 200)
     let start = PanelGeometry.slideStartFrame(for: final, offset: 18)

@@ -57,9 +57,10 @@ final class ListPanelController {
         }
         panel.contentView = hostingView
         hosting = hostingView
-        layout()
+        panel.resetFrameAnimation()
+        let placed = layout()
         let reduceMotion = NSWorkspace.shared.accessibilityDisplayShouldReduceMotion
-        panel.slideIn(to: panel.frame, reduceMotion: reduceMotion, makeKey: true)
+        panel.slideIn(to: placed ?? panel.frame, reduceMotion: reduceMotion, makeKey: true)
         installMonitors()
         onChange?()
     }
@@ -68,6 +69,7 @@ final class ListPanelController {
         guard isShown else { return }
         removeMonitors()
         panel.orderOut(nil)
+        panel.resetFrameAnimation()
         hosting = nil
         panel.contentView = nil
         model.isListOpen = false
@@ -75,16 +77,18 @@ final class ListPanelController {
     }
 
     /// Fits the panel to the card and hangs it under the status item again; the top edge stays put.
-    private func layout() {
-        guard let hosting else { return }
+    @discardableResult
+    private func layout() -> CGRect? {
+        guard let hosting else { return nil }
         let screens = ScreenDescriptor.current()
         let screen = screens.first { $0.frame.contains(CGPoint(x: anchor.midX, y: anchor.midY)) } ?? screens.first
-        guard let screen else { return }
+        guard let screen else { return nil }
         let size = CGSize(width: TK.Size.panelWidth, height: max(hosting.fittingSize.height, 1))
         let frame = PanelGeometry.menuBarPanelFrame(anchor: anchor, visibleFrame: screen.visibleFrame, size: size)
-        guard frame != panel.settledFrame else { return }
+        guard frame != panel.settledFrame else { return frame }
         panel.place(frame)
         panel.invalidateShadow()
+        return frame
     }
 
     private func installMonitors() {

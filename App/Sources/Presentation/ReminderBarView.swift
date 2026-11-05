@@ -45,30 +45,30 @@ struct ReminderBarView: View {
     }
 
     private var header: some View {
-        // Counts down while the bar is open (the soonest expiry decides).
-        SwiftUI.TimelineView(.periodic(from: .now, by: 1)) { context in
-            HStack(spacing: TK.Space.m) {
-                if let file = files.first {
-                    LiveRing(file: file) {
-                        FinderIcon(path: file.path, kind: file.kind, size: TK.Size.ringIcon)
-                    }
+        HStack(spacing: TK.Space.m) {
+            if let file = files.first {
+                LiveRing(file: file) {
+                    FinderIcon(path: file.path, kind: file.kind, size: TK.Size.ringIcon)
                 }
-                VStack(alignment: .leading, spacing: 2) {
-                    Text(NoticeView.title(for: files))
-                        .font(.system(size: TK.TextSize.title, weight: .semibold))
-                        .foregroundStyle(TK.Palette.textPrimary)
-                        .lineLimit(1)
-                        .truncationMode(.middle)
+            }
+            VStack(alignment: .leading, spacing: 2) {
+                Text(NoticeView.title(for: files))
+                    .font(.system(size: TK.TextSize.title, weight: .semibold))
+                    .foregroundStyle(TK.Palette.textPrimary)
+                    .lineLimit(1)
+                    .truncationMode(.middle)
+                // Counts down while the bar is open (the soonest expiry decides); only this line ticks each second.
+                SwiftUI.TimelineView(.periodic(from: .now, by: 1)) { context in
                     Text("Deleting in \(remaining(at: context.date))")
                         .font(.system(size: TK.TextSize.small))
                         .foregroundStyle(TK.Palette.textSecondary)
                 }
-                Spacer(minLength: TK.Space.s)
-                Button(action: onDismiss) { RoundCloseGlyph() }
-                    .buttonStyle(.plain)
-                    .focusable(false)
-                    .accessibilityLabel(Text("Dismiss reminder"))
             }
+            Spacer(minLength: TK.Space.s)
+            Button(action: onDismiss) { RoundCloseGlyph() }
+                .buttonStyle(.plain)
+                .focusable(false)
+                .accessibilityLabel(Text("Dismiss reminder"))
         }
     }
 

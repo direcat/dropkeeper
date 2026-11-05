@@ -18,6 +18,8 @@ final class PanelCoordinator {
     /// The menu bar anchor a prompt, notice or error opened with (see `PanelDecision.anchor`).
     private var lockedAnchor: CGRect?
     private var keyMonitor: Any?
+    /// The pending re-measure of a content that had not laid out yet (see `render`).
+    private var retryWork: DispatchWorkItem?
 
     init(model: AppModel, statusAnchor: @escaping @MainActor () -> CGRect?) {
         self.model = model
@@ -78,9 +80,11 @@ final class PanelCoordinator {
         let previousContent = lastContent
         lastContent = content
         guard content != .hidden else {
+            retryWork?.cancel()
+            retryWork = nil
             lockedAnchor = nil
             model.resumePanelTimers()  // no exit event arrives for a panel that goes away under the pointer
-            hide()
+            if panel.isVisible { hide() } else { dropContent() }
             return
         }
         let root = PanelRootView(model: model, content: content)
@@ -107,7 +111,12 @@ final class PanelCoordinator {
         let fitting = hostingView.fittingSize
         if fitting.height < TK.Motion.panelMinMeasuredHeight, retryTinyMeasurement {
             // The new content has not laid out yet: measure again on the next turn rather than show a sliver.
-            DispatchQueue.main.async { MainActor.assumeIsolated { self.render(retryTinyMeasurement: false) } }
+            retryWork?.cancel()
+            let work = DispatchWorkItem { [weak self] in
+                MainActor.assumeIsolated { self?.render(retryTinyMeasurement: false) }
+            }
+            retryWork = work
+            DispatchQueue.main.async(execute: work)
             return
         }
         guard let frame = frame(for: content, previous: previousContent, fitting: fitting) else {
@@ -192,7 +201,12 @@ final class PanelCoordinator {
         guard isFadingOut else { return }
         isFadingOut = false
         panel.orderOut(nil)
-        // No hidden view graph keeps running (ring timelines), and the next show measures a fresh one.
+        dropContent()
+    }
+
+    /// No hidden view graph keeps running (ring timelines), and the next show measures a fresh one.
+    private func dropContent() {
+        panel.resetFrameAnimation()
         hosting = nil
         panel.contentView = nil
     }
