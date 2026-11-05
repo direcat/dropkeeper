@@ -152,7 +152,9 @@ final class AppModel {
         failed = files.filter { $0.state == .failed }
         queue.update(pending: pending, scheduled: scheduled)
         if queue.current?.id != previous { resetPromptState() }
-        if queue.current == nil { requestedFileId = nil }
+        if let requested = requestedFileId, !pending.contains(where: { $0.id == requested }) {
+            requestedFileId = nil  // the file left (decided or gone): its exemption ends with it
+        }
         scheduleClock()  // also syncs the auto-hide timers
     }
 

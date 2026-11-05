@@ -34,14 +34,25 @@ final class FirstMouseHostingView<Content: View>: NSHostingView<Content> {
 
     override func acceptsFirstMouse(for event: NSEvent?) -> Bool { true }
 
+    /// Our own area only: the hosting view's other areas drive SwiftUI's `.onHover`.
+    private var pointerArea: NSTrackingArea?
+
     override func updateTrackingAreas() {
         super.updateTrackingAreas()
-        for area in trackingAreas where area.owner === self { removeTrackingArea(area) }
-        addTrackingArea(
-            NSTrackingArea(
-                rect: .zero, options: [.mouseEnteredAndExited, .activeAlways, .inVisibleRect], owner: self))
+        if let pointerArea { removeTrackingArea(pointerArea) }
+        let area = NSTrackingArea(
+            rect: .zero, options: [.mouseEnteredAndExited, .activeAlways, .inVisibleRect], owner: self)
+        addTrackingArea(area)
+        pointerArea = area
     }
 
-    override func mouseEntered(with event: NSEvent) { onPointerChange?(true) }
-    override func mouseExited(with event: NSEvent) { onPointerChange?(false) }
+    override func mouseEntered(with event: NSEvent) {
+        super.mouseEntered(with: event)
+        if event.trackingArea === pointerArea { onPointerChange?(true) }
+    }
+
+    override func mouseExited(with event: NSEvent) {
+        super.mouseExited(with: event)
+        if event.trackingArea === pointerArea { onPointerChange?(false) }
+    }
 }

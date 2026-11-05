@@ -21,7 +21,7 @@ private func render(_ view: some View) -> CGImage? {
         file: file, stackCount: 3, duplicateOf: nil,
         timeline: .constant(TimelineModel(durations: Settings().timelineStops, preselect: .keep)),
         applyToAll: .constant(false), now: base, hideProgress: nil, hideSeconds: nil,
-        onDone: {}, onKeep: {}, onClose: {}, onKeyActivity: {}, onOpen: {}, onDeleteDuplicate: {})
+        onDone: {}, onKeep: {}, onClose: {}, onOpen: {}, onDeleteDuplicate: {})
     let image = try #require(render(view))
     #expect(image.width >= Int(TK.Size.panelWidth))
 }
@@ -34,7 +34,7 @@ private func render(_ view: some View) -> CGImage? {
             file: file, stackCount: 1, duplicateOf: duplicateOf,
             timeline: .constant(TimelineModel(durations: Settings().timelineStops, preselect: .keep)),
             applyToAll: .constant(false), now: base, hideProgress: nil, hideSeconds: nil,
-            onDone: {}, onKeep: {}, onClose: {}, onKeyActivity: {}, onOpen: {}, onDeleteDuplicate: {})
+            onDone: {}, onKeep: {}, onClose: {}, onOpen: {}, onDeleteDuplicate: {})
     }
     let plain = try #require(render(make(nil)))
     let flagged = try #require(render(make("report.pdf")))
@@ -47,7 +47,7 @@ private func prompt(hideProgress: Double?, hideSeconds: Int?) -> PromptView {
         file: scheduledFile(expiresIn: 0, id: "report.pdf"), stackCount: 1, duplicateOf: nil,
         timeline: .constant(TimelineModel(durations: Settings().timelineStops, preselect: .keep)),
         applyToAll: .constant(false), now: base, hideProgress: hideProgress, hideSeconds: hideSeconds,
-        onDone: {}, onKeep: {}, onClose: {}, onKeyActivity: {}, onOpen: {}, onDeleteDuplicate: {})
+        onDone: {}, onKeep: {}, onClose: {}, onOpen: {}, onDeleteDuplicate: {})
 }
 
 @MainActor

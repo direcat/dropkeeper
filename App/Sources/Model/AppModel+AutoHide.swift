@@ -3,12 +3,13 @@ import Foundation
 
 /// The two notification countdowns and what they belong to.
 struct AutoHideState {
-    var prompt = AutoHideTimer(duration: Settings().notificationTimeout)
-    var reminder = AutoHideTimer(duration: Settings().notificationTimeout)
+    /// Unset until the first sync brings in the model's settings.
+    var prompt = AutoHideTimer(duration: Settings.notificationTimeoutNever)
+    var reminder = AutoHideTimer(duration: Settings.notificationTimeoutNever)
     /// What the running prompt countdown belongs to (current file and stack size); a change restarts it.
     struct PromptKey: Equatable {
         let current: FileID
-        let count: Int
+        var ids: Set<FileID>
     }
     var promptKey: PromptKey?
     var reminderIds: Set<FileID> = []
@@ -52,12 +53,15 @@ extension AppModel {
         if hidesByItself, isPromptAvailable, !queue.isRevisiting, let current = queue.current,
             requestedFileId != current.id
         {
-            let key = AutoHideState.PromptKey(current: current.id, count: queue.items.count)
-            if key != state.promptKey || state.prompt.remaining(now: now) == nil {
+            let ids = Set(queue.items.map(\.id))
+            // A new current file or a file joining restarts; a file only leaving the stack doesn't.
+            let isNew =
+                state.promptKey.map { $0.current != current.id || !ids.isSubset(of: $0.ids) } ?? true
+            if isNew || state.prompt.remaining(now: now) == nil {
                 state.prompt.start(now: now)
                 if state.isPanelHovered { state.prompt.pause(now: now) }
-                state.promptKey = key
             }
+            state.promptKey = AutoHideState.PromptKey(current: current.id, ids: ids)
         } else {
             state.prompt.stop()
             state.promptKey = nil
@@ -103,6 +107,8 @@ extension AppModel {
     /// like its close button.
     func expireAutoHideTimers() {
         let now = clock()
+        // VoiceOver may have started since the last sync: then nothing hides, and the sync stops the timers.
+        if isVoiceOverRunning() { return syncAutoHide() }
         if autoHide.prompt.isDue(now: now) { dismissPromptStack() }
         if autoHide.reminder.isDue(now: now) { dismissReminders() }
         syncAutoHide()

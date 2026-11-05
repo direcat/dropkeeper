@@ -19,6 +19,7 @@ final class PanelCoordinator {
     private var lastContent = PanelContent.hidden
     /// The menu bar anchor a prompt, notice or error opened with (see `PanelDecision.anchor`).
     private var lockedAnchor: CGRect?
+    private var keyMonitor: Any?
 
     init(
         model: AppModel, statusAnchor: @escaping @MainActor () -> CGRect?,
@@ -41,6 +42,13 @@ final class PanelCoordinator {
                 self?.lockedAnchor = nil
                 self?.render()
             }
+        }
+        // Any key pressed in the panel (arrows, Tab, Space...) shows the user is still at the prompt.
+        keyMonitor = NSEvent.addLocalMonitorForEvents(matching: .keyDown) { [weak self] event in
+            MainActor.assumeIsolated {
+                if let self, event.window === self.panel { self.model.noteKeyActivity() }
+            }
+            return event
         }
         render()
     }
@@ -91,6 +99,7 @@ final class PanelCoordinator {
         guard let frame = frame(for: content, previous: previousContent, fitting: hostingView.fittingSize) else {
             lastContent = .hidden
             lockedAnchor = nil
+            model.resumePanelTimers()
             hide()
             return
         }
@@ -130,17 +139,23 @@ final class PanelCoordinator {
                 // Undoes a fade-out that is still running.
                 panel.animator().alphaValue = 1
             }
+            syncPointer(frame: frame)
         case .fadeIn:
             panel.setFrame(frame, display: true)
             panel.alphaValue = 0
             panel.orderFrontRegardless()
-            // A panel that appears under the pointer gets no enter event: hold the countdowns from the start.
-            if frame.contains(NSEvent.mouseLocation) { model.pausePanelTimers() }
+            syncPointer(frame: frame)
             NSAnimationContext.runAnimationGroup { context in
                 context.duration = 0.15
                 panel.animator().alphaValue = 1
             }
         }
+    }
+
+    /// A panel that appears, grows or shrinks under a resting pointer gets no enter or exit event, so the
+    /// countdowns follow where the pointer is instead.
+    private func syncPointer(frame: CGRect) {
+        if frame.contains(NSEvent.mouseLocation) { model.pausePanelTimers() } else { model.resumePanelTimers() }
     }
 
     private func hide() {

@@ -26,7 +26,10 @@ private func pendingFile(_ id: String) -> TrackedFile {
             model.isVoiceOverRunning = { false }
         }
 
-        func cleanUp() { UserDefaults(suiteName: suite)?.removePersistentDomain(forName: suite) }
+        func cleanUp() {
+            model.autoHide.cancelTasks()
+            UserDefaults(suiteName: suite)?.removePersistentDomain(forName: suite)
+        }
     }
 
     @Test func fileClosedWithEscCanBeReopenedFromTheList() {
@@ -242,6 +245,57 @@ private func pendingFile(_ id: String) -> TrackedFile {
         model.changeRuleNotice()
         #expect(model.queue.isRevisiting && model.queue.current?.id == "a")
         #expect(model.promptHideProgress == nil)
+    }
+
+    @Test func quietModeStillHoldsBackTheFileAfterTheRequestedOne() {
+        let fixture = Fixture()
+        defer { fixture.cleanUp() }
+        let model = fixture.model
+        var quiet = Settings()
+        quiet.quietMode = true
+        model.adopt(quiet)
+        model.apply([pendingFile("a"), pendingFile("b")])
+        model.review("a")
+        #expect(model.isPromptAvailable && model.promptHideProgress == nil)
+        model.apply([pendingFile("b")])  // a was decided
+        #expect(model.queue.current?.id == "b" && !model.isPromptAvailable)
+    }
+
+    @Test func fileLeavingTheStackDoesNotRestartTheCountdown() {
+        let fixture = Fixture()
+        defer { fixture.cleanUp() }
+        let model = fixture.model
+        let clock = Clock()
+        attach(clock, to: model)
+        model.apply([pendingFile("a"), pendingFile("b")])
+        clock.now += 10
+        model.apply([pendingFile("a")])
+        #expect(model.promptTimer.remaining(now: clock.now) == 20)
+    }
+
+    @Test func switchingToNeverDuringACountdownStopsIt() {
+        let fixture = Fixture()
+        defer { fixture.cleanUp() }
+        let model = fixture.model
+        model.apply([pendingFile("a")])
+        #expect(model.promptHideProgress != nil)
+        var never = Settings()
+        never.notificationTimeout = Settings.notificationTimeoutNever
+        model.adopt(never)
+        #expect(model.promptHideProgress == nil)
+    }
+
+    @Test func voiceOverStartingMidCountdownStopsInsteadOfHiding() {
+        let fixture = Fixture()
+        defer { fixture.cleanUp() }
+        let model = fixture.model
+        let clock = Clock()
+        attach(clock, to: model)
+        model.apply([pendingFile("a")])
+        model.isVoiceOverRunning = { true }
+        clock.now += 31
+        model.expireAutoHideTimers()
+        #expect(model.queue.current != nil && model.promptHideProgress == nil)
     }
 
     @Test func voiceOverDisablesAutoHide() {

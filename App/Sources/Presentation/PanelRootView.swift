@@ -40,10 +40,10 @@ struct PanelRootView: View {
         }
     }
 
-    /// The bar and the caption follow the model's countdown, so the view ticks by itself: once a second while the
-    /// countdown runs (the bar is a coarse indicator, and a slow tick keeps the CPU idle).
+    /// The bar and the caption follow the model's countdown, so the view ticks by itself: once a second while a
+    /// countdown runs, never otherwise (the bar is a coarse indicator, and a slow tick keeps the CPU idle).
     private func prompt(for file: TrackedFile) -> some View {
-        SwiftUI.TimelineView(.periodic(from: .now, by: TK.Motion.hideTick)) { _ in
+        SwiftUI.TimelineView(HideTickSchedule(isRunning: model.promptHideProgress != nil)) { _ in
             promptView(for: file)
         }
     }
@@ -56,8 +56,22 @@ struct PanelRootView: View {
             hideSeconds: model.promptHideSeconds,
             onDone: { Task { await model.decide(for: file.id) } },
             onKeep: { Task { await model.keepPrompted(for: file.id) } },
-            onClose: { model.dismissPrompt() }, onKeyActivity: { model.noteKeyActivity() },
+            onClose: { model.dismissPrompt() },
             onOpen: { FileOpener.open(FinderReveal.target(for: file.path)) },
             onDeleteDuplicate: { Task { await model.deleteDuplicate(for: file.id) } })
+    }
+}
+
+/// One tick a second while the prompt counts down; a single entry (no ticking) when it doesn't.
+struct HideTickSchedule: TimelineSchedule {
+    let isRunning: Bool
+
+    func entries(from start: Date, mode: Mode) -> AnyIterator<Date> {
+        var next: Date? = start
+        return AnyIterator {
+            guard let current = next else { return nil }
+            next = isRunning ? current.addingTimeInterval(TK.Motion.hideTick) : nil
+            return current
+        }
     }
 }
