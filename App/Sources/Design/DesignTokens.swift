@@ -24,11 +24,11 @@ enum TK {
             light: Color(hex: 0x767680).opacity(0.14), dark: Color(hex: 0x767680).opacity(0.28))
         static let hairline = dynamic(light: Color.black.opacity(0.07), dark: Color.white.opacity(0.08))
         /// The inner highlight along the edge of a glass card.
-        static let cardEdge = dynamic(light: Color.white.opacity(0.5), dark: Color.white.opacity(0.12))
+        static let cardEdge = dynamic(light: Color.white.opacity(0.7), dark: Color.white.opacity(0.2))
         /// The rounded card behind a Settings group.
-        static let group = dynamic(light: Color.white.opacity(0.65), dark: Color.white.opacity(0.06))
+        static let group = dynamic(light: Color.white.opacity(0.55), dark: Color.white.opacity(0.07))
         static let cardTint = dynamic(
-            light: Color(hex: 0xF4F1EF).opacity(0.80), dark: Color(hex: 0x26262A).opacity(0.78))
+            light: Color(hex: 0xF4F1EF).opacity(0.50), dark: Color(hex: 0x26262A).opacity(0.45))
         /// The selected segment of a segmented control.
         static let segmentOn = dynamic(light: Color.white, dark: Color.white.opacity(0.18))
         static let accent = dynamic(light: Petrol.p500, dark: Petrol.p400)

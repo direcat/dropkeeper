@@ -1,11 +1,12 @@
 import AppKit
 import SwiftUI
 
-/// The system popover material behind the window, so the card blurs whatever is under it.
-struct PopoverMaterial: NSViewRepresentable {
+/// A translucent system material behind the window, so the card visibly blurs whatever is under it. HUD is
+/// much more see-through than the popover material; the tint on top keeps text readable.
+struct GlassMaterial: NSViewRepresentable {
     func makeNSView(context: Context) -> NSVisualEffectView {
         let view = NSVisualEffectView()
-        view.material = .popover
+        view.material = .hudWindow
         view.blendingMode = .behindWindow
         view.state = .active
         return view
@@ -18,7 +19,7 @@ struct PopoverMaterial: NSViewRepresentable {
 struct GlassSurface: View {
     var body: some View {
         ZStack {
-            PopoverMaterial()
+            GlassMaterial()
             TK.Palette.cardTint
         }
     }
