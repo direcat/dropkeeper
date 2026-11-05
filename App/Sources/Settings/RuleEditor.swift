@@ -53,34 +53,39 @@ struct RuleEditor: View {
             Text(isNew ? "New rule" : "Edit rule")
                 .font(.headline)
                 .padding(.top, TK.Space.l)
-            Form {
-                TextField("Name", text: $rule.name, prompt: Text(verbatim: fallbackName))
-                Picker("What", selection: $kind) {
-                    Text("Kind of file").tag(MatchKind.category)
-                    Text("File name pattern").tag(MatchKind.pattern)
-                }
-                if kind == .category {
-                    Picker("Kind", selection: $category) {
-                        ForEach(RuleCategory.allCases, id: \.self) { Text(RuleSummary.categoryName($0)).tag($0) }
+            ScrollView {
+                SettingsGroup {
+                    SettingsRow("Name") {
+                        TextField("Name", text: $rule.name, prompt: Text(verbatim: fallbackName))
+                            .labelsHidden()
+                            .multilineTextAlignment(.trailing)
+                            .frame(width: TK.Size.settingsPicker)
                     }
-                } else {
-                    TextField(String(localized: "Pattern, e.g. invoice*.pdf"), text: $pattern)
-                    if PatternCheck.matchesEverything(pattern) {
-                        Text("This pattern would match every file.")
-                            .font(.system(size: TK.TextSize.formCaption))
-                            .foregroundStyle(.red)
+                    SettingsRow("What") {
+                        Picker("What", selection: $kind) {
+                            Text("Kind of file").tag(MatchKind.category)
+                            Text("File name pattern").tag(MatchKind.pattern)
+                        }
+                        .labelsHidden()
+                        .frame(width: TK.Size.settingsPicker)
                     }
-                }
-                Picker("Where", selection: $rule.folderPath) {
-                    Text("All watched folders").tag(String?.none)
-                    ForEach(folderPaths, id: \.self) {
-                        Text(verbatim: ($0 as NSString).abbreviatingWithTildeInPath).tag(Optional($0))
+                    matchRow
+                    SettingsRow("Where") {
+                        Picker("Where", selection: $rule.folderPath) {
+                            Text("All watched folders").tag(String?.none)
+                            ForEach(folderPaths, id: \.self) {
+                                Text(verbatim: ($0 as NSString).abbreviatingWithTildeInPath).tag(Optional($0))
+                            }
+                        }
+                        .labelsHidden()
+                        .frame(width: TK.Size.settingsPicker)
                     }
+                    StepSlider(
+                        "When", values: StopPresets.all, selection: $rule.duration, label: { DurationLabel.long($0) })
                 }
-                StepSlider(
-                    "When", values: StopPresets.all, selection: $rule.duration, label: { DurationLabel.long($0) })
+                .padding(.horizontal, TK.Size.settingsContentSide)
+                .padding(.top, TK.Space.m)
             }
-            .formStyle(.grouped)
             HStack {
                 Spacer()
                 Button("Cancel", role: .cancel) { dismiss() }
@@ -93,6 +98,34 @@ struct RuleEditor: View {
         }
         .font(.system(size: TK.TextSize.formBody))
         .frame(width: TK.Size.ruleEditor.width, height: TK.Size.ruleEditor.height)
+    }
+
+    @ViewBuilder private var matchRow: some View {
+        if kind == .category {
+            SettingsRow("Kind") {
+                Picker("Kind", selection: $category) {
+                    ForEach(RuleCategory.allCases, id: \.self) { Text(RuleSummary.categoryName($0)).tag($0) }
+                }
+                .labelsHidden()
+                .frame(width: TK.Size.settingsPicker)
+            }
+        } else {
+            SettingsRow {
+                VStack(alignment: .leading) {
+                    Text("Pattern")
+                    if PatternCheck.matchesEverything(pattern) {
+                        Text("This pattern would match every file.")
+                            .settingsCaption()
+                            .foregroundStyle(TK.Palette.destructive)
+                    }
+                }
+            } control: {
+                TextField(String(localized: "Pattern, e.g. invoice*.pdf"), text: $pattern)
+                    .labelsHidden()
+                    .multilineTextAlignment(.trailing)
+                    .frame(width: TK.Size.settingsPicker)
+            }
+        }
     }
 
     private var fallbackName: String {

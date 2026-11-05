@@ -61,19 +61,18 @@ struct EditedRule: Identifiable {
     var id: UUID { rule.id }
 }
 
-/// The ordered list of rules (first match wins) with add, edit, delete and drag to reorder.
+/// The ordered list of rules (first match wins) with add, edit, delete and move up or down.
 struct RulesSection: View {
     @Bindable var store: SettingsDraft
     let model: AppModel
     @Binding var editing: EditedRule?
 
     var body: some View {
-        Section("Rules") {
+        SettingsGroup("Rules") {
             ForEach($store.draft.rules) { $rule in
                 row($rule)
             }
-            .onMove { store.draft.rules.move(fromOffsets: $0, toOffset: $1) }
-            Button("Add rule") {
+            SettingsButtonRow("Add rule") {
                 editing = EditedRule(
                     rule: Rule(name: "", match: .category(.installers), duration: 86_400), isNew: true)
             }
@@ -81,42 +80,44 @@ struct RulesSection: View {
     }
 
     private func row(_ rule: Binding<Rule>) -> some View {
-        HStack {
-            Toggle(isOn: rule.isEnabled) { Text(verbatim: RuleSummary.displayName(for: rule.wrappedValue)) }
-                .labelsHidden()
-            VStack(alignment: .leading) {
-                Text(verbatim: RuleSummary.displayName(for: rule.wrappedValue))
-                Text(verbatim: RuleSummary.text(for: rule.wrappedValue))
-                    .font(.system(size: TK.TextSize.formCaption))
-                    .foregroundStyle(.secondary)
-                if RuleSummary.isInert(rule.wrappedValue, watched: model.folders),
-                    let path = rule.wrappedValue.folderPath
-                {
-                    let folder = (path as NSString).abbreviatingWithTildeInPath
-                    Text("\(folder) isn't a watched folder, so this rule does nothing.")
-                        .font(.system(size: TK.TextSize.formCaption))
-                        .foregroundStyle(.orange)
+        SettingsRow {
+            HStack(spacing: TK.Space.m) {
+                Toggle(isOn: rule.isEnabled) { Text(verbatim: RuleSummary.displayName(for: rule.wrappedValue)) }
+                    .labelsHidden()
+                VStack(alignment: .leading) {
+                    Text(verbatim: RuleSummary.displayName(for: rule.wrappedValue))
+                    Text(verbatim: RuleSummary.text(for: rule.wrappedValue)).settingsCaption()
+                    if RuleSummary.isInert(rule.wrappedValue, watched: model.folders),
+                        let path = rule.wrappedValue.folderPath
+                    {
+                        let folder = (path as NSString).abbreviatingWithTildeInPath
+                        Text("\(folder) isn't a watched folder, so this rule does nothing.")
+                            .font(.system(size: TK.TextSize.formCaption))
+                            .foregroundStyle(TK.Palette.warning)
+                    }
                 }
             }
-            Spacer()
-            moveButton("chevron.up", label: "Move up", rule: rule.wrappedValue, offset: -1)
-            moveButton("chevron.down", label: "Move down", rule: rule.wrappedValue, offset: 1)
-            Button {
-                editing = EditedRule(rule: rule.wrappedValue, isNew: false)
-            } label: {
-                Image(systemName: "pencil")
+        } control: {
+            HStack {
+                moveButton("chevron.up", label: "Move up", rule: rule.wrappedValue, offset: -1)
+                moveButton("chevron.down", label: "Move down", rule: rule.wrappedValue, offset: 1)
+                Button {
+                    editing = EditedRule(rule: rule.wrappedValue, isNew: false)
+                } label: {
+                    Image(systemName: "pencil")
+                }
+                .buttonStyle(.borderless)
+                .help(Text("Edit rule"))
+                .accessibilityLabel(Text("Edit rule"))
+                Button {
+                    store.draft.rules.removeAll { $0.id == rule.wrappedValue.id }
+                } label: {
+                    Image(systemName: "trash")
+                }
+                .buttonStyle(.borderless)
+                .help(Text("Delete rule"))
+                .accessibilityLabel(Text("Delete rule"))
             }
-            .buttonStyle(.borderless)
-            .help(Text("Edit rule"))
-            .accessibilityLabel(Text("Edit rule"))
-            Button {
-                store.draft.rules.removeAll { $0.id == rule.wrappedValue.id }
-            } label: {
-                Image(systemName: "trash")
-            }
-            .buttonStyle(.borderless)
-            .help(Text("Delete rule"))
-            .accessibilityLabel(Text("Delete rule"))
         }
     }
 

@@ -137,3 +137,30 @@ func ordinaryPatternsAreNotMatchAll(raw: String) {
     let desktop = Rule.defaults(home: "/h")[1]
     #expect(RuleSummary.displayName(for: desktop) == String(localized: "Screenshots on Desktop"))
 }
+
+@Test func statisticsRows() {
+    let rows = StatisticsText.rows(
+        Statistics(
+            movedToTrash: 2, deletedPermanently: 1, kept: 3, scheduledByRules: 4, duplicatesDeleted: 1,
+            bytesFreed: 1_500_000))
+    #expect(rows.first?.value == "6")
+    #expect(rows.map(\.label).contains("Space freed"))
+    #expect(rows.count == 7)
+    #expect(rows.last?.value == ByteCountFormatter.string(fromByteCount: 1_500_000, countStyle: .file))
+}
+
+@Test func statisticsRowsOfAnEmptyHistory() {
+    let rows = StatisticsText.rows(.zero)
+    #expect(rows.map(\.value).dropLast().allSatisfy { $0 == "0" })
+}
+
+@MainActor
+@Test func statisticsAreMissingWithoutEngine() async {
+    let model = AppModel(applyLoginItem: { _ in })
+    #expect(await model.statistics() == nil)
+}
+
+@Test func appearanceTitlesAreDistinct() {
+    let titles = Appearance.allCases.map(AppearanceLabel.title)
+    #expect(Set(titles).count == Appearance.allCases.count)
+}

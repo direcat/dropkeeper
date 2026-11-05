@@ -146,7 +146,7 @@
       }
     },
     "Scheduled by rules" : {
-      "comment" : "Rule notice detail when files from different rules were scheduled together",
+      "comment" : "Rule notice detail when files from different rules were scheduled together; also a Statistics row",
       "localizations" : {
         "cs" : { "stringUnit" : { "state" : "translated", "value" : "Naplánováno pravidly" } },
         "de" : { "stringUnit" : { "state" : "translated", "value" : "Von Regeln geplant" } },
@@ -416,7 +416,7 @@
       }
     },
     "Kept" : {
-      "comment" : "Shown above the Keep stop on the timeline",
+      "comment" : "Shown above the Keep stop on the timeline; also a Statistics row",
       "localizations" : {
         "cs" : { "stringUnit" : { "state" : "translated", "value" : "Ponecháno" } },
         "de" : { "stringUnit" : { "state" : "translated", "value" : "Behalten" } },
@@ -664,7 +664,7 @@
       }
     },
     "Moved to Trash" : {
-      "comment" : "Notice subtitle after a file was moved to the Trash",
+      "comment" : "Notice subtitle after a file was moved to the Trash; also a Statistics row",
       "localizations" : {
         "cs" : { "stringUnit" : { "state" : "translated", "value" : "Přesunuto do Koše" } },
         "de" : { "stringUnit" : { "state" : "translated", "value" : "In den Papierkorb gelegt" } },
@@ -1201,7 +1201,7 @@
       }
     },
     "Clear history now" : {
-      "comment" : "Settings button that asks to clear the history",
+      "comment" : "Settings row title: clearing the history (its button asks to confirm)",
       "localizations" : {
         "cs" : { "stringUnit" : { "state" : "translated", "value" : "Vymazat historii" } },
         "de" : { "stringUnit" : { "state" : "translated", "value" : "Verlauf jetzt löschen" } },
@@ -1688,7 +1688,7 @@
       }
     },
     "Deleted permanently" : {
-      "comment" : "History row: the file was deleted without the Trash",
+      "comment" : "History row: the file was deleted without the Trash; also a Statistics row",
       "localizations" : {
         "cs" : { "stringUnit" : { "state" : "translated", "value" : "Smazáno trvale" } },
         "de" : { "stringUnit" : { "state" : "translated", "value" : "Endgültig gelöscht" } },
@@ -1739,6 +1739,96 @@
         "de" : { "stringUnit" : { "state" : "translated", "value" : "Letzte %lld · unbegrenzt aufbewahrt" } },
         "es" : { "stringUnit" : { "state" : "translated", "value" : "Últimos %lld · se conserva para siempre" } },
         "fr" : { "stringUnit" : { "state" : "translated", "value" : "%lld derniers · conservé indéfiniment" } }
+      }
+    },
+    "Appearance" : {
+      "comment" : "Settings row: Auto, Light or Dark",
+      "localizations" : {
+        "cs" : { "stringUnit" : { "state" : "translated", "value" : "Vzhled" } },
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Erscheinungsbild" } },
+        "es" : { "stringUnit" : { "state" : "translated", "value" : "Apariencia" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Apparence" } }
+      }
+    },
+    "Auto" : {
+      "comment" : "Appearance setting: follow the system's Light or Dark",
+      "localizations" : {
+        "cs" : { "stringUnit" : { "state" : "translated", "value" : "Auto" } },
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Automatisch" } },
+        "es" : { "stringUnit" : { "state" : "translated", "value" : "Automático" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Auto" } }
+      }
+    },
+    "Light" : {
+      "comment" : "Appearance setting: always light",
+      "localizations" : {
+        "cs" : { "stringUnit" : { "state" : "translated", "value" : "Světlý" } },
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Hell" } },
+        "es" : { "stringUnit" : { "state" : "translated", "value" : "Claro" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Clair" } }
+      }
+    },
+    "Dark" : {
+      "comment" : "Appearance setting: always dark",
+      "localizations" : {
+        "cs" : { "stringUnit" : { "state" : "translated", "value" : "Tmavý" } },
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Dunkel" } },
+        "es" : { "stringUnit" : { "state" : "translated", "value" : "Oscuro" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Sombre" } }
+      }
+    },
+    "Pattern" : {
+      "comment" : "Rule editor: the file name pattern field",
+      "localizations" : {
+        "cs" : { "stringUnit" : { "state" : "translated", "value" : "Vzor" } },
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Muster" } },
+        "es" : { "stringUnit" : { "state" : "translated", "value" : "Patrón" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Motif" } }
+      }
+    },
+    "Statistics" : {
+      "comment" : "Settings group title in Data",
+      "localizations" : {
+        "cs" : { "stringUnit" : { "state" : "translated", "value" : "Statistiky" } },
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Statistik" } },
+        "es" : { "stringUnit" : { "state" : "translated", "value" : "Estadísticas" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Statistiques" } }
+      }
+    },
+    "Files handled" : {
+      "comment" : "Statistics row: files decided on (trashed, deleted or kept)",
+      "localizations" : {
+        "cs" : { "stringUnit" : { "state" : "translated", "value" : "Zpracované soubory" } },
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Bearbeitete Dateien" } },
+        "es" : { "stringUnit" : { "state" : "translated", "value" : "Archivos gestionados" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Fichiers traités" } }
+      }
+    },
+    "Duplicates deleted" : {
+      "comment" : "Statistics row",
+      "localizations" : {
+        "cs" : { "stringUnit" : { "state" : "translated", "value" : "Smazané duplicity" } },
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Gelöschte Duplikate" } },
+        "es" : { "stringUnit" : { "state" : "translated", "value" : "Duplicados eliminados" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Doublons supprimés" } }
+      }
+    },
+    "Space freed" : {
+      "comment" : "Statistics row: disk space freed by deleted files",
+      "localizations" : {
+        "cs" : { "stringUnit" : { "state" : "translated", "value" : "Uvolněné místo" } },
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Freigegebener Speicher" } },
+        "es" : { "stringUnit" : { "state" : "translated", "value" : "Espacio liberado" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Espace libéré" } }
+      }
+    },
+    "Since the oldest entry in your history." : {
+      "comment" : "Statistics footnote: the period the figures cover",
+      "localizations" : {
+        "cs" : { "stringUnit" : { "state" : "translated", "value" : "Od nejstaršího záznamu v historii." } },
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Seit dem ältesten Eintrag im Verlauf." } },
+        "es" : { "stringUnit" : { "state" : "translated", "value" : "Desde la entrada más antigua del historial." } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Depuis l’entrée la plus ancienne de l’historique." } }
       }
     },
     "DropKeeper" : {

@@ -10,6 +10,8 @@ final class SettingsDraft {
     var confirmPermanent = false
     var confirmClear = false
     var clearedCount: Int?
+    /// Bumped when the history was cleared, so what is derived from it (the statistics) reloads.
+    var historyRevision = 0
 
     var draft: DropKeeperCore.Settings {
         didSet {
@@ -39,5 +41,6 @@ final class SettingsDraft {
 
     func clearHistory() async {
         clearedCount = await model.clearHistory()
+        historyRevision += 1
     }
 }

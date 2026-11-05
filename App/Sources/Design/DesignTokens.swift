@@ -40,6 +40,8 @@ enum TK {
         static let hairline = dynamic(light: Color.black.opacity(0.07), dark: Color.white.opacity(0.08))
         /// The inner highlight along the edge of a glass card.
         static let cardEdge = dynamic(light: Color.white.opacity(0.5), dark: Color.white.opacity(0.12))
+        /// The rounded card behind a Settings group.
+        static let group = dynamic(light: Color.white.opacity(0.65), dark: Color.white.opacity(0.06))
         static let cardTint = dynamic(
             light: Color(hex: 0xF4F1EF).opacity(0.80), dark: Color(hex: 0x26262A).opacity(0.78))
         /// The selected segment of a segmented control.
@@ -84,6 +86,11 @@ enum TK {
         static let control: CGFloat = 10
         static let button: CGFloat = 11
         static let fileGlyph: CGFloat = 8
+        /// A Settings tab's selected background, and the small segmented control in a Settings row with its
+        /// selected segment.
+        static let tab: CGFloat = 8
+        static let miniSegment: CGFloat = 8
+        static let miniSegmentInner: CGFloat = 6
     }
     /// Text sizes in points. The panel tokens are the original 11/12/13 pt plus 2; the form tokens are
     /// for form-like text (Settings, Onboarding, captions and hints in the panel).
@@ -94,6 +101,8 @@ enum TK {
         static let formBody: CGFloat = 15
         static let formCallout: CGFloat = 14
         static let formCaption: CGFloat = 12
+        /// The label under a Settings tab's icon.
+        static let tabLabel: CGFloat = 11
     }
     enum Size {
         static let panelWidth: CGFloat = 380
@@ -133,8 +142,26 @@ enum TK {
         static let hairline: CGFloat = 1
         static let settingsWindow = CGSize(width: 680, height: 560)
         static let ruleEditor = CGSize(width: 480, height: 400)
-        /// Room for the longest value label beside a Settings step slider.
+        /// Room for the longest value label beside a Settings step slider, and the slider itself.
         static let stepSliderLabel: CGFloat = 90
+        static let stepSliderWidth: CGFloat = 180
+        /// A Settings row's minimum height and its vertical padding.
+        static let settingsRow: CGFloat = 44
+        static let settingsRowInset: CGFloat = 10
+        /// Padding inside a Settings group card (sides) and around the scrolling content (sides, top).
+        static let settingsGroupInset: CGFloat = 18
+        static let settingsContentSide: CGFloat = 28
+        static let settingsContentTop: CGFloat = 18
+        /// The tab bar's icon, and its padding above the labels.
+        static let tabIcon: CGFloat = 18
+        static let tabInset: CGFloat = 5
+        /// Inner padding of the Settings segmented control's track, and the room for a Settings picker.
+        static let miniSegmentPadding: CGFloat = 2
+        static let settingsPicker: CGFloat = 170
+        /// The wordmark in the About tab.
+        static let lockup: CGFloat = 28
+        /// The Statistics values' column.
+        static let statisticsValue: CGFloat = 120
     }
     /// Opacities of decorations that are not colors of their own.
     enum Opacity {

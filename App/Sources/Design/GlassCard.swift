@@ -2,7 +2,7 @@ import AppKit
 import SwiftUI
 
 /// The system popover material behind the window, so the card blurs whatever is under it.
-private struct PopoverMaterial: NSViewRepresentable {
+struct PopoverMaterial: NSViewRepresentable {
     func makeNSView(context: Context) -> NSVisualEffectView {
         let view = NSVisualEffectView()
         view.material = .popover
@@ -12,6 +12,16 @@ private struct PopoverMaterial: NSViewRepresentable {
     }
 
     func updateNSView(_ view: NSVisualEffectView, context: Context) {}
+}
+
+/// The glass surface on its own: the blurred backdrop with the card tint. The Settings window's background.
+struct GlassSurface: View {
+    var body: some View {
+        ZStack {
+            PopoverMaterial()
+            TK.Palette.cardTint
+        }
+    }
 }
 
 /// A frosted card: blurred backdrop, a light or dark tint and a white inner highlight.
@@ -28,12 +38,7 @@ struct GlassCard<Content: View>: View {
     var body: some View {
         let shape = RoundedRectangle(cornerRadius: radius, style: .continuous)
         content
-            .background {
-                ZStack {
-                    PopoverMaterial()
-                    TK.Palette.cardTint
-                }
-            }
+            .background { GlassSurface() }
             .clipShape(shape)
             .overlay { shape.strokeBorder(TK.Palette.cardEdge, lineWidth: TK.Size.cardStroke) }
     }

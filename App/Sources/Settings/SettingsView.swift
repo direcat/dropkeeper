@@ -38,8 +38,8 @@ enum DefaultChoiceTag {
     }
 }
 
-/// One Settings tab's content. Every tab is its own `Form` hosted by `SettingsWindowController`, all editing one
-/// shared `SettingsDraft`.
+/// One Settings tab's content: a scrolling page of groups. Every tab is hosted by `SettingsRootView` under the tab
+/// bar, all editing one shared `SettingsDraft`.
 struct SettingsTabView: View {
     let tab: SettingsTab
     let model: AppModel
@@ -52,14 +52,12 @@ struct SettingsTabView: View {
             case .folders: FoldersTab(model: model)
             case .expiry: ExpiryTab(store: store)
             case .rules: RulesTab(store: store, model: model)
-            case .data: DataTab(store: store)
+            case .data: DataTab(store: store, model: model)
             case .about: AboutTab()
             }
         }
-        .formStyle(.grouped)
         .font(.system(size: TK.TextSize.formBody))
-        .controlSize(.large)
-        .frame(width: TK.Size.settingsWindow.width, height: TK.Size.settingsWindow.height)
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
         .onAppear { store.sync() }
         .onChange(of: model.settings) { _, _ in store.sync() }
         .alert(
@@ -74,33 +72,108 @@ struct SettingsTabView: View {
     }
 }
 
+/// The window's content: tabs stretched across the full width on the glass surface, and the selected tab's page.
+struct SettingsRootView: View {
+    let model: AppModel
+    @Bindable var store: SettingsDraft
+    let onSelect: (SettingsTab) -> Void
+
+    var body: some View {
+        VStack(spacing: 0) {
+            tabBar
+            Rectangle().fill(TK.Palette.hairline).frame(height: TK.Size.cardStroke)
+            SettingsTabView(tab: store.activeTab, model: model, store: store)
+                .id(store.activeTab)
+        }
+        .frame(width: TK.Size.settingsWindow.width, height: TK.Size.settingsWindow.height)
+        .background { GlassSurface().ignoresSafeArea() }
+    }
+
+    private var tabBar: some View {
+        HStack(spacing: TK.Space.xs) {
+            ForEach(SettingsTab.allCases, id: \.self) { tab in
+                tabButton(tab)
+            }
+        }
+        .padding(.horizontal, TK.Space.m)
+        .padding(.top, TK.Space.xs)
+        .padding(.bottom, TK.Space.m - TK.Space.xs / 2)
+    }
+
+    private func tabButton(_ tab: SettingsTab) -> some View {
+        let selected = store.activeTab == tab
+        return Button {
+            onSelect(tab)
+        } label: {
+            VStack(spacing: TK.Space.xs / 2) {
+                Image(systemName: tab.systemImage)
+                    .font(.system(size: TK.Size.tabIcon))
+                    .frame(height: TK.Size.tabIcon + TK.Space.xs)
+                Text(verbatim: tab.title)
+                    .font(.system(size: TK.TextSize.tabLabel))
+            }
+            .foregroundStyle(selected ? TK.Palette.accentText : TK.Palette.textSecondary)
+            .frame(maxWidth: .infinity)
+            .padding(.vertical, TK.Size.tabInset)
+            .background {
+                if selected {
+                    RoundedRectangle(cornerRadius: TK.Radius.tab, style: .continuous).fill(TK.Palette.fill)
+                }
+            }
+            .contentShape(Rectangle())
+        }
+        .buttonStyle(.plain)
+        .accessibilityLabel(Text(verbatim: tab.title))
+        .accessibilityAddTraits(selected ? .isSelected : [])
+    }
+}
+
+/// The scrolling page of groups every tab is made of.
+private struct TabPage<Content: View>: View {
+    @ViewBuilder let content: Content
+
+    var body: some View {
+        ScrollView {
+            VStack(alignment: .leading, spacing: TK.Space.l) {
+                content
+            }
+            .padding(.horizontal, TK.Size.settingsContentSide)
+            .padding(.vertical, TK.Size.settingsContentTop)
+            .frame(maxWidth: .infinity, alignment: .leading)
+        }
+    }
+}
+
 private struct GeneralTab: View {
     @Bindable var store: SettingsDraft
     @State private var language = AppLanguage.shared.selection
 
     var body: some View {
-        Form {
-            Section("General") {
-                Toggle("Launch at login", isOn: $store.draft.launchAtLogin)
-                languagePicker
-                Toggle(isOn: $store.draft.quietMode) {
-                    Text("Quiet mode")
-                    Text("Don't open the prompt by itself. A dot on the menu bar icon shows waiting files.")
+        TabPage {
+            SettingsGroup("General") {
+                SettingsToggleRow("Launch at login", isOn: $store.draft.launchAtLogin)
+                SettingsRow("Appearance") {
+                    SettingsSegmented(
+                        label: "Appearance", values: Appearance.allCases, selection: $store.draft.appearance,
+                        title: AppearanceLabel.title)
                 }
+                languagePicker
+                if AppLanguage.shared.needsRestart { restartRow }
+                SettingsToggleRow(
+                    "Quiet mode",
+                    caption: "Don't open the prompt by itself. A dot on the menu bar icon shows waiting files.",
+                    isOn: $store.draft.quietMode)
             }
-            Section("Notifications") {
+            SettingsGroup("Notifications") {
                 StepSlider(
-                    "Hide notifications after", values: Settings.notificationTimeoutOptions,
-                    selection: $store.draft.notificationTimeout, label: { DurationLabel.notificationTimeout($0) })
-                Text(
-                    """
-                    The new-file prompt and the reminder before deletion hide by themselves. \
-                    The file keeps waiting, its default action or deletion still happens on time, \
-                    and it stays in the menu bar list.
-                    """
-                )
-                .font(.system(size: TK.TextSize.formCaption))
-                .foregroundStyle(.secondary)
+                    "Hide notifications after",
+                    caption: """
+                        The new-file prompt and the reminder before deletion hide by themselves. \
+                        The file keeps waiting, its default action or deletion still happens on time, \
+                        and it stays in the menu bar list.
+                        """,
+                    values: Settings.notificationTimeoutOptions, selection: $store.draft.notificationTimeout,
+                    label: { DurationLabel.notificationTimeout($0) })
             }
         }
     }
@@ -110,31 +183,32 @@ private struct GeneralTab: View {
         "en": "English", "cs": "Čeština", "de": "Deutsch", "es": "Español", "fr": "Français",
     ]
 
-    @ViewBuilder private var languagePicker: some View {
-        Picker(
-            "Language",
-            selection: Binding(
-                get: { language },
-                set: {
-                    language = $0
-                    AppLanguage.shared.select($0)
-                })
-        ) {
-            Text("System").tag(String?.none)
-            ForEach(AppLanguage.supported, id: \.self) { code in
-                Text(verbatim: Self.languageNames[code] ?? code).tag(Optional(code))
-            }
-        }
-        if AppLanguage.shared.needsRestart {
-            HStack {
-                Text("DropKeeper needs to restart to change the language.")
-                    .font(.system(size: TK.TextSize.formCaption))
-                    .foregroundStyle(.secondary)
-                Spacer()
-                Button("Restart DropKeeper") {
-                    AppDelegate.relaunchOnQuit = true
-                    NSApp.terminate(nil)
+    private var languagePicker: some View {
+        SettingsRow("Language") {
+            Picker(
+                "Language",
+                selection: Binding(
+                    get: { language },
+                    set: {
+                        language = $0
+                        AppLanguage.shared.select($0)
+                    })
+            ) {
+                Text("System").tag(String?.none)
+                ForEach(AppLanguage.supported, id: \.self) { code in
+                    Text(verbatim: Self.languageNames[code] ?? code).tag(Optional(code))
                 }
+            }
+            .labelsHidden()
+            .frame(width: TK.Size.settingsPicker)
+        }
+    }
+
+    private var restartRow: some View {
+        SettingsRow("DropKeeper needs to restart to change the language.") {
+            Button("Restart DropKeeper") {
+                AppDelegate.relaunchOnQuit = true
+                NSApp.terminate(nil)
             }
         }
     }
@@ -144,40 +218,44 @@ private struct FoldersTab: View {
     let model: AppModel
 
     var body: some View {
-        Form {
-            Section("Watch folders") {
+        TabPage {
+            SettingsGroup("Watch folders") {
                 ForEach(model.folders) { folder in
-                    HStack {
-                        Image(systemName: folder.status == .ok ? "folder" : "exclamationmark.triangle")
-                            .foregroundStyle(folder.status == .ok ? Color.secondary : Color.orange)
-                        VStack(alignment: .leading) {
-                            Text(verbatim: (folder.path as NSString).abbreviatingWithTildeInPath)
-                            if folder.status == .noAccess {
-                                Text("DropKeeper has no access to this folder.")
-                                    .font(.system(size: TK.TextSize.formCaption))
-                                    .foregroundStyle(.secondary)
-                            } else if folder.status == .unavailable {
-                                Text("This folder is not available.")
-                                    .font(.system(size: TK.TextSize.formCaption))
-                                    .foregroundStyle(.secondary)
-                            }
-                        }
-                        Spacer()
-                        if folder.status == .noAccess {
-                            Button("Grant access") { openPrivacySettings() }
-                            Button("Check again") { Task { await model.refreshFolders() } }
-                        }
-                        Button {
-                            if let id = folder.id { Task { await model.removeFolder(id: id) } }
-                        } label: {
-                            Image(systemName: "trash")
-                        }
-                        .buttonStyle(.borderless)
-                        .help(Text("Remove folder"))
-                        .accessibilityLabel(Text("Remove folder"))
+                    row(folder)
+                }
+                SettingsButtonRow("Add folder") { addFolder() }
+            }
+        }
+    }
+
+    private func row(_ folder: WatchedFolder) -> some View {
+        SettingsRow {
+            HStack(spacing: TK.Space.m) {
+                Image(systemName: folder.status == .ok ? "folder" : "exclamationmark.triangle")
+                    .foregroundStyle(folder.status == .ok ? TK.Palette.textSecondary : TK.Palette.warning)
+                VStack(alignment: .leading) {
+                    Text(verbatim: (folder.path as NSString).abbreviatingWithTildeInPath)
+                    if folder.status == .noAccess {
+                        Text("DropKeeper has no access to this folder.").settingsCaption()
+                    } else if folder.status == .unavailable {
+                        Text("This folder is not available.").settingsCaption()
                     }
                 }
-                Button("Add folder") { addFolder() }
+            }
+        } control: {
+            HStack {
+                if folder.status == .noAccess {
+                    Button("Grant access") { openPrivacySettings() }
+                    Button("Check again") { Task { await model.refreshFolders() } }
+                }
+                Button {
+                    if let id = folder.id { Task { await model.removeFolder(id: id) } }
+                } label: {
+                    Image(systemName: "trash")
+                }
+                .buttonStyle(.borderless)
+                .help(Text("Remove folder"))
+                .accessibilityLabel(Text("Remove folder"))
             }
         }
     }
@@ -202,7 +280,7 @@ private struct ExpiryTab: View {
     @Bindable var store: SettingsDraft
 
     var body: some View {
-        Form {
+        TabPage {
             timeline
             expiry
         }
@@ -215,83 +293,96 @@ private struct ExpiryTab: View {
     }
 
     private var timeline: some View {
-        Section {
+        SettingsGroup("Timeline", footer: Text("Times you can pick in the prompt.")) {
             ForEach(store.draft.timelineStops.indices, id: \.self) { index in
-                HStack {
-                    Picker(selection: stopBinding(index)) {
-                        ForEach(StopPresets.options(for: index, in: store.draft.timelineStops), id: \.self) {
-                            Text(DurationLabel.short($0)).tag($0)
+                SettingsRow {
+                    Text(verbatim: "#\(index + 1)")
+                } control: {
+                    HStack {
+                        Picker(selection: stopBinding(index)) {
+                            ForEach(StopPresets.options(for: index, in: store.draft.timelineStops), id: \.self) {
+                                Text(DurationLabel.short($0)).tag($0)
+                            }
+                        } label: {
+                            Text(verbatim: "#\(index + 1)")
                         }
-                    } label: {
-                        Text(verbatim: "#\(index + 1)")
+                        .labelsHidden()
+                        .frame(width: TK.Size.settingsPicker)
+                        Button {
+                            store.draft.timelineStops.remove(at: index)
+                        } label: {
+                            Image(systemName: "trash")
+                        }
+                        .buttonStyle(.borderless)
+                        .disabled(store.draft.timelineStops.count <= 2)
+                        .help(Text("Remove time"))
+                        .accessibilityLabel(Text("Remove time"))
                     }
-                    Button {
-                        store.draft.timelineStops.remove(at: index)
-                    } label: {
-                        Image(systemName: "trash")
-                    }
-                    .buttonStyle(.borderless)
-                    .disabled(store.draft.timelineStops.count <= 2)
-                    .help(Text("Remove time"))
-                    .accessibilityLabel(Text("Remove time"))
                 }
             }
-            Button("Add time") {
+            SettingsButtonRow("Add time") {
                 if let stop = StopPresets.stopToAdd(to: store.draft.timelineStops) {
                     store.draft.timelineStops.append(stop)
                 }
             }
             .disabled(
                 store.draft.timelineStops.count >= 5 || StopPresets.stopToAdd(to: store.draft.timelineStops) == nil)
-        } header: {
-            Text("Timeline")
-        } footer: {
-            Text("Times you can pick in the prompt.")
-                .font(.system(size: TK.TextSize.formCaption))
-                .foregroundStyle(.secondary)
         }
     }
 
     private var expiry: some View {
-        Section("Expiry") {
-            Picker(
-                "Default action",
-                selection: Binding(
-                    get: {
-                        DefaultChoiceTag.tag(for: store.draft.defaultChoice, stops: store.draft.timelineStops)
-                    },
-                    set: {
-                        store.draft.defaultChoice = DefaultChoiceTag.choice(
-                            for: $0, stops: store.draft.timelineStops)
-                    })
-            ) {
-                Text("Last chosen time").tag(-2)
-                Text("Keep it").tag(-1)
-                ForEach(store.draft.timelineStops.indices, id: \.self) { index in
-                    Text("Delete after \(DurationLabel.long(store.draft.timelineStops[index]))").tag(index)
+        SettingsGroup("Expiry") {
+            SettingsRow("Default action") {
+                Picker(
+                    "Default action",
+                    selection: Binding(
+                        get: {
+                            DefaultChoiceTag.tag(for: store.draft.defaultChoice, stops: store.draft.timelineStops)
+                        },
+                        set: {
+                            store.draft.defaultChoice = DefaultChoiceTag.choice(
+                                for: $0, stops: store.draft.timelineStops)
+                        })
+                ) {
+                    Text("Last chosen time").tag(-2)
+                    Text("Keep it").tag(-1)
+                    ForEach(store.draft.timelineStops.indices, id: \.self) { index in
+                        Text("Delete after \(DurationLabel.long(store.draft.timelineStops[index]))").tag(index)
+                    }
                 }
+                .labelsHidden()
+                .frame(width: TK.Size.settingsPicker)
             }
             StepSlider(
                 "Apply default action after", values: Settings.gracePeriodOptions, selection: $store.draft.gracePeriod,
                 label: { DurationLabel.long($0) })
-            Toggle("Remind before deleting", isOn: $store.draft.reminderEnabled)
+            SettingsToggleRow("Remind before deleting", isOn: $store.draft.reminderEnabled)
             StepSlider(
                 "Remind before", values: Settings.reminderLeadTimeOptions, selection: $store.draft.reminderLeadTime,
                 label: { DurationLabel.long($0) }
             )
             .disabled(!store.draft.reminderEnabled)
-            Picker(
-                "Expired files",
-                selection: Binding(
-                    get: { store.draft.deleteMode },
-                    set: { mode in
-                        if mode == .permanent { store.confirmPermanent = true } else { store.draft.deleteMode = mode }
-                    })
-            ) {
-                Text("Move to Trash").tag(DeleteMode.trash)
-                Text("Delete permanently").tag(DeleteMode.permanent)
+            SettingsRow("Expired files") {
+                Picker(
+                    "Expired files",
+                    selection: Binding(
+                        get: { store.draft.deleteMode },
+                        set: { mode in
+                            if mode == .permanent {
+                                store.confirmPermanent = true
+                            } else {
+                                store.draft.deleteMode = mode
+                            }
+                        })
+                ) {
+                    Text("Move to Trash").tag(DeleteMode.trash)
+                    Text("Delete permanently").tag(DeleteMode.permanent)
+                }
+                .labelsHidden()
+                .frame(width: TK.Size.settingsPicker)
             }
-            Toggle("Mark scheduled files with the “Temporary” Finder tag", isOn: $store.draft.finderTagEnabled)
+            SettingsToggleRow(
+                "Mark scheduled files with the “Temporary” Finder tag", isOn: $store.draft.finderTagEnabled)
         }
     }
 
@@ -318,7 +409,7 @@ private struct RulesTab: View {
     @State private var editing: EditedRule?
 
     var body: some View {
-        Form {
+        TabPage {
             RulesSection(store: store, model: model, editing: $editing)
             IgnoredFilesSection(store: store)
         }
@@ -336,20 +427,23 @@ private struct RulesTab: View {
 
 private struct DataTab: View {
     @Bindable var store: SettingsDraft
+    let model: AppModel
+
+    private var clearedCaption: LocalizedStringKey? {
+        store.clearedCount.map { "Removed \($0) records" }
+    }
 
     var body: some View {
-        Form {
-            Section("Data") {
+        TabPage {
+            SettingsGroup("Data") {
                 StepSlider(
                     "Keep history for", values: HistoryRetention.allCases, selection: $store.draft.historyRetention,
                     label: DurationLabel.retention)
-                HStack {
-                    Button("Clear history now") { store.confirmClear = true }
-                    if let clearedCount = store.clearedCount {
-                        Text("Removed \(clearedCount) records").foregroundStyle(.secondary)
-                    }
+                SettingsRow("Clear history now", caption: clearedCaption) {
+                    Button("Clear history") { store.confirmClear = true }
                 }
             }
+            StatisticsSection(model: model, store: store)
         }
         .alert("Clear history?", isPresented: $store.confirmClear) {
             Button("Clear history", role: .destructive) {
@@ -365,22 +459,31 @@ private struct DataTab: View {
 private struct AboutTab: View {
     private static let version = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "–"
 
-    private var promise: some View {
-        Text("Free and open source (MIT). 100 % offline, no analytics, no tracking, nothing leaves your computer.")
-    }
-
     var body: some View {
-        Form {
-            Section("About") {
-                HStack(alignment: .center, spacing: TK.Space.l) {
-                    Image("Lockup").resizable().scaledToFit().frame(height: 28)
-                    Spacer()
+        TabPage {
+            SettingsGroup("About") {
+                SettingsRow {
+                    Image("Lockup").resizable().scaledToFit().frame(height: TK.Size.lockup)
+                } control: {
                     Text("Version \(Self.version)")
-                        .foregroundStyle(.secondary)
+                        .foregroundStyle(TK.Palette.textSecondary)
                 }
-                promise
-                Link(
-                    "direcat.github.io/dropkeeper", destination: URL(string: "https://direcat.github.io/dropkeeper/")!)
+                SettingsRow {
+                    Text(
+                        """
+                        Free and open source (MIT). 100 % offline, no analytics, no tracking, \
+                        nothing leaves your computer.
+                        """)
+                } control: {
+                    EmptyView()
+                }
+                SettingsRow {
+                    Link(
+                        "direcat.github.io/dropkeeper",
+                        destination: URL(string: "https://direcat.github.io/dropkeeper/")!)
+                } control: {
+                    EmptyView()
+                }
             }
         }
     }

@@ -1,48 +1,34 @@
 import AppKit
 import SwiftUI
 
-/// Toolbar-style tabs. They are AppKit's: a SwiftUI `TabView` in this plain window would draw an in-content
-/// segmented control, and the Safari-style toolbar look only comes with a SwiftUI `Settings` scene.
+/// The window's content: our own tab bar, stretched across the full width (a toolbar's tabs sit centered and
+/// can't be stretched), over the glass surface. The selected tab is remembered across launches.
 @MainActor
-final class SettingsTabViewController: NSTabViewController {
+final class SettingsRootController: NSHostingController<SettingsRootView> {
     static let selectedTabKey = "settingsTab"
 
-    private let store: SettingsDraft
+    let store: SettingsDraft
     private let defaults: UserDefaults
 
     init(model: AppModel, store: SettingsDraft, defaults: UserDefaults) {
         self.store = store
         self.defaults = defaults
-        super.init(nibName: nil, bundle: nil)
-        tabStyle = .toolbar
-        for tab in SettingsTab.allCases {
-            let hosting = NSHostingController(rootView: SettingsTabView(tab: tab, model: model, store: store))
-            // One fixed window size for every tab; content scrolls inside a tab.
-            hosting.sizingOptions = []
-            hosting.preferredContentSize = TK.Size.settingsWindow
-            let item = NSTabViewItem(viewController: hosting)
-            item.label = tab.title
-            item.image = NSImage(systemSymbolName: tab.systemImage, accessibilityDescription: tab.title)
-            addTabViewItem(item)
-        }
         let saved = defaults.integer(forKey: Self.selectedTabKey)
-        selectedTabViewItemIndex = tabViewItems.indices.contains(saved) ? saved : 0
-        syncActiveTab()
+        store.activeTab = SettingsTab.allCases.indices.contains(saved) ? SettingsTab.allCases[saved] : .general
+        // The closure needs `self`, which doesn't exist yet: it reaches the store and defaults directly.
+        super.init(
+            rootView: SettingsRootView(
+                model: model, store: store,
+                onSelect: { tab in
+                    store.activeTab = tab
+                    defaults.set(SettingsTab.allCases.firstIndex(of: tab) ?? 0, forKey: Self.selectedTabKey)
+                }))
+        // One fixed window size for every tab; content scrolls inside a tab.
+        sizingOptions = []
+        preferredContentSize = TK.Size.settingsWindow
     }
 
     @available(*, unavailable) required init?(coder: NSCoder) { fatalError("init(coder:) is not supported") }
-
-    override func tabView(_ tabView: NSTabView, didSelect tabViewItem: NSTabViewItem?) {
-        super.tabView(tabView, didSelect: tabViewItem)
-        defaults.set(selectedTabViewItemIndex, forKey: Self.selectedTabKey)
-        syncActiveTab()
-    }
-
-    private func syncActiveTab() {
-        if SettingsTab.allCases.indices.contains(selectedTabViewItemIndex) {
-            store.activeTab = SettingsTab.allCases[selectedTabViewItemIndex]
-        }
-    }
 }
 
 @MainActor
@@ -67,8 +53,12 @@ final class SettingsWindowController {
         } else if window == nil {
             let window = NSWindow(contentViewController: makeTabs())
             window.title = String(localized: "DropKeeper Settings")
-            window.styleMask = [.titled, .closable]
-            window.toolbarStyle = .preference
+            // The tab bar sits right under the traffic lights, on the glass surface.
+            window.styleMask = [.titled, .closable, .fullSizeContentView]
+            window.titlebarAppearsTransparent = true
+            window.titleVisibility = .hidden
+            window.isOpaque = false
+            window.backgroundColor = .clear
             window.isReleasedWhenClosed = false
             self.window = window
             placeOnOpen(window)
@@ -89,7 +79,7 @@ final class SettingsWindowController {
         window.center()
     }
 
-    private func makeTabs() -> NSTabViewController {
-        SettingsTabViewController(model: model, store: SettingsDraft(model: model), defaults: defaults)
+    private func makeTabs() -> NSViewController {
+        SettingsRootController(model: model, store: SettingsDraft(model: model), defaults: defaults)
     }
 }

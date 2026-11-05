@@ -1,16 +1,19 @@
 import SwiftUI
 
-/// A slider over a short list of discrete values, with the selected one's label trailing.
+/// A Settings row with a slider over a short list of discrete values, the selected one's label trailing.
 struct StepSlider<Value: Hashable>: View {
     let title: LocalizedStringKey
+    let caption: LocalizedStringKey?
     let values: [Value]
     @Binding var selection: Value
     let label: (Value) -> String
 
     init(
-        _ title: LocalizedStringKey, values: [Value], selection: Binding<Value>, label: @escaping (Value) -> String
+        _ title: LocalizedStringKey, caption: LocalizedStringKey? = nil, values: [Value],
+        selection: Binding<Value>, label: @escaping (Value) -> String
     ) {
         self.title = title
+        self.caption = caption
         self.values = values
         self._selection = selection
         self.label = label
@@ -31,7 +34,7 @@ struct StepSlider<Value: Hashable>: View {
 
     var body: some View {
         let index = Self.index(of: selection, in: values)
-        LabeledContent(title) {
+        SettingsRow(title, caption: caption) {
             HStack(spacing: TK.Space.m) {
                 Slider(
                     value: Binding(
@@ -43,6 +46,7 @@ struct StepSlider<Value: Hashable>: View {
                     in: 0...Double(max(values.count - 1, 1)), step: 1
                 )
                 .labelsHidden()
+                .frame(width: TK.Size.stepSliderWidth)
                 .accessibilityLabel(Text(title))
                 .accessibilityValue(Text(values.isEmpty ? "" : label(values[index])))
                 Text(values.isEmpty ? "" : label(values[index]))

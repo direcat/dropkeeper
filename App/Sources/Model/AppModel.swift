@@ -532,3 +532,16 @@ enum ErrorText {
         }
     }
 }
+
+extension AppModel {
+    /// Totals over the stored history, or nil without an engine or when it failed (reported).
+    func statistics() async -> Statistics? {
+        guard let engine else { return nil }
+        do {
+            return try await engine.statistics()
+        } catch {
+            report(error)
+            return nil
+        }
+    }
+}

@@ -105,25 +105,19 @@ private func prompt(hideProgress: Double?, hideSeconds: Int?) -> PromptView {
     #expect(CGFloat(image.height) >= TK.Size.settingsWindow.height)
 }
 
-/// The spike: AppKit's toolbar tabs in this app's plain window give one toolbar item per tab, each with its symbol.
+/// The tab bar is our own, so selecting a tab sets the shown tab and remembers it.
 @MainActor
-@Test func settingsWindowHasToolbarTabs() throws {
+@Test func settingsWindowRemembersTheSelectedTab() throws {
     let suite = "DropKeeperAppTests.\(UUID().uuidString)"
     let defaults = try #require(UserDefaults(suiteName: suite))
     defer { defaults.removePersistentDomain(forName: suite) }
-    defaults.set(3, forKey: SettingsTabViewController.selectedTabKey)
+    defaults.set(3, forKey: SettingsRootController.selectedTabKey)
     let model = AppModel(defaults: defaults, applyLoginItem: { _ in })
-    let controller = SettingsTabViewController(model: model, store: SettingsDraft(model: model), defaults: defaults)
-    let window = NSWindow(contentViewController: controller)
-    window.styleMask = [.titled, .closable]
-    window.toolbarStyle = .preference
-    #expect(controller.tabStyle == .toolbar)
-    #expect(controller.tabViewItems.count == SettingsTab.allCases.count)
-    #expect(controller.tabViewItems.allSatisfy { $0.image != nil })
-    #expect(controller.selectedTabViewItemIndex == 3)
-    #expect(window.toolbar?.items.count == SettingsTab.allCases.count)
-    controller.selectedTabViewItemIndex = 5
-    #expect(defaults.integer(forKey: SettingsTabViewController.selectedTabKey) == 5)
+    let controller = SettingsRootController(model: model, store: SettingsDraft(model: model), defaults: defaults)
+    #expect(controller.store.activeTab == .rules)
+    controller.rootView.onSelect(.about)
+    #expect(controller.store.activeTab == .about)
+    #expect(defaults.integer(forKey: SettingsRootController.selectedTabKey) == 5)
 }
 
 /// The window opens at its fixed size and centered on its screen, on first open and again after a close.
@@ -151,6 +145,7 @@ private func prompt(hideProgress: Double?, hideSeconds: Int?) -> PromptView {
     controller.settingsWindow?.close()
     controller.show()
     try expectCentered()
-    #expect(controller.settingsWindow?.toolbar?.items.count == 6)
+    #expect(controller.settingsWindow?.toolbar == nil)
+    #expect(controller.settingsWindow?.styleMask.contains(.fullSizeContentView) == true)
     controller.settingsWindow?.close()
 }

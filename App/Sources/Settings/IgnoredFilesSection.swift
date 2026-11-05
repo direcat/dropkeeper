@@ -17,14 +17,14 @@ struct IgnoredFilesSection: View {
     private var refused: Bool { PatternCheck.matchesEverything(newPattern) }
 
     var body: some View {
-        Section {
-            Toggle("Detect duplicate downloads", isOn: $store.draft.duplicateDetection)
+        SettingsGroup {
+            SettingsToggleRow("Detect duplicate downloads", isOn: $store.draft.duplicateDetection)
         }
-        Section {
+        SettingsGroup("Ignored files", footer: footer) {
             ForEach(store.draft.ignoredPatterns, id: \.self) { pattern in
-                HStack {
+                SettingsRow {
                     Text(verbatim: pattern)
-                    Spacer()
+                } control: {
                     Button {
                         store.draft.ignoredPatterns.removeAll { $0 == pattern }
                     } label: {
@@ -38,24 +38,24 @@ struct IgnoredFilesSection: View {
             HStack {
                 // The String overload keeps the `*` in the placeholder from being read as Markdown.
                 TextField(String(localized: "Pattern, e.g. *.dmg or ~$*"), text: $newPattern)
+                    .textFieldStyle(.plain)
                     .onSubmit(addPattern)
                 Button("Add", action: addPattern)
                     .disabled(IgnorePattern.normalize(newPattern) == nil || refused)
             }
-        } header: {
-            Text("Ignored files")
-        } footer: {
-            VStack(alignment: .leading, spacing: TK.Space.xs) {
-                Text(
-                    String(
-                        localized: "* matches any characters and ? matches one. A plain word such as zip means *.zip."))
-                if refused {
-                    Text("This pattern would match every file.").foregroundStyle(.red)
-                }
-            }
-            .font(.system(size: TK.TextSize.formCaption))
-            .foregroundStyle(.secondary)
+            .padding(.vertical, TK.Size.settingsRowInset)
+            .frame(minHeight: TK.Size.settingsRow)
         }
+        if refused {
+            Text("This pattern would match every file.")
+                .settingsCaption()
+                .foregroundStyle(TK.Palette.destructive)
+        }
+    }
+
+    /// The String overload keeps the `*` from being read as Markdown.
+    private var footer: Text {
+        Text(String(localized: "* matches any characters and ? matches one. A plain word such as zip means *.zip."))
     }
 
     private func addPattern() {
