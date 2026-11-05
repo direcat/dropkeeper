@@ -4,6 +4,8 @@ All notable changes to DropKeeper are documented here. The format follows [Keep 
 
 ## [Unreleased]
 
+## [1.2.0] - 2026-11-05
+
 ### Added
 - Quiet mode option "Apply the default action automatically": new files get the default action (the one the grace period applies) right away, with no prompt and no waiting dot. Rules still take precedence, files already waiting get the default when you switch it on, and the option only has an effect while Quiet mode is on. With duplicate detection on as well, a confirmed duplicate of a file that is still there is deleted right away instead (to the Trash or permanently, following Expired files), ahead of any rule, and the usual notice with Undo appears. Of two identical files that arrive together the one named like a copy ("name (1)", or Finder's English "name copy" / "name copy 2") goes; if neither name is a copy name, the one that sorts last goes. A duplicate is only deleted automatically while its original is still there and not itself being checked; when the original is scheduled for deletion, the copy goes only if it would be scheduled anyway (a rule matches it or the default action is a timer) and the original is not about to expire, otherwise it follows the normal path.
 - Setting "Hide notifications after" (5 seconds to 15 minutes, or Never; 30 seconds by default): the prompt and the reminder hide on their own and the file stays in the list. A "Hides in N s · stays in the list" bar shows the time left; it pauses while the pointer is over the prompt, a key press restarts it, and with VoiceOver running nothing hides by itself.
