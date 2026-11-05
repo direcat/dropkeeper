@@ -22,7 +22,8 @@ struct IgnoredFilesSection: View {
                 "Detect duplicate downloads",
                 caption: """
                     A new download with exactly the same content as a file in the same folder is pointed out in the \
-                    prompt, with an offer to delete the duplicate.
+                    prompt, with an offer to delete the duplicate. With “Apply the default action automatically” on, \
+                    the duplicate is deleted right away.
                     """,
                 isOn: $store.draft.duplicateDetection)
         }

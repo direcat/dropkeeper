@@ -885,13 +885,13 @@
         "fr" : { "stringUnit" : { "state" : "translated", "value" : "Appliquer l’action par défaut automatiquement" } }
       }
     },
-    "New files get the default action right away instead of waiting for you." : {
+    "New files, and files already waiting, get the default action right away instead of waiting for you." : {
       "comment" : "Settings: explanation of the automatic default action",
       "localizations" : {
-        "cs" : { "stringUnit" : { "state" : "translated", "value" : "Nové soubory dostanou výchozí akci hned, místo aby čekaly na vás." } },
-        "de" : { "stringUnit" : { "state" : "translated", "value" : "Neue Dateien erhalten sofort die Standardaktion, statt auf Sie zu warten." } },
-        "es" : { "stringUnit" : { "state" : "translated", "value" : "Los archivos nuevos reciben la acción predeterminada de inmediato, en lugar de esperar tu decisión." } },
-        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Les nouveaux fichiers reçoivent tout de suite l’action par défaut au lieu d’attendre votre décision." } }
+        "cs" : { "stringUnit" : { "state" : "translated", "value" : "Nové soubory i soubory, které už čekají, dostanou výchozí akci hned, místo aby čekaly na vás." } },
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Neue und bereits wartende Dateien erhalten sofort die Standardaktion, statt auf Sie zu warten." } },
+        "es" : { "stringUnit" : { "state" : "translated", "value" : "Los archivos nuevos y los que ya esperan reciben la acción predeterminada de inmediato, en lugar de esperar tu decisión." } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Les nouveaux fichiers et ceux qui attendent déjà reçoivent tout de suite l’action par défaut au lieu d’attendre votre décision." } }
       }
     },
     "Watch folders" : {
@@ -1453,17 +1453,17 @@
         "fr" : { "stringUnit" : { "state" : "translated", "value" : "Ce motif correspondrait à tous les fichiers." } }
       }
     },
-    "A new download with exactly the same content as a file in the same folder is pointed out in the prompt, with an offer to delete the duplicate." : {
+    "A new download with exactly the same content as a file in the same folder is pointed out in the prompt, with an offer to delete the duplicate. With “Apply the default action automatically” on, the duplicate is deleted right away." : {
       "comment" : "Settings caption under the duplicate detection toggle",
       "localizations" : {
-        "cs" : { "stringUnit" : { "state" : "translated", "value" : "Nové stažení se stejným obsahem jako soubor ve stejné složce se v dotazu označí a nabídne se smazání duplikátu." } },
-        "de" : { "stringUnit" : { "state" : "translated", "value" : "Ein neuer Download mit genau demselben Inhalt wie eine Datei im selben Ordner wird in der Abfrage angezeigt, mit dem Angebot, das Duplikat zu löschen." } },
-        "es" : { "stringUnit" : { "state" : "translated", "value" : "Una descarga nueva con exactamente el mismo contenido que un archivo de la misma carpeta se señala en el aviso, con la opción de eliminar el duplicado." } },
-        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Un nouveau téléchargement au contenu identique à celui d'un fichier du même dossier est signalé dans la fenêtre, avec la possibilité de supprimer le doublon." } }
+        "cs" : { "stringUnit" : { "state" : "translated", "value" : "Nové stažení se stejným obsahem jako soubor ve stejné složce se v dotazu označí a nabídne se smazání duplikátu. S volbou „Výchozí akci použít automaticky“ se duplikát smaže hned." } },
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Ein neuer Download mit genau demselben Inhalt wie eine Datei im selben Ordner wird in der Abfrage angezeigt, mit dem Angebot, das Duplikat zu löschen. Mit „Standardaktion automatisch anwenden“ wird das Duplikat sofort gelöscht." } },
+        "es" : { "stringUnit" : { "state" : "translated", "value" : "Una descarga nueva con exactamente el mismo contenido que un archivo de la misma carpeta se señala en el aviso, con la opción de eliminar el duplicado. Con «Aplicar la acción predeterminada automáticamente» activado, el duplicado se elimina de inmediato." } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Un nouveau téléchargement au contenu identique à celui d’un fichier du même dossier est signalé dans l’invite, avec la possibilité de supprimer le doublon. Avec « Appliquer l’action par défaut automatiquement » activé, le doublon est supprimé tout de suite." } }
       }
     },
     "Detect duplicate downloads" : {
-      "comment" : "Settings toggle: flag a download identical to a file already in a watched folder",
+      "comment" : "Settings toggle: flag a download identical to a file in the same folder",
       "localizations" : {
         "cs" : { "stringUnit" : { "state" : "translated", "value" : "Rozpoznávat duplicitní stažené soubory" } },
         "de" : { "stringUnit" : { "state" : "translated", "value" : "Doppelte Downloads erkennen" } },
@@ -1834,7 +1834,7 @@
     "Space reclaimed" : {
       "comment" : "Statistics row: disk space reclaimed by deleted files",
       "localizations" : {
-        "cs" : { "stringUnit" : { "state" : "translated", "value" : "Získané místo" } },
+        "cs" : { "stringUnit" : { "state" : "translated", "value" : "Uvolněné místo" } },
         "de" : { "stringUnit" : { "state" : "translated", "value" : "Zurückgewonnener Speicher" } },
         "es" : { "stringUnit" : { "state" : "translated", "value" : "Espacio recuperado" } },
         "fr" : { "stringUnit" : { "state" : "translated", "value" : "Espace récupéré" } }

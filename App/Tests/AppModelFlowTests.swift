@@ -11,6 +11,29 @@ private func pendingFile(_ id: String) -> TrackedFile {
     return file
 }
 
+private func trashed(
+    _ resolution: Resolution, id: String, length: TimeInterval = 1800, expiresAt: Date, inTrash: Bool = true
+) -> TrackedFile {
+    var file = scheduledFile(expiresIn: 0, id: id)
+    file.state = .trashed
+    file.resolution = resolution
+    file.scheduleDuration = length
+    file.expiresAt = expiresAt
+    file.trashPath = inTrash ? "/tmp/.Trash/\(id)" : nil
+    return file
+}
+
+/// A scheduled file inside its reminder window (default 5 minutes lead), as the model sees it.
+@MainActor private func remindedFile(_ model: AppModel, id: String, expiresIn seconds: TimeInterval = 200) -> Date {
+    let expiresAt = Date().addingTimeInterval(seconds)
+    var file = scheduledFile(expiresIn: 0, id: id)
+    file.expiresAt = expiresAt
+    file.scheduleDuration = 1800
+    file.updatedAt = Date()
+    model.apply([file])
+    return expiresAt
+}
+
 /// App model flows that need no engine: without one, every engine action fails like a broken engine would.
 @MainActor
 @Suite(.serialized) struct AppModelFlowTests {
@@ -74,29 +97,6 @@ private func pendingFile(_ id: String) -> TrackedFile {
         #expect(model.requestedFileId == nil)  // a later download must not bypass Quiet mode
     }
 
-    private func trashed(
-        _ resolution: Resolution, id: String, length: TimeInterval = 1800, expiresAt: Date, inTrash: Bool = true
-    ) -> TrackedFile {
-        var file = scheduledFile(expiresIn: 0, id: id)
-        file.state = .trashed
-        file.resolution = resolution
-        file.scheduleDuration = length
-        file.expiresAt = expiresAt
-        file.trashPath = inTrash ? "/tmp/.Trash/\(id)" : nil
-        return file
-    }
-
-    /// A scheduled file inside its reminder window (default 5 minutes lead), as the model sees it.
-    private func remindedFile(_ model: AppModel, id: String, expiresIn seconds: TimeInterval = 200) -> Date {
-        let expiresAt = Date().addingTimeInterval(seconds)
-        var file = scheduledFile(expiresIn: 0, id: id)
-        file.expiresAt = expiresAt
-        file.scheduleDuration = 1800
-        file.updatedAt = Date()
-        model.apply([file])
-        return expiresAt
-    }
-
     @Test func expiryAfterAShownReminderShowsNoTrashNotice() async {
         let fixture = Fixture()
         defer { fixture.cleanUp() }
@@ -137,6 +137,17 @@ private func pendingFile(_ id: String) -> TrackedFile {
         let model = fixture.model
         let expiresAt = remindedFile(model, id: "perm")
         await model.handle(.trashed([trashed(.expired, id: "perm", expiresAt: expiresAt, inTrash: false)]))
+        #expect(model.notice.items.count == 1)
+    }
+
+    @Test func automaticDuplicateDeleteKeepsItsNotice() async {
+        let fixture = Fixture()
+        defer { fixture.cleanUp() }
+        let model = fixture.model
+        let expiresAt = remindedFile(model, id: "dup")
+        var file = trashed(.deletedNow, id: "dup", expiresAt: expiresAt)
+        file.duplicateOf = "report.png"
+        await model.handle(.trashed([file]))
         #expect(model.notice.items.count == 1)
     }
 

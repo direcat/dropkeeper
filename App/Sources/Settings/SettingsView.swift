@@ -168,7 +168,10 @@ private struct GeneralTab: View {
                     isOn: $store.draft.quietMode)
                 SettingsToggleRow(
                     "Apply the default action automatically",
-                    caption: "New files get the default action right away instead of waiting for you.",
+                    caption: """
+                        New files, and files already waiting, get the default action right away instead of waiting \
+                        for you.
+                        """,
                     isOn: $store.draft.autoApplyDefault
                 )
                 .padding(.leading, TK.Space.xl)
@@ -445,14 +448,11 @@ private struct DataTab: View {
 
     var body: some View {
         TabPage {
-            SettingsGroup("Data") {
+            SettingsGroup("Data", footer: clearedCaption.map { Text($0) }) {
                 StepSlider(
                     "Keep history for", values: HistoryRetention.allCases, selection: $store.draft.historyRetention,
                     label: DurationLabel.retention)
                 SettingsButtonRow("Clear history") { store.confirmClear = true }
-                if let clearedCaption {
-                    Text(clearedCaption).settingsCaption().frame(maxWidth: .infinity, alignment: .leading)
-                }
             }
             StatisticsSection(model: model, store: store)
         }

@@ -78,7 +78,7 @@ struct RuleEditor: View {
                             }
                         }
                         .labelsHidden()
-                        .fixedSize()
+                        .frame(width: TK.Size.settingsPicker)
                     }
                     StepSlider(
                         "When", values: StopPresets.all, selection: $rule.duration, label: { DurationLabel.long($0) })

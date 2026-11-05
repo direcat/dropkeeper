@@ -35,6 +35,7 @@ The prompt always appears under the menu bar icon, as its own floating card (no 
 - [ ] Esc: the prompt closes; the file gets the default choice after the grace period.
 - [ ] Quiet mode: no prompt opens by itself; a dot appears on the menu bar icon; clicking a waiting file in the list (outside its name) or choosing Show prompt in its menu opens the prompt for that file.
 - [ ] Quiet mode + "Apply the default action automatically": a new download gets the default action at once (Keep: kept; a time: listed under Deleting soon) with no prompt and no dot; a matching rule still applies its own time; files already waiting get the default when the option is switched on. The option is greyed out while Quiet mode is off and does nothing then.
+- [ ] Quiet mode + "Apply the default action automatically" + duplicate detection: a download identical to a file in the same folder is deleted at once (Trash or permanently, per Expired files), also when a rule matches; a Trash deletion shows the notice with Undo and counts in Statistics (Duplicates deleted) and History. With duplicate detection off it just gets the default action.
 - [ ] Close a prompt with Esc, then click that file ("Waiting") in the list outside its name: its prompt opens again. In Quiet mode the next download still doesn't open by itself.
 - [ ] A file whose timer is not longer than the reminder lead time (or with reminders off) expires while a prompt is open: after the prompt closes, the notice shows for 2.5 s with Undo.
 - [ ] Expiry after a reminder was shown (reminders on, timer longer than the lead time; dismissing the reminder or letting it hide counts): the file goes to the Trash with no notice; Put back in History restores it. Expiry with reminders off (or a timer not longer than the lead time): the notice shows for 2.5 s and Undo puts it back.
@@ -42,7 +43,7 @@ The prompt always appears under the menu bar icon, as its own floating card (no 
 - [ ] List row menu → Move to Trash: the file goes to the Trash at once and the notice with Undo appears; in permanent-delete mode the item reads "Delete Permanently", asks for confirmation (Cancel keeps the file), and the notice has no Undo; disabled when the file is gone. Also try Delete from the list (not only the prompt); the confirmation alert must come to the front.
 - [ ] Permanent-delete mode: confirmation on switching; the notice says "Deleted" and has no Undo. A reminded expiry in this mode still shows the "Deleted" notice.
 - [ ] Last 10 seconds: an amber countdown in the menu bar.
-- [ ] Sleep the Mac past an expiry: after wake the file is trashed within seconds, with the notice and Undo (the reminder was never shown, so no notice is skipped).
+- [ ] Sleep the Mac past an expiry: after wake the file is trashed within seconds, with the notice and Undo when the Mac slept before the reminder was due (a reminder that was already due suppresses the notice).
 - [ ] Remove Downloads access in System Settings: warning icon in the menu bar and in Settings; "Check again" clears it after granting access.
 - [ ] Launch at login toggles in System Settings → General → Login Items.
 - [ ] A failed prompt, list or notice action (e.g. Undo after emptying the Trash) shows a short error in the panel (and in the open list); a failed Undo keeps the notice so Undo can be tried again.

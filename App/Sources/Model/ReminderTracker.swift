@@ -7,7 +7,8 @@ struct ReminderTracker: Equatable {
     private(set) var due: [TrackedFile] = []
     /// Keyed by expiry as well, so extending a file re-arms its reminder.
     private var dismissed: Set<Key> = []
-    /// Every (file, expiry) a reminder was due for, so a deletion can tell whether its reminder was ever on screen.
+    /// Every (file, expiry) a reminder was due for, so a deletion can tell whether its reminder was due (the
+    /// model's view: the panel may have been covered).
     /// A dismissed or auto-hidden reminder still counts. An extended file has a new expiry and so a new key.
     private var shown: Set<Key> = []
 
@@ -28,7 +29,7 @@ struct ReminderTracker: Equatable {
 
     private static let shownMemory: TimeInterval = 600
 
-    /// True when a reminder was due for this file's current expiry (it need not be on screen any more).
+    /// True when a reminder was due for this file's current expiry (it may be dismissed or hidden by now).
     func wasShown(_ file: TrackedFile) -> Bool {
         guard let expiresAt = file.expiresAt else { return false }
         return shown.contains(Key(id: file.id, expiresAt: expiresAt))
