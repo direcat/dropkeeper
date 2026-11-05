@@ -12,7 +12,7 @@ enum DeleteConfirmation {
         let delete = alert.addButton(withTitle: String(localized: "Delete permanently"))
         delete.hasDestructiveAction = true
         alert.addButton(withTitle: String(localized: "Cancel"))
-        NSApp.activate()
+        AppActivation.activate()
         return alert.runModal() == .alertFirstButtonReturn
     }
 }

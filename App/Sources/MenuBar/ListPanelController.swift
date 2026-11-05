@@ -45,7 +45,7 @@ final class ListPanelController {
         guard !isShown, let frame = anchorFrame() else { return }
         anchor = frame
         // Activating the app makes ⌘, and ⌘Q from the main menu work while the card is key.
-        NSApp.activate()
+        AppActivation.activate()
         model.isListOpen = true
         // A fresh view each time, so the card opens on Upcoming.
         let root = PendingListView(model: model, actions: actions)

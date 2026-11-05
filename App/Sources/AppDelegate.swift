@@ -204,7 +204,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         alert.messageText = message
         alert.informativeText = String(localized: "Quit DropKeeper and try again. Your files have not been touched.")
         alert.alertStyle = .critical
-        NSApp.activate()
+        AppActivation.activate()
         alert.runModal()
         NSApp.terminate(nil)
     }
