@@ -51,6 +51,9 @@ public struct Settings: Codable, Sendable, Equatable {
     public var notificationTimeout: TimeInterval = 30
     public var appearance = Appearance.auto
     public var quietMode = false
+    /// With Quiet mode on: new files get the default action right away instead of waiting for the user.
+    /// Stored even while Quiet mode is off, where it has no effect (see `appliesDefaultRightAway`).
+    public var autoApplyDefault = false
     public var timelineStops: [TimeInterval] = [1800, 3600, 86_400, 864_000]
     public var gracePeriod: TimeInterval = 300
     public var defaultChoice = DefaultChoice.keep
@@ -66,7 +69,8 @@ public struct Settings: Codable, Sendable, Equatable {
     public init() {}
 
     enum CodingKeys: String, CodingKey {
-        case launchAtLogin, notificationTimeout, appearance, quietMode, timelineStops, gracePeriod, defaultChoice,
+        case launchAtLogin, notificationTimeout, appearance, quietMode, autoApplyDefault, timelineStops, gracePeriod,
+            defaultChoice,
             deleteMode, finderTagEnabled, ignoredPatterns, historyRetention,
             reminderEnabled, reminderLeadTime, rules, duplicateDetection
     }
@@ -86,6 +90,8 @@ public struct Settings: Codable, Sendable, Equatable {
         // An unknown raw value (e.g. from a newer version) falls back to the default.
         appearance = (try? container.decodeIfPresent(Appearance.self, forKey: .appearance)) ?? defaults.appearance
         quietMode = try container.decodeIfPresent(Bool.self, forKey: .quietMode) ?? defaults.quietMode
+        autoApplyDefault =
+            try container.decodeIfPresent(Bool.self, forKey: .autoApplyDefault) ?? defaults.autoApplyDefault
         timelineStops =
             try container.decodeIfPresent([TimeInterval].self, forKey: .timelineStops) ?? defaults.timelineStops
         gracePeriod = try container.decodeIfPresent(TimeInterval.self, forKey: .gracePeriod) ?? defaults.gracePeriod
@@ -112,6 +118,9 @@ public struct Settings: Codable, Sendable, Equatable {
         duplicateDetection =
             try container.decodeIfPresent(Bool.self, forKey: .duplicateDetection) ?? defaults.duplicateDetection
     }
+
+    /// True when pending files are resolved at once with the default action (what the grace period does later).
+    public var appliesDefaultRightAway: Bool { quietMode && autoApplyDefault }
 
     /// The action to apply by default. `.lastChosen` follows `lastChoice` while it is still available
     /// (`.keep`, or a duration that is a timeline stop), otherwise it falls back to `.keep`.

@@ -4,7 +4,10 @@ import Foundation
 public enum Scheduler {
     public static func deadline(for file: TrackedFile, settings: Settings) -> Date? {
         switch file.state {
-        case .pending: return file.firstSeen.addingTimeInterval(settings.gracePeriod)
+        case .pending:
+            // Due at once when the default is applied right away: the same disposal as the grace period's.
+            return settings.appliesDefaultRightAway
+                ? file.firstSeen : file.firstSeen.addingTimeInterval(settings.gracePeriod)
         case .scheduled: return file.expiresAt
         case .kept, .trashed, .gone, .failed: return nil
         }

@@ -225,3 +225,16 @@ import Testing
     let settings = try JSONDecoder().decode(Settings.self, from: Data(#"{"appearance":"sepia"}"#.utf8))
     #expect(settings.appearance == .auto)
 }
+
+@Test func autoApplyDefaultDecodesTolerantlyAndNeedsQuietMode() throws {
+    var settings = Settings()
+    #expect(!settings.autoApplyDefault)
+    #expect(!settings.appliesDefaultRightAway)
+    settings.autoApplyDefault = true
+    #expect(!settings.appliesDefaultRightAway)  // Quiet mode off: stored, no effect
+    settings.quietMode = true
+    #expect(settings.appliesDefaultRightAway)
+    let decoded = try JSONDecoder().decode(Settings.self, from: JSONEncoder().encode(settings))
+    #expect(decoded.autoApplyDefault && decoded.normalized().autoApplyDefault)
+    #expect(try JSONDecoder().decode(Settings.self, from: Data("{}".utf8)).autoApplyDefault == false)
+}

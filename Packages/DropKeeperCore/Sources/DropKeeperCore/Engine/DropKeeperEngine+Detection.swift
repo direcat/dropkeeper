@@ -199,6 +199,11 @@ extension DropKeeperEngine {
         if file.state == .scheduled, let current {
             notify.yield(.ruleApplied([RuleApplication(file: file, ruleId: current.id, ruleName: current.name)]))
         }
+        // A duplicate waits as pending; with the default applied right away it needs no grace period either.
+        if file.state == .pending, settings.appliesDefaultRightAway {
+            runDue()
+            rescheduleTimer()
+        }
     }
 
     /// The folder to insert a rule-path file into, or nil when the file vanished, changed, was claimed or its

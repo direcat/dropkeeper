@@ -169,6 +169,8 @@ extension DropKeeperEngine {
         }
         try store.saveSettings(normalized)
         settings = normalized
+        // Files already waiting get the default too once it is applied right away.
+        if isRunning, normalized.appliesDefaultRightAway { runDue() }
         rescheduleTimer()
     }
 
