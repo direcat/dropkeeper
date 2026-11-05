@@ -61,7 +61,7 @@ struct EditedRule: Identifiable {
     var id: UUID { rule.id }
 }
 
-/// The ordered list of rules (first match wins) with add, edit, delete and move up or down.
+/// The ordered list of rules (first match wins) with add, edit, delete, drag to reorder and move up or down.
 struct RulesSection: View {
     @Bindable var store: SettingsDraft
     let model: AppModel
@@ -119,6 +119,21 @@ struct RulesSection: View {
                 .accessibilityLabel(Text("Delete rule"))
             }
         }
+        .draggable(rule.wrappedValue.id.uuidString)
+        .dropDestination(for: String.self) { items, _ in
+            drop(items, onto: rule.wrappedValue.id)
+        }
+    }
+
+    /// Dropping a dragged rule onto another moves it to that rule's place.
+    private func drop(_ items: [String], onto target: UUID) -> Bool {
+        let rules = store.draft.rules
+        guard let dragged = items.first.flatMap(UUID.init(uuidString:)),
+            let from = rules.firstIndex(where: { $0.id == dragged }),
+            let to = rules.firstIndex(where: { $0.id == target }), from != to
+        else { return false }
+        store.draft.rules = RuleOrder.move(rules, id: dragged, by: to - from)
+        return true
     }
 
     private func moveButton(_ symbol: String, label: LocalizedStringKey, rule: Rule, offset: Int) -> some View {

@@ -50,7 +50,7 @@ struct SettingsGroup<Content: View>: View {
                 ForEach(rows) { row in
                     row
                     if row.id != rows.last?.id {
-                        Rectangle().fill(TK.Palette.hairline).frame(height: TK.Size.cardStroke)
+                        Rectangle().fill(TK.Palette.hairline).frame(height: TK.Size.hairline)
                     }
                 }
             }
@@ -185,7 +185,7 @@ struct SettingsSegmented<Value: Hashable>: View {
                 .font(.system(size: TK.TextSize.formCaption, weight: .medium))
                 .foregroundStyle(selected ? TK.Palette.textPrimary : TK.Palette.textSecondary)
                 .padding(.horizontal, TK.Space.m)
-                .padding(.vertical, TK.Space.xs - 1)
+                .padding(.vertical, TK.Size.miniSegmentInset)
                 .background {
                     if selected {
                         RoundedRectangle(cornerRadius: TK.Radius.miniSegmentInner, style: .continuous)

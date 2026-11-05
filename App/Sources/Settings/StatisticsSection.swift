@@ -3,8 +3,10 @@ import SwiftUI
 
 /// The labels and values of the Statistics group, apart from the view so they can be tested.
 enum StatisticsText {
-    static func rows(_ statistics: Statistics) -> [(label: String, value: String)] {
-        [
+    /// The shown rows; without figures (not loaded, or loading failed) every value is a dash.
+    static func rows(_ statistics: Statistics?) -> [(label: String, value: String)] {
+        guard let statistics else { return rows(.zero).map { ($0.label, "–") } }
+        return [
             (String(localized: "Files handled"), statistics.handled.formatted()),
             (String(localized: "Moved to Trash"), statistics.movedToTrash.formatted()),
             (String(localized: "Deleted permanently"), statistics.deletedPermanently.formatted()),
@@ -13,10 +15,17 @@ enum StatisticsText {
             (String(localized: "Duplicates deleted"), statistics.duplicatesDeleted.formatted()),
             (
                 String(localized: "Space freed"),
-                ByteCountFormatter.string(fromByteCount: statistics.bytesFreed, countStyle: .file)
+                bytes(statistics.bytesFreed)
             ),
         ]
     }
+}
+
+private func bytes(_ count: Int64) -> String {
+    let formatter = ByteCountFormatter()
+    formatter.countStyle = .file
+    formatter.allowsNonnumericFormatting = false  // "0 KB", not "Zero KB"
+    return formatter.string(fromByteCount: count)
 }
 
 /// The Statistics group of the Data tab: totals over the stored history. It loads when it appears and again
@@ -24,12 +33,12 @@ enum StatisticsText {
 struct StatisticsSection: View {
     let model: AppModel
     let store: SettingsDraft
-    @State private var statistics = Statistics.zero
+    @State private var statistics: Statistics?
 
     var body: some View {
         SettingsGroup("Statistics", footer: Text("Since the oldest entry in your history.")) {
             ForEach(StatisticsText.rows(statistics), id: \.label) { row in
-                SettingsRow(caption: nil) {
+                SettingsRow {
                     Text(verbatim: row.label)
                 } control: {
                     Text(verbatim: row.value)
@@ -41,7 +50,7 @@ struct StatisticsSection: View {
             }
         }
         .task(id: store.historyRevision) {
-            if let fresh = await model.statistics() { statistics = fresh }
+            statistics = await model.statistics()
         }
     }
 }

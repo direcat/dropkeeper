@@ -45,11 +45,15 @@ struct IgnoredFilesSection: View {
             }
             .padding(.vertical, TK.Size.settingsRowInset)
             .frame(minHeight: TK.Size.settingsRow)
-        }
-        if refused {
-            Text("This pattern would match every file.")
-                .settingsCaption()
-                .foregroundStyle(TK.Palette.destructive)
+            if refused {
+                SettingsRow {
+                    Text("This pattern would match every file.")
+                        .settingsCaption()
+                        .foregroundStyle(TK.Palette.destructive)
+                } control: {
+                    EmptyView()
+                }
+            }
         }
     }
 

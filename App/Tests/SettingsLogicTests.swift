@@ -160,7 +160,16 @@ func ordinaryPatternsAreNotMatchAll(raw: String) {
     #expect(await model.statistics() == nil)
 }
 
-@Test func appearanceTitlesAreDistinct() {
-    let titles = Appearance.allCases.map(AppearanceLabel.title)
-    #expect(Set(titles).count == Appearance.allCases.count)
+@Test func statisticsRowsWithoutFiguresAreBlank() {
+    #expect(StatisticsText.rows(nil).map(\.value).allSatisfy { $0 == "–" })
+    #expect(StatisticsText.rows(nil).count == 7)
+}
+
+@Test func emptySpaceFreedReadsAsNumber() {
+    #expect(StatisticsText.rows(.zero).last?.value.contains("0") == true)
+}
+
+@Test func appearanceTitlesFollowTheCases() {
+    #expect(Appearance.allCases == [.auto, .light, .dark])
+    #expect(Appearance.allCases.map(AppearanceLabel.title) == ["Auto", "Light", "Dark"])
 }

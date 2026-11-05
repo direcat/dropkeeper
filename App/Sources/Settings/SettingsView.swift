@@ -75,17 +75,17 @@ struct SettingsTabView: View {
 /// The window's content: tabs stretched across the full width on the glass surface, and the selected tab's page.
 struct SettingsRootView: View {
     let model: AppModel
-    @Bindable var store: SettingsDraft
+    let store: SettingsDraft
     let onSelect: (SettingsTab) -> Void
 
     var body: some View {
         VStack(spacing: 0) {
             tabBar
-            Rectangle().fill(TK.Palette.hairline).frame(height: TK.Size.cardStroke)
+            Rectangle().fill(TK.Palette.hairline).frame(height: TK.Size.hairline)
             SettingsTabView(tab: store.activeTab, model: model, store: store)
                 .id(store.activeTab)
         }
-        .frame(width: TK.Size.settingsWindow.width, height: TK.Size.settingsWindow.height)
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
         .background { GlassSurface().ignoresSafeArea() }
     }
 
@@ -98,6 +98,9 @@ struct SettingsRootView: View {
         .padding(.horizontal, TK.Space.m)
         .padding(.top, TK.Space.xs)
         .padding(.bottom, TK.Space.m - TK.Space.xs / 2)
+        .accessibilityElement(children: .contain)
+        .accessibilityAddTraits(.isTabBar)
+        .accessibilityLabel(Text("Settings tabs"))
     }
 
     private func tabButton(_ tab: SettingsTab) -> some View {

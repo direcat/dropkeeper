@@ -1831,6 +1831,15 @@
         "fr" : { "stringUnit" : { "state" : "translated", "value" : "Depuis l’entrée la plus ancienne de l’historique." } }
       }
     },
+    "Settings tabs" : {
+      "comment" : "VoiceOver label of the Settings window's tab bar",
+      "localizations" : {
+        "cs" : { "stringUnit" : { "state" : "translated", "value" : "Karty nastavení" } },
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Tabs der Einstellungen" } },
+        "es" : { "stringUnit" : { "state" : "translated", "value" : "Pestañas de ajustes" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Onglets des réglages" } }
+      }
+    },
     "DropKeeper" : {
       "comment" : "App name, VoiceOver label of the menu bar item",
       "shouldTranslate" : false

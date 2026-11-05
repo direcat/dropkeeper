@@ -157,6 +157,8 @@ enum TK {
         static let tabInset: CGFloat = 5
         /// Inner padding of the Settings segmented control's track, and the room for a Settings picker.
         static let miniSegmentPadding: CGFloat = 2
+        /// Vertical padding of a segment in the Settings segmented control.
+        static let miniSegmentInset: CGFloat = 3
         static let settingsPicker: CGFloat = 170
         /// The wordmark in the About tab.
         static let lockup: CGFloat = 28

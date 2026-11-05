@@ -15,20 +15,21 @@ final class SettingsRootController: NSHostingController<SettingsRootView> {
         self.defaults = defaults
         let saved = defaults.integer(forKey: Self.selectedTabKey)
         store.activeTab = SettingsTab.allCases.indices.contains(saved) ? SettingsTab.allCases[saved] : .general
-        // The closure needs `self`, which doesn't exist yet: it reaches the store and defaults directly.
-        super.init(
-            rootView: SettingsRootView(
-                model: model, store: store,
-                onSelect: { tab in
-                    store.activeTab = tab
-                    defaults.set(SettingsTab.allCases.firstIndex(of: tab) ?? 0, forKey: Self.selectedTabKey)
-                }))
+        super.init(rootView: SettingsRootView(model: model, store: store, onSelect: { _ in }))
+        rootView = SettingsRootView(model: model, store: store, onSelect: { [weak self] in self?.select($0) })
         // One fixed window size for every tab; content scrolls inside a tab.
         sizingOptions = []
         preferredContentSize = TK.Size.settingsWindow
     }
 
     @available(*, unavailable) required init?(coder: NSCoder) { fatalError("init(coder:) is not supported") }
+
+    func select(_ tab: SettingsTab) {
+        store.activeTab = tab
+        defaults.set(SettingsTab.allCases.firstIndex(of: tab) ?? 0, forKey: Self.selectedTabKey)
+        // The title is hidden, but the Window menu and VoiceOver name the window after its tab, as the toolbar did.
+        view.window?.title = tab.title
+    }
 }
 
 @MainActor
@@ -52,7 +53,9 @@ final class SettingsWindowController {
             placeOnOpen(window)
         } else if window == nil {
             let window = NSWindow(contentViewController: makeTabs())
-            window.title = String(localized: "DropKeeper Settings")
+            window.title =
+                (window.contentViewController as? SettingsRootController)?.store.activeTab.title
+                ?? String(localized: "DropKeeper Settings")
             // The tab bar sits right under the traffic lights, on the glass surface.
             window.styleMask = [.titled, .closable, .fullSizeContentView]
             window.titlebarAppearsTransparent = true

@@ -105,6 +105,17 @@ private func prompt(hideProgress: Double?, hideSeconds: Int?) -> PromptView {
     #expect(CGFloat(image.height) >= TK.Size.settingsWindow.height)
 }
 
+@MainActor
+@Test func settingsRootRendersAtWindowSize() throws {
+    let model = AppModel(applyLoginItem: { _ in })
+    let view = SettingsRootView(model: model, store: SettingsDraft(model: model), onSelect: { _ in })
+    let renderer = ImageRenderer(content: view)
+    renderer.proposedSize = ProposedViewSize(TK.Size.settingsWindow)
+    let image = try #require(renderer.cgImage)
+    #expect(CGFloat(image.width) >= TK.Size.settingsWindow.width)
+    #expect(CGFloat(image.height) >= TK.Size.settingsWindow.height)
+}
+
 /// The tab bar is our own, so selecting a tab sets the shown tab and remembers it.
 @MainActor
 @Test func settingsWindowRemembersTheSelectedTab() throws {
@@ -115,7 +126,7 @@ private func prompt(hideProgress: Double?, hideSeconds: Int?) -> PromptView {
     let model = AppModel(defaults: defaults, applyLoginItem: { _ in })
     let controller = SettingsRootController(model: model, store: SettingsDraft(model: model), defaults: defaults)
     #expect(controller.store.activeTab == .rules)
-    controller.rootView.onSelect(.about)
+    controller.select(.about)
     #expect(controller.store.activeTab == .about)
     #expect(defaults.integer(forKey: SettingsRootController.selectedTabKey) == 5)
 }
