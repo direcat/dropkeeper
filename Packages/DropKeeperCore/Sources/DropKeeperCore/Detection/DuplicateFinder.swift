@@ -37,12 +37,20 @@ public enum DuplicateFinder {
             folderPath: folderPath, fs: fs)
     }
 
-    /// True for a copy-style name such as "report (1).pdf" (a Finder or browser copy of "report.pdf").
+    /// True for a copy-style name: "report (1).pdf" (browser) or "report copy.pdf" and "report copy 2.pdf" (Finder,
+    /// English).
     static func isCopyName(_ path: String) -> Bool {
         let name = ((path as NSString).lastPathComponent as NSString).deletingPathExtension
-        guard name.hasSuffix(")"), let open = name.range(of: " (", options: .backwards) else { return false }
-        let digits = name[open.upperBound..<name.index(before: name.endIndex)]
-        return !digits.isEmpty && digits.allSatisfy(\.isNumber)
+        if name.hasSuffix(")"), let open = name.range(of: " (", options: .backwards) {
+            let digits = name[open.upperBound..<name.index(before: name.endIndex)]
+            if !digits.isEmpty, digits.allSatisfy(\.isNumber) { return true }
+        }
+        if name.hasSuffix(" copy") { return true }
+        if let range = name.range(of: " copy ", options: .backwards) {
+            let digits = name[range.upperBound...]
+            return !digits.isEmpty && digits.allSatisfy(\.isNumber)
+        }
+        return false
     }
 
     /// Which of two identical files that appeared together is the original (kept): the one without a copy suffix,

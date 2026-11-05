@@ -164,13 +164,12 @@ extension DropKeeperEngine {
         }
     }
 
-    /// True when `name` in `folder` is still there and nothing is about to delete it: not being checked itself, and
-    /// either untracked or kept. (A scheduled or waiting original may still go, taking the last copy with it.)
+    /// True when `name` in `folder` is still there and is not itself new (its own check is not running). A waiting or
+    /// scheduled original is fine: if it is kept the copy was redundant, and if it expires the copy would have gone
+    /// with it. (A trashed or deleted original has no file left to stat.)
     private func isSafeOriginal(_ name: String, in folder: WatchedFolder) -> Bool {
         let path = folder.path + "/" + name
-        guard duplicateChecks[path] == nil, let stat = env.fs.stat(path) else { return false }
-        guard let record = trackedRecord(at: path, stat: stat) else { return true }
-        return record.state == .kept
+        return duplicateChecks[path] == nil && env.fs.stat(path) != nil
     }
 
     /// A rule-matched file, and every file while the default action is applied right away, is inserted only when its
