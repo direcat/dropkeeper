@@ -1200,15 +1200,6 @@
         "fr" : { "stringUnit" : { "state" : "translated", "value" : "Indéfiniment" } }
       }
     },
-    "Clear history now" : {
-      "comment" : "Settings row title: clearing the history (its button asks to confirm)",
-      "localizations" : {
-        "cs" : { "stringUnit" : { "state" : "translated", "value" : "Vymazat historii" } },
-        "de" : { "stringUnit" : { "state" : "translated", "value" : "Verlauf jetzt löschen" } },
-        "es" : { "stringUnit" : { "state" : "translated", "value" : "Borrar historial ahora" } },
-        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Effacer l’historique maintenant" } }
-      }
-    },
     "Clear history?" : {
       "comment" : "Confirmation title before clearing the history",
       "localizations" : {

@@ -442,8 +442,9 @@ private struct DataTab: View {
                 StepSlider(
                     "Keep history for", values: HistoryRetention.allCases, selection: $store.draft.historyRetention,
                     label: DurationLabel.retention)
-                SettingsRow("Clear history now", caption: clearedCaption) {
-                    Button("Clear history") { store.confirmClear = true }
+                SettingsButtonRow("Clear history") { store.confirmClear = true }
+                if let clearedCaption {
+                    Text(clearedCaption).settingsCaption().frame(maxWidth: .infinity, alignment: .leading)
                 }
             }
             StatisticsSection(model: model, store: store)
