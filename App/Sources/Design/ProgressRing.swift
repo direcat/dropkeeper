@@ -27,6 +27,9 @@ struct ProgressRing<Center: View>: View {
     }
 }
 
+/// A color stop of the progress ring.
+enum RingStop: Hashable { case green, amber, red }
+
 enum RingProgress {
     /// The part of the timer that is left, 0…1; 0 without an expiry or length. After Extend the remaining time
     /// can exceed the old length, so it is clamped.
@@ -35,12 +38,41 @@ enum RingProgress {
         return min(max(expiresAt.timeIntervalSince(now) / length, 0), 1)
     }
 
-    /// The last seconds, or less than a tenth of the timer.
-    static func isWarning(for file: TrackedFile, now: Date) -> Bool {
-        guard let expiresAt = file.expiresAt else { return false }
-        return expiresAt.timeIntervalSince(now) <= Double(TK.Motion.urgentThresholdSeconds)
-            || share(for: file, now: now) < warningShare
+    /// The ring's color blend for a remaining share: green from half the time left, amber at a quarter, red from
+    /// a twentieth, linear in between. `amount` is how far the blend has moved from `from` to `to`.
+    struct Blend: Equatable {
+        let from: RingStop
+        let to: RingStop
+        let amount: Double
     }
 
-    private static let warningShare = 0.1
+    static let greenShare = 0.5
+    static let amberShare = 0.25
+    static let redShare = 0.05
+
+    static func blend(share: Double) -> Blend {
+        let share = min(max(share, 0), 1)
+        if share >= greenShare { return Blend(from: .green, to: .green, amount: 0) }
+        if share >= amberShare {
+            return Blend(from: .green, to: .amber, amount: (greenShare - share) / (greenShare - amberShare))
+        }
+        if share > redShare {
+            return Blend(from: .amber, to: .red, amount: (amberShare - share) / (amberShare - redShare))
+        }
+        return Blend(from: .red, to: .red, amount: 0)
+    }
+
+    /// The ring's color for a remaining share (1 = all the time left, 0 = expired).
+    static func tint(share: Double) -> Color {
+        let blend = blend(share: share)
+        return color(of: blend.from).mix(with: color(of: blend.to), by: blend.amount)
+    }
+
+    private static func color(of stop: RingStop) -> Color {
+        switch stop {
+        case .green: TK.Palette.ringGreen
+        case .amber: TK.Palette.warning
+        case .red: TK.Palette.destructive
+        }
+    }
 }

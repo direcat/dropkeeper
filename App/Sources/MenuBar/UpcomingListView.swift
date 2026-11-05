@@ -115,10 +115,8 @@ private struct ListRow: View {
             FinderIcon(path: file.path, kind: file.kind, size: TK.Size.fileGlyph)
                 .clipShape(RoundedRectangle(cornerRadius: TK.Radius.control))
         case .deletingSoon:
-            ProgressRing(
-                progress: RingProgress.share(for: file, now: model.now),
-                tint: RingProgress.isWarning(for: file, now: model.now) ? TK.Palette.warning : TK.Palette.accent
-            ) {
+            let share = RingProgress.share(for: file, now: model.now)
+            ProgressRing(progress: share, tint: RingProgress.tint(share: share)) {
                 FinderIcon(path: file.path, kind: file.kind, size: TK.Size.listIcon)
             }
         case .couldNotDelete:

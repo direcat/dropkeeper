@@ -48,7 +48,8 @@ struct ReminderBarView: View {
         // Counts down while the bar is open (the soonest expiry decides).
         SwiftUI.TimelineView(.periodic(from: .now, by: 1)) { context in
             HStack(spacing: TK.Space.m) {
-                ProgressRing(progress: share(at: context.date), tint: TK.Palette.warning) {
+                let share = share(at: context.date)
+                ProgressRing(progress: share, tint: RingProgress.tint(share: share)) {
                     FinderIcon(path: files.first?.path ?? "", kind: files.first?.kind ?? .other, size: TK.Size.ringIcon)
                 }
                 VStack(alignment: .leading, spacing: 2) {

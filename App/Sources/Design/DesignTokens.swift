@@ -37,6 +37,8 @@ enum TK {
         static let knob = Color.white
         static let onAccent = dynamic(light: Color.white, dark: Neutral.ink)
         static let warning = Color(hex: 0xEBA941)
+        /// The ring's stops, from plenty of time to none: green, the amber warning above, and `destructive` as the red.
+        static let ringGreen = dynamic(light: Color(hex: 0x2FB350), dark: Color(hex: 0x34C759))
         static let destructive = dynamic(light: Color(hex: 0xD9534F), dark: Color(hex: 0xFF6B6B))
 
         private static func dynamic(light: Color, dark: Color) -> Color {
@@ -96,7 +98,7 @@ enum TK {
         static let textButtonInset: CGFloat = -TK.Space.m + TK.Space.xs
         /// The file icon inside the progress ring.
         static let ringIcon: CGFloat = 28
-        static let ringLine: CGFloat = 3.5
+        static let ringLine: CGFloat = 2.5
         /// The inner stroke of a glass card.
         static let cardStroke: CGFloat = 0.5
         static let fileGlyph: CGFloat = 40
@@ -176,7 +178,6 @@ enum TK {
         static let reduced = Animation.easeInOut(duration: 0.15)
         static let deletedNoticeSeconds: Double = 2.5
         static let ruleNoticeSeconds: Double = 6
-        static let urgentThresholdSeconds = 10
         /// How often the prompt's hide bar and caption refresh.
         static let hideTick: Double = 1
     }
