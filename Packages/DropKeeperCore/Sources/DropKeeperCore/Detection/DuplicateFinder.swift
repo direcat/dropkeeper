@@ -36,4 +36,21 @@ public enum DuplicateFinder {
                 path: path, size: size, folderPath: folderPath, ignoredPatterns: ignoredPatterns, fs: fs),
             folderPath: folderPath, fs: fs)
     }
+
+    /// True for a copy-style name such as "report (1).pdf" (a Finder or browser copy of "report.pdf").
+    static func isCopyName(_ path: String) -> Bool {
+        let name = ((path as NSString).lastPathComponent as NSString).deletingPathExtension
+        guard name.hasSuffix(")"), let open = name.range(of: " (", options: .backwards) else { return false }
+        let digits = name[open.upperBound..<name.index(before: name.endIndex)]
+        return !digits.isEmpty && digits.allSatisfy(\.isNumber)
+    }
+
+    /// Which of two identical files that appeared together is the original (kept): the one without a copy suffix,
+    /// else the one whose path sorts first. A stable rule, so exactly one of a pair survives.
+    static func isPreferredOriginal(_ path: String, over other: String) -> Bool {
+        let copy = isCopyName(path)
+        let otherCopy = isCopyName(other)
+        if copy != otherCopy { return !copy }
+        return path < other
+    }
 }

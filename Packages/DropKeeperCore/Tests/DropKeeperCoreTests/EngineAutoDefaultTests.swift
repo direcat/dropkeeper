@@ -140,7 +140,7 @@ import Testing
 
     @Test func nonDuplicateUsesTheDefaultPath() async throws {
         let harness = try await harness()
-        await dropDuplicate(harness, data: Data("other bytes".utf8))
+        await dropDuplicate(harness, data: Data("diff bytes".utf8))
         let file = try harness.file(named: "report (1).png")
         #expect(file.state == .kept && file.resolution == .defaultKept && file.duplicateOf == nil)
     }
@@ -150,5 +150,48 @@ import Testing
         await dropDuplicate(harness)
         let file = try harness.file(named: "report (1).png")
         #expect(file.state == .pending && file.duplicateOf == "report.png")
+    }
+
+    /// Two identical new files in one poll (a double-clicked download) must never delete each other.
+    private func dropPair(_ harness: EngineHarness) async {
+        let paths = ["x.pdf", "x (1).pdf"].map { EngineHarness.downloads + "/" + $0 }
+        for path in paths { harness.fs.createFile(path, content: content, added: harness.time.now()) }
+        for path in paths { await harness.event(path, [.created, .isFile]) }
+        harness.time.advance(by: 1)
+        await harness.engine.tick()
+        await harness.settleDuplicateChecks()
+        await harness.engine.tick()
+    }
+
+    @Test(arguments: [DeleteMode.trash, DeleteMode.permanent])
+    func aPairOfNewIdenticalFilesLosesOnlyTheCopy(mode: DeleteMode) async throws {
+        let harness = try await harness(mode: mode)
+        try harness.fs.removeItem(EngineHarness.downloads + "/report.png")
+        await dropPair(harness)
+        let original = try harness.file(named: "x.pdf")
+        let copy = try harness.file(named: "x (1).pdf")
+        #expect(original.state == .kept)
+        #expect(copy.state == .trashed && copy.duplicateOf == "x.pdf")
+        #expect(harness.fs.exists(EngineHarness.downloads + "/x.pdf"))
+        #expect(!harness.fs.exists(EngineHarness.downloads + "/x (1).pdf"))
+    }
+
+    @Test func aScheduledOriginalIsNeverTheOneThatSurvivesAlone() async throws {
+        // The original is still scheduled for deletion, so deleting the copy now could lose the last one.
+        let harness = try await harness(rules: [
+            Rule(name: "Images", match: .category(.images), folderPath: EngineHarness.downloads, duration: 3600)
+        ])
+        try harness.fs.removeItem(EngineHarness.downloads + "/report.png")
+        let original = EngineHarness.downloads + "/pic.png"
+        harness.fs.createFile(original, content: content, added: harness.time.now())
+        await harness.event(original, [.created, .isFile])
+        harness.time.advance(by: 1)
+        await harness.engine.tick()
+        await harness.settleDuplicateChecks()
+        #expect(try harness.file(named: "pic.png").state == .scheduled)
+        await dropDuplicate(harness, name: "pic (1).png")
+        let copy = try harness.file(named: "pic (1).png")
+        #expect(copy.state != .trashed && copy.duplicateOf == nil)
+        #expect(harness.fs.exists(EngineHarness.downloads + "/pic (1).png"))
     }
 }

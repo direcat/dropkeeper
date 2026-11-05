@@ -97,7 +97,9 @@ extension DropKeeperEngine {
     func pollTracker(now: Date) {
         guard !tracker.isEmpty else { return }
         var applications: [RuleApplication] = []
-        for (path, stat) in tracker.poll(now: now, fs: env.fs) {
+        let ready = tracker.poll(now: now, fs: env.fs)
+        let batch = Set(ready.map(\.path))
+        for (path, stat) in ready {
             guard let folder = folder(containing: path),
                 DownloadDetector.isCandidate(
                     path: path, folderPath: folder.path, ignoredPatterns: settings.ignoredPatterns),
@@ -118,9 +120,7 @@ extension DropKeeperEngine {
                 rules: settings.rules, fs: env.fs)
             let candidates =
                 settings.duplicateDetection
-                ? DuplicateFinder.candidates(
-                    path: path, size: stat.size, folderPath: folder.path,
-                    ignoredPatterns: settings.ignoredPatterns, fs: env.fs)
+                ? originals(for: path, size: stat.size, in: folder, batch: batch)
                 : []
             if !candidates.isEmpty {
                 // Without a rule the prompt appears right away; the duplicate hint follows the check.
@@ -150,6 +150,28 @@ extension DropKeeperEngine {
     }
 
     // MARK: Duplicate check
+
+    /// The files that may serve as the original of the new file at `path`. A file that is itself new (its own check is
+    /// running, or it appeared in the same poll) only counts when it is the preferred original of the two, so two
+    /// identical new files can never be each other's duplicate (and both be deleted).
+    private func originals(for path: String, size: Int64, in folder: WatchedFolder, batch: Set<String>) -> [String] {
+        DuplicateFinder.candidates(
+            path: path, size: size, folderPath: folder.path, ignoredPatterns: settings.ignoredPatterns, fs: env.fs
+        ).filter { name in
+            let candidate = folder.path + "/" + name
+            guard duplicateChecks[candidate] == nil else { return false }
+            return !batch.contains(candidate) || DuplicateFinder.isPreferredOriginal(candidate, over: path)
+        }
+    }
+
+    /// True when `name` in `folder` is still there and nothing is about to delete it: not being checked itself, and
+    /// either untracked or kept. (A scheduled or waiting original may still go, taking the last copy with it.)
+    private func isSafeOriginal(_ name: String, in folder: WatchedFolder) -> Bool {
+        let path = folder.path + "/" + name
+        guard duplicateChecks[path] == nil, let stat = env.fs.stat(path) else { return false }
+        guard let record = trackedRecord(at: path, stat: stat) else { return true }
+        return record.state == .kept
+    }
 
     /// A rule-matched file, and every file while the default action is applied right away, is inserted only when its
     /// duplicate check ends.
@@ -202,6 +224,10 @@ extension DropKeeperEngine {
             : RuleMatcher.firstMatch(
                 name: (file.path as NSString).lastPathComponent, path: file.path, folderPath: folder.path,
                 rules: settings.rules, fs: env.fs)
+        var duplicate = duplicate
+        if let name = duplicate, settings.appliesDefaultRightAway, !isSafeOriginal(name, in: folder) {
+            duplicate = nil  // the original is gone or on its way out: never delete the last copy
+        }
         var file = file
         if let duplicate {
             // The duplicate stays pending for the user to decide; the rule's duration applies after the grace period.
@@ -221,6 +247,7 @@ extension DropKeeperEngine {
         guard settings.appliesDefaultRightAway else { return }
         // The default is applied right away: a confirmed duplicate is deleted (per the delete mode, and ahead of any
         // rule), anything else gets the default action like a file whose grace period ended.
+        // A failed delete is fine: the record stays pending and `runDue` then applies the default action instead.
         if duplicate != nil { try? deleteNow(ids: [file.id]) }
         runDue()
         rescheduleTimer()
@@ -251,7 +278,8 @@ extension DropKeeperEngine {
     }
 
     /// Lets running checks finish normally before shutdown; after `timeout` the files still waiting for their
-    /// check become plain pending records (no rule applied), so the next launch prompts for them.
+    /// check become plain pending records (no rule applied); the next launch prompts for them, or applies the default
+    /// action to them when that is automatic.
     func drainDuplicateChecks(timeout: Duration) async {
         let deadline = ContinuousClock.now + timeout
         while !duplicateChecks.isEmpty, ContinuousClock.now < deadline, !Task.isCancelled {
