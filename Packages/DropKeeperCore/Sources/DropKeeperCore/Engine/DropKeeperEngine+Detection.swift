@@ -124,9 +124,13 @@ extension DropKeeperEngine {
                 : []
             if !candidates.isEmpty {
                 // Without a rule the prompt appears right away; the duplicate hint follows the check.
-                // A rule-matched file is inserted only when the check ends.
-                if rule == nil { _ = insert(file) }
-                startDuplicateCheck(file: file, stat: stat, rule: rule, candidates: candidates, folder: folder)
+                // A rule-matched file is inserted only when the check ends, and so is every file when the default
+                // action is applied right away (a duplicate is then deleted instead of decided).
+                let defersInsert = rule != nil || settings.appliesDefaultRightAway
+                if !defersInsert { _ = insert(file) }
+                startDuplicateCheck(
+                    file: file, stat: stat, rule: rule, defersInsert: defersInsert, candidates: candidates,
+                    folder: folder)
                 continue
             }
             if let rule {
@@ -153,24 +157,28 @@ extension DropKeeperEngine {
     /// Compares the new file's bytes with the same-size candidates off the actor, then hops back to finish.
     /// A rule-matched file is not inserted until the check ends, so it is never observable as pending.
     private func startDuplicateCheck(
-        file: TrackedFile, stat: FileStat, rule: Rule?, candidates: [String], folder: WatchedFolder
+        file: TrackedFile, stat: FileStat, rule: Rule?, defersInsert: Bool, candidates: [String],
+        folder: WatchedFolder
     ) {
         let fs = env.fs
         let path = file.path
         let folderPath = folder.path
         let task = Task.detached(priority: .utility) { [weak self] in
             let name = DuplicateFinder.firstMatch(path: path, candidates: candidates, folderPath: folderPath, fs: fs)
-            await self?.finishDuplicateCheck(file: file, stat: stat, rule: rule, duplicate: name)
+            await self?.finishDuplicateCheck(
+                file: file, stat: stat, rule: rule, defersInsert: defersInsert, duplicate: name)
         }
-        duplicateChecks[path] = DuplicateCheck(task: task, file: file, awaitsInsert: rule != nil)
+        duplicateChecks[path] = DuplicateCheck(task: task, file: file, awaitsInsert: defersInsert)
     }
 
-    func finishDuplicateCheck(file: TrackedFile, stat: FileStat, rule: Rule?, duplicate: String?) {
+    func finishDuplicateCheck(
+        file: TrackedFile, stat: FileStat, rule: Rule?, defersInsert: Bool, duplicate: String?
+    ) {
         duplicateChecks[file.path] = nil
         guard isRunning else { return }
         // Settings may have changed during the comparison.
         let duplicate = settings.duplicateDetection ? duplicate : nil
-        guard rule != nil else {
+        guard defersInsert else {
             // Only a record that is still the same pending item gets the hint.
             guard let name = duplicate, var current = try? store.file(id: file.id), current.state == .pending,
                 current.path == file.path
@@ -182,15 +190,20 @@ extension DropKeeperEngine {
         let now = env.time.now()
         guard let folder = validatedFolder(for: file, stat: stat, now: now) else { return }
         // The rule may have been disabled or removed meanwhile: then the file is a plain pending item.
-        let current = RuleMatcher.firstMatch(
-            name: (file.path as NSString).lastPathComponent, path: file.path, folderPath: folder.path,
-            rules: settings.rules, fs: env.fs)
+        let current =
+            rule == nil
+            ? nil
+            : RuleMatcher.firstMatch(
+                name: (file.path as NSString).lastPathComponent, path: file.path, folderPath: folder.path,
+                rules: settings.rules, fs: env.fs)
         var file = file
         if let duplicate {
             // The duplicate stays pending for the user to decide; the rule's duration applies after the grace period.
             file.duplicateOf = duplicate
-            file.scheduleDuration = current?.duration
-            file.viaRule = current != nil
+            if rule != nil {
+                file.scheduleDuration = current?.duration
+                file.viaRule = current != nil
+            }
         } else if let current {
             actions.schedule(&file, duration: current.duration, now: now, tagEnabled: settings.finderTagEnabled)
             file.viaRule = true
@@ -199,11 +212,12 @@ extension DropKeeperEngine {
         if file.state == .scheduled, let current {
             notify.yield(.ruleApplied([RuleApplication(file: file, ruleId: current.id, ruleName: current.name)]))
         }
-        // A duplicate waits as pending; with the default applied right away it needs no grace period either.
-        if file.state == .pending, settings.appliesDefaultRightAway {
-            runDue()
-            rescheduleTimer()
-        }
+        guard settings.appliesDefaultRightAway else { return }
+        // The default is applied right away: a confirmed duplicate is deleted (per the delete mode, and ahead of any
+        // rule), anything else gets the default action like a file whose grace period ended.
+        if duplicate != nil { try? deleteNow(ids: [file.id]) }
+        runDue()
+        rescheduleTimer()
     }
 
     /// The folder to insert a rule-path file into, or nil when the file vanished, changed, was claimed or its
