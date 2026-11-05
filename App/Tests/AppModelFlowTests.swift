@@ -74,6 +74,46 @@ private func pendingFile(_ id: String) -> TrackedFile {
         #expect(model.requestedFileId == nil)  // a later download must not bypass Quiet mode
     }
 
+    private func trashed(_ resolution: Resolution, length: TimeInterval = 1800) -> TrackedFile {
+        var file = scheduledFile(expiresIn: 0, id: "t.pdf")
+        file.state = .trashed
+        file.resolution = resolution
+        file.scheduleDuration = length
+        return file
+    }
+
+    @Test func remindedExpiryShowsNoTrashNotice() async {
+        let fixture = Fixture()
+        defer { fixture.cleanUp() }
+        let model = fixture.model
+        model.adopt(Settings())  // reminders on, 5 min lead
+        await model.handle(.trashed([trashed(.expired)]))
+        #expect(!model.notice.isVisible)
+    }
+
+    @Test func expiryWithoutAReminderStillShowsTheNotice() async {
+        let fixture = Fixture()
+        defer { fixture.cleanUp() }
+        let model = fixture.model
+        var off = Settings()
+        off.reminderEnabled = false
+        model.adopt(off)
+        await model.handle(.trashed([trashed(.expired)]))
+        #expect(model.notice.isVisible)
+        model.adopt(Settings())  // on, but a 2 minute timer is shorter than the lead: no reminder was shown
+        await model.handle(.trashed([trashed(.expired, length: 120)]))
+        #expect(model.notice.isVisible)
+    }
+
+    @Test func manualDeleteNowAlwaysShowsTheNotice() async {
+        let fixture = Fixture()
+        defer { fixture.cleanUp() }
+        let model = fixture.model
+        model.adopt(Settings())
+        await model.handle(.trashed([trashed(.deletedNow)]))
+        #expect(model.notice.isVisible)
+    }
+
     @Test func failedUndoKeepsTheNoticeAndShowsAnError() async {
         let fixture = Fixture()
         defer { fixture.cleanUp() }

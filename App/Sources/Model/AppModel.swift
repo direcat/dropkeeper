@@ -177,7 +177,9 @@ final class AppModel {
         switch note {
         case .trashed(let files):
             guard !isListOpen else { break }  // the list shows the result itself
-            notice.add(files, now: Date())
+            let shown = Self.noticeFiles(files, settings: settings)
+            guard !shown.isEmpty else { break }
+            notice.add(shown, now: Date())
             scheduleNoticeExpiry()
         case .failed:
             break  // failed files arrive through the file observation
@@ -553,6 +555,20 @@ extension AppModel {
         } catch {
             report(error)
             return nil
+        }
+    }
+}
+
+extension AppModel {
+    /// The files a "Moved to Trash" notice is shown for. A deletion by expiry (also of a file that got the default
+    /// timer) was announced by its pre-expiry reminder, so it needs no notice; every manual deletion keeps its notice
+    /// as an undo safety net, and so does an expiry nobody was reminded of (reminders off, or a timer no longer
+    /// than the lead time, which never gets a reminder).
+    static func noticeFiles(_ files: [TrackedFile], settings: Settings) -> [TrackedFile] {
+        files.filter { file in
+            guard file.resolution == .expired, settings.reminderEnabled else { return true }
+            // The disposed record is no longer `scheduled`, so its stored timer length is read directly.
+            return (file.scheduleDuration ?? 0) <= settings.reminderLeadTime
         }
     }
 }

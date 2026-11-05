@@ -12,6 +12,7 @@ All notable changes to DropKeeper are documented here. The format follows [Keep 
 - Rules can be reordered by dragging, as well as with Move up / Move down.
 
 ### Changed
+- No "Moved to Trash" notice after a file expires when its reminder already warned about it (reminders on and a timer longer than the lead time). Deleting by hand still shows the notice with Undo, and so does an expiry nobody was reminded of; Put back in History is always there.
 - New design: frosted cards, progress rings in the list, a full-width tab bar and grouped cards in Settings, and a redesigned onboarding. The list is its own floating card under the menu bar icon (no popover arrow), one card at a time.
 
 ### Removed

@@ -35,9 +35,9 @@ The prompt always appears under the menu bar icon, as its own floating card (no 
 - [ ] Esc: the prompt closes; the file gets the default choice after the grace period.
 - [ ] Quiet mode: no prompt opens by itself; a dot appears on the menu bar icon; clicking a waiting file in the list (outside its name) or choosing Show prompt in its menu opens the prompt for that file.
 - [ ] Close a prompt with Esc, then click that file ("Waiting") in the list outside its name: its prompt opens again. In Quiet mode the next download still doesn't open by itself.
-- [ ] A file expires while a prompt is open: after the prompt closes, the notice shows for 2.5 s with Undo.
-- [ ] Expiry: the file goes to the Trash, the notice shows for 2.5 s, and Undo puts it back.
-- [ ] Two expiries within 2.5 s: one merged notice; Undo restores both.
+- [ ] A file whose timer is not longer than the reminder lead time (or with reminders off) expires while a prompt is open: after the prompt closes, the notice shows for 2.5 s with Undo.
+- [ ] Expiry after a reminder (reminders on, timer longer than the lead time): the file goes to the Trash with no notice; Put back in History restores it. Expiry with reminders off (or a timer not longer than the lead time): the notice shows for 2.5 s and Undo puts it back.
+- [ ] Two unreminded expiries (reminders off) within 2.5 s: one merged notice; Undo restores both.
 - [ ] List row menu → Move to Trash: the file goes to the Trash at once and the notice with Undo appears; in permanent-delete mode the item reads "Delete Permanently", asks for confirmation (Cancel keeps the file), and the notice has no Undo; disabled when the file is gone. Also try Delete from the list (not only the prompt); the confirmation alert must come to the front.
 - [ ] Permanent-delete mode: confirmation on switching; the notice says "Deleted" and has no Undo.
 - [ ] Last 10 seconds: an amber countdown in the menu bar.
