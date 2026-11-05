@@ -164,13 +164,30 @@ extension DropKeeperEngine {
         }
     }
 
-    /// True when `name` in `folder` is still there and is not itself new (its own check is not running). A waiting or
-    /// scheduled original is fine: if it is kept the copy was redundant, and if it expires the copy would have gone
-    /// with it. (A trashed or deleted original has no file left to stat.)
-    private func isSafeOriginal(_ name: String, in folder: WatchedFolder) -> Bool {
+    /// True when deleting the new copy of `name` in `folder` cannot cost the last copy. The original must still be
+    /// there and not be new itself (its own check is not running). A kept, waiting or untracked original is fine. A
+    /// scheduled original only counts when the copy would be scheduled for deletion anyway (`copyGoesAnyway`: a rule
+    /// matches it, or the default is a timer) and the original is not about to expire; otherwise deleting the copy
+    /// now could leave nothing when the original expires.
+    private func isSafeOriginal(_ name: String, in folder: WatchedFolder, copyGoesAnyway: Bool) -> Bool {
         let path = folder.path + "/" + name
-        return duplicateChecks[path] == nil && env.fs.stat(path) != nil
+        guard duplicateChecks[path] == nil, let stat = env.fs.stat(path) else { return false }
+        guard let record = trackedRecord(at: path, stat: stat), record.state == .scheduled else { return true }
+        guard copyGoesAnyway, let expiresAt = record.expiresAt else { return false }
+        return expiresAt > env.time.now().addingTimeInterval(Self.originalExpiryMargin)
     }
+
+    /// The original to keep for a found duplicate. While the default action is applied right away the duplicate is
+    /// deleted, so an original that is gone, new itself or about to go no longer counts (never delete the last copy).
+    private func confirmedDuplicate(_ name: String?, in folder: WatchedFolder, ruleMatched: Bool) -> String? {
+        guard let name, settings.appliesDefaultRightAway else { return name }
+        var timerDefault = false
+        if case .expireAfter = settings.resolve(lastChoice: storedLastChoice()) { timerDefault = true }
+        return isSafeOriginal(name, in: folder, copyGoesAnyway: ruleMatched || timerDefault) ? name : nil
+    }
+
+    /// An original that expires within this long is treated as already gone.
+    static let originalExpiryMargin: TimeInterval = 5
 
     /// A rule-matched file, and every file while the default action is applied right away, is inserted only when its
     /// duplicate check ends.
@@ -223,10 +240,7 @@ extension DropKeeperEngine {
             : RuleMatcher.firstMatch(
                 name: (file.path as NSString).lastPathComponent, path: file.path, folderPath: folder.path,
                 rules: settings.rules, fs: env.fs)
-        var duplicate = duplicate
-        if let name = duplicate, settings.appliesDefaultRightAway, !isSafeOriginal(name, in: folder) {
-            duplicate = nil  // the original is gone or on its way out: never delete the last copy
-        }
+        let duplicate = confirmedDuplicate(duplicate, in: folder, ruleMatched: current != nil)
         var file = file
         if let duplicate {
             // The duplicate stays pending for the user to decide; the rule's duration applies after the grace period.

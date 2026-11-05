@@ -144,8 +144,10 @@ final class ListPanelController {
             close()
             return true
         }
-        guard event.modifierFlags.intersection(.deviceIndependentFlagsMask) == .command else { return false }
-        switch event.charactersIgnoringModifiers {
+        guard event.modifierFlags.intersection(.deviceIndependentFlagsMask).subtracting(.capsLock) == .command else {
+            return false
+        }
+        switch event.charactersIgnoringModifiers?.lowercased() {
         case ",": actions.openSettings()
         case "q": NSApp.terminate(nil)
         case "w": close()

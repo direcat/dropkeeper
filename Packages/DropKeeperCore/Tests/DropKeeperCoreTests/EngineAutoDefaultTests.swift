@@ -211,6 +211,55 @@ import Testing
         #expect(copy.state == .trashed && copy.duplicateOf == "orig.png")
     }
 
+    /// An original scheduled by hand, then the option switched on with the given default.
+    private func handScheduledOriginal(
+        _ harness: EngineHarness, choice: DefaultChoice, duration: TimeInterval
+    ) async throws {
+        try harness.fs.removeItem(EngineHarness.downloads + "/report.png")
+        var settings = await harness.engine.currentSettings
+        settings.autoApplyDefault = false
+        try await harness.engine.updateSettings(settings)
+        let path = EngineHarness.downloads + "/orig.png"
+        harness.fs.createFile(path, content: content, added: harness.time.now())
+        await harness.event(path, [.created, .isFile])
+        harness.time.advance(by: 1)
+        await harness.engine.tick()
+        await harness.settleDuplicateChecks()
+        try await harness.engine.schedule(ids: [try harness.file(named: "orig.png").id], duration: duration)
+        settings.autoApplyDefault = true
+        settings.defaultChoice = choice
+        try await harness.engine.updateSettings(settings)
+    }
+
+    @Test func copyOfAHandScheduledOriginalIsKeptWhenTheDefaultKeeps() async throws {
+        let harness = try await harness(auto: false)
+        try await handScheduledOriginal(harness, choice: .keep, duration: 3600)
+        await dropDuplicate(harness, name: "orig copy.png")
+        let copy = try harness.file(named: "orig copy.png")
+        #expect(copy.state == .kept && copy.duplicateOf == nil)
+    }
+
+    @Test func copyOfAnOriginalAboutToExpireIsNotDeleted() async throws {
+        let harness = try await harness(auto: false)
+        try await handScheduledOriginal(harness, choice: .expireAfter(3600), duration: 1800)
+        harness.time.advance(by: 1797)  // the original expires in a few seconds
+        await dropDuplicate(harness, name: "orig copy.png")
+        let copy = try harness.file(named: "orig copy.png")
+        #expect(copy.state == .scheduled && copy.duplicateOf == nil)
+        await harness.advance(10)
+        #expect(try harness.file(named: "orig.png").state == .trashed)
+        #expect(try harness.file(named: "orig copy.png").state == .scheduled)
+    }
+
+    @Test func copyIsKeptWhenTheOriginalVanishesDuringTheCheck() async throws {
+        let harness = try await harness()
+        let original = EngineHarness.downloads + "/report.png"
+        harness.fs.contentsEqualHook = { _, _ in try? harness.fs.removeItem(original) }
+        await dropDuplicate(harness, name: "report copy.png")
+        let copy = try harness.file(named: "report copy.png")
+        #expect(copy.state == .kept && copy.duplicateOf == nil)
+    }
+
     @Test func copyOfAGoneOriginalTakesTheDefaultPath() async throws {
         let harness = try await harness()
         try harness.fs.removeItem(EngineHarness.downloads + "/report.png")
