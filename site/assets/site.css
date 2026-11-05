@@ -81,7 +81,7 @@ h1, h2, h3 { font-family: var(--cond); font-weight: 600; line-height: 1.05; lett
 .copy:hover { background: rgba(163,221,224,.32); }
 .small { margin: 22px 0 0; font-size: .92rem; color: var(--p300); }
 
-/* MacBook-top frame around the demo video */
+/* MacBook-top frame around the demo video. The ::before shape mimics the old notch demo; remove it together with the new demo media. */
 .screen {
   position: relative; margin: 0 auto; max-width: 940px;
   background: #000; padding: 16px 10px 0; border-radius: 22px 22px 0 0;

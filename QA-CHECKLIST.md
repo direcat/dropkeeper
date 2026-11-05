@@ -20,7 +20,8 @@ Release builds ignore these arguments.
 ## Presentation
 The prompt always appears under the menu bar icon, as its own floating card (no popover arrow); one card at a time.
 
-- [ ] Lid closed with an external display, and any Mac model: the prompt appears under the menu bar icon.
+- [ ] Lid closed with an external display: the prompt appears under the menu bar icon.
+- [ ] Any Mac model, with or without a notch cutout: the prompt appears under the menu bar icon.
 - [ ] An open prompt, notice or error does not jump to the other display when the pointer crosses displays.
 - [ ] Changing displays while a prompt is open moves the prompt to the right place.
 - [ ] Full-screen app in front: the prompt and notice still appear.
@@ -55,7 +56,7 @@ The prompt always appears under the menu bar icon, as its own floating card (no 
 - [ ] Duplicate prompt: download the same file twice into one folder; the prompt shows "Same as …" and Delete duplicate removes the new copy; with duplicate detection off in Settings, no such offer.
 - [ ] Reminder: with the default 5 minutes, a file scheduled for longer than the lead time (e.g. 30 min) shows a reminder shortly before expiry; Extend adds the timer length, Keep keeps it, Delete now trashes it at once (with Undo). Turned off in Settings: no reminder.
 - [ ] Last chosen time: set Default action to Last chosen time (Settings > Expiry), then pick 1 day on one file; the next prompt preselects 1 day and Return applies it.
-- [ ] Settings tabs: eyeball the toolbar tabs (Safari-style: General, Folders, Expiry, Rules, Data, About) and that the window opens centered every time, also after moving it and on a second display.
+- [ ] Settings tabs: eyeball the full-width tab bar (General, Folders, Expiry, Rules, Data, About) and that the window opens centered every time, also after moving it and on a second display.
 - [ ] Settings sliders: time values change with the slider and the value label updates; ignored file patterns can be added and removed.
 - [ ] Upgrade 1.0 to 1.1: with a 1.0 database and defaults that have ignored extensions (e.g. pdf), launch 1.1; they appear in Ignored files as `*.pdf` together with the default patterns (`~$*`, `#*#`, `*~`), and every other setting is unchanged.
 - [ ] Ignored patterns: a file named `~$report.docx` or `notes.txt~` in a watched folder gets no prompt.
@@ -65,6 +66,8 @@ The prompt always appears under the menu bar icon, as its own floating card (no 
 - [ ] Pointer resting over the prompt while reading: it never hides while hovered; leaving starts the remaining time, not a full new one.
 - [ ] Keyboard-only user picks a time with the arrows after 25 s: the countdown restarts on the key press; with VoiceOver running nothing auto-hides.
 - [ ] Open the list while a prompt is showing, then close it: the panel hides while the list is open and does not reappear for files already decided from the list; a still-pending file shows its prompt again only if it was not timed out or dismissed.
+- [ ] Menu bar list card: Esc and a click outside close it; clicking the menu bar icon while it is open closes it (the card itself and its menus do not count as outside). Clicks in the gaps between separate cards (list, prompt, notice) do not act on anything.
+- [ ] Settings and Onboarding: the content sits below the titlebar and traffic lights and nothing is clipped at the bottom, in Light and Dark.
 - [ ] Appearance Dark while macOS is Light (and back to Auto): panel, list, Settings and onboarding all switch immediately, without a restart.
 - [ ] History shows the last 10 decisions; Put back restores a trashed file and the row disappears. Put back for a file whose Trash copy was already emptied shows the error in the panel ("couldn't put back"), the row stays and nothing crashes.
 - [ ] A file put back from the Finder Trash by hand (not via Put back) does not appear in History.
@@ -76,8 +79,9 @@ The prompt always appears under the menu bar icon, as its own floating card (no 
 ## Accessibility and appearance
 - [ ] VoiceOver: the timeline reads "Delete in 1 hour, at …" and can be adjusted with VoiceOver gestures.
 - [ ] VoiceOver: the time sliders in Settings read their label and value and can be adjusted; the rule rows' Move up and Move down actions are announced and work.
+- [ ] Keyboard focus: every new control (segmented control, "•••" buttons, Decide, Put back, Settings tab bar) shows a visible focus ring in Light and in Dark.
 - [ ] Reduce Motion: panels fade instead of growing.
-- [ ] Light and dark appearance: Settings and onboarding look right; the panel, the list, Settings and onboarding follow the Appearance setting (see below).
+- [ ] Light and dark appearance: Settings and onboarding look right; the panel, the list, Settings and onboarding follow the Appearance setting (see 1.2 features).
 
 ## Languages
 - [ ] English, Czech, German, Spanish and French: no truncated or untranslated text.
