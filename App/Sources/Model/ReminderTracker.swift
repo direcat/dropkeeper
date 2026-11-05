@@ -7,6 +7,9 @@ struct ReminderTracker: Equatable {
     private(set) var due: [TrackedFile] = []
     /// Keyed by expiry as well, so extending a file re-arms its reminder.
     private var dismissed: Set<Key> = []
+    /// Every (file, expiry) a reminder was due for, so a deletion can tell whether its reminder was ever on screen.
+    /// A dismissed or auto-hidden reminder still counts. An extended file has a new expiry and so a new key.
+    private var shown: Set<Key> = []
 
     private struct Key: Hashable {
         let id: FileID
@@ -18,6 +21,17 @@ struct ReminderTracker: Equatable {
         dismissed.formIntersection(current)
         due = Self.inWindow(scheduled, now: now, enabled: enabled, leadTime: leadTime)
             .filter { !dismissed.contains(Key(id: $0.id, expiresAt: $0.expiresAt!)) }
+        shown.formUnion(due.map { Key(id: $0.id, expiresAt: $0.expiresAt!) })
+        // The deletion notification arrives within moments of the expiry; older records are dead weight.
+        shown = shown.filter { $0.expiresAt > now.addingTimeInterval(-Self.shownMemory) }
+    }
+
+    private static let shownMemory: TimeInterval = 600
+
+    /// True when a reminder was due for this file's current expiry (it need not be on screen any more).
+    func wasShown(_ file: TrackedFile) -> Bool {
+        guard let expiresAt = file.expiresAt else { return false }
+        return shown.contains(Key(id: file.id, expiresAt: expiresAt))
     }
 
     mutating func dismiss(ids: [FileID]) {

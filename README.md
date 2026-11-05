@@ -37,7 +37,7 @@ Keep what matters. Let the rest disappear. When a file lands in a watched folder
 
 ## How it works
 
-A new file lands in a watched folder, a small prompt opens under the menu bar icon, and you pick when it should go: 30 minutes, an hour, a day, ten days — or keep it. When the time is up, DropKeeper moves the file to the Trash (you were warned by the reminder, and Put back in History is one click away). Rename it or move it into a subfolder and it is still tracked; move it out of the watched folders and it is kept. Files that were there before you installed DropKeeper are never touched.
+A new file lands in a watched folder, a small prompt opens under the menu bar icon, and you pick when it should go: 30 minutes, an hour, a day, ten days — or keep it. When the time is up, DropKeeper moves the file to the Trash (the reminder warned you first, and History can put it back). Rename it or move it into a subfolder and it is still tracked; move it out of the watched folders and it is kept. Files that were there before you installed DropKeeper are never touched.
 
 ## Install
 

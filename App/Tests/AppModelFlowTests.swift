@@ -74,44 +74,79 @@ private func pendingFile(_ id: String) -> TrackedFile {
         #expect(model.requestedFileId == nil)  // a later download must not bypass Quiet mode
     }
 
-    private func trashed(_ resolution: Resolution, length: TimeInterval = 1800) -> TrackedFile {
-        var file = scheduledFile(expiresIn: 0, id: "t.pdf")
+    private func trashed(
+        _ resolution: Resolution, id: String, length: TimeInterval = 1800, expiresAt: Date, inTrash: Bool = true
+    ) -> TrackedFile {
+        var file = scheduledFile(expiresIn: 0, id: id)
         file.state = .trashed
         file.resolution = resolution
         file.scheduleDuration = length
+        file.expiresAt = expiresAt
+        file.trashPath = inTrash ? "/tmp/.Trash/\(id)" : nil
         return file
     }
 
-    @Test func remindedExpiryShowsNoTrashNotice() async {
+    /// A scheduled file inside its reminder window (default 5 minutes lead), as the model sees it.
+    private func remindedFile(_ model: AppModel, id: String, expiresIn seconds: TimeInterval = 200) -> Date {
+        let expiresAt = Date().addingTimeInterval(seconds)
+        var file = scheduledFile(expiresIn: 0, id: id)
+        file.expiresAt = expiresAt
+        file.scheduleDuration = 1800
+        file.updatedAt = Date()
+        model.apply([file])
+        return expiresAt
+    }
+
+    @Test func expiryAfterAShownReminderShowsNoTrashNotice() async {
         let fixture = Fixture()
         defer { fixture.cleanUp() }
         let model = fixture.model
-        model.adopt(Settings())  // reminders on, 5 min lead
-        await model.handle(.trashed([trashed(.expired)]))
-        #expect(!model.notice.isVisible)
+        let expiresAt = remindedFile(model, id: "a")
+        #expect(model.reminders.due.count == 1)
+        model.dismissReminders()  // dismissed with the x: it was still shown
+        model.apply([])  // the file leaves the scheduled list at expiry
+        await model.handle(.trashed([trashed(.expired, id: "a", expiresAt: expiresAt)]))
+        #expect(model.notice.items.isEmpty)
     }
 
-    @Test func expiryWithoutAReminderStillShowsTheNotice() async {
+    @Test func expiryWithoutAShownReminderShowsTheNotice() async {
+        let fixture = Fixture()
+        defer { fixture.cleanUp() }
+        let model = fixture.model
+        // Eligible (long timer, reminders on) but the app never saw the window, e.g. the Mac slept through it.
+        await model.handle(.trashed([trashed(.expired, id: "slept", expiresAt: Date())]))
+        #expect(model.notice.items.count == 1)
+    }
+
+    @Test func expiryWithRemindersOffShowsTheNotice() async {
         let fixture = Fixture()
         defer { fixture.cleanUp() }
         let model = fixture.model
         var off = Settings()
         off.reminderEnabled = false
         model.adopt(off)
-        await model.handle(.trashed([trashed(.expired)]))
-        #expect(model.notice.isVisible)
-        model.adopt(Settings())  // on, but a 2 minute timer is shorter than the lead: no reminder was shown
-        await model.handle(.trashed([trashed(.expired, length: 120)]))
-        #expect(model.notice.isVisible)
+        let expiresAt = remindedFile(model, id: "off")
+        #expect(model.reminders.due.isEmpty)
+        await model.handle(.trashed([trashed(.expired, id: "off", expiresAt: expiresAt)]))
+        #expect(model.notice.items.count == 1)
+    }
+
+    @Test func permanentExpiryAfterAReminderStillShowsTheNotice() async {
+        let fixture = Fixture()
+        defer { fixture.cleanUp() }
+        let model = fixture.model
+        let expiresAt = remindedFile(model, id: "perm")
+        await model.handle(.trashed([trashed(.expired, id: "perm", expiresAt: expiresAt, inTrash: false)]))
+        #expect(model.notice.items.count == 1)
     }
 
     @Test func manualDeleteNowAlwaysShowsTheNotice() async {
         let fixture = Fixture()
         defer { fixture.cleanUp() }
         let model = fixture.model
-        model.adopt(Settings())
-        await model.handle(.trashed([trashed(.deletedNow)]))
-        #expect(model.notice.isVisible)
+        let expiresAt = remindedFile(model, id: "m")
+        await model.handle(.trashed([trashed(.deletedNow, id: "m", expiresAt: expiresAt)]))
+        #expect(model.notice.items.count == 1)
     }
 
     @Test func failedUndoKeepsTheNoticeAndShowsAnError() async {
