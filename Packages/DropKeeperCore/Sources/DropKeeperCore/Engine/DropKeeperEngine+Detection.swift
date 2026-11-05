@@ -126,11 +126,8 @@ extension DropKeeperEngine {
                 // Without a rule the prompt appears right away; the duplicate hint follows the check.
                 // A rule-matched file is inserted only when the check ends, and so is every file when the default
                 // action is applied right away (a duplicate is then deleted instead of decided).
-                let defersInsert = rule != nil || settings.appliesDefaultRightAway
-                if !defersInsert { _ = insert(file) }
-                startDuplicateCheck(
-                    file: file, stat: stat, rule: rule, defersInsert: defersInsert, candidates: candidates,
-                    folder: folder)
+                if !defersInsert(rule: rule) { _ = insert(file) }
+                startDuplicateCheck(file: file, stat: stat, rule: rule, candidates: candidates, folder: folder)
                 continue
             }
             if let rule {
@@ -154,21 +151,25 @@ extension DropKeeperEngine {
 
     // MARK: Duplicate check
 
+    /// A rule-matched file, and every file while the default action is applied right away, is inserted only when its
+    /// duplicate check ends.
+    private func defersInsert(rule: Rule?) -> Bool { rule != nil || settings.appliesDefaultRightAway }
+
     /// Compares the new file's bytes with the same-size candidates off the actor, then hops back to finish.
     /// A rule-matched file is not inserted until the check ends, so it is never observable as pending.
     private func startDuplicateCheck(
-        file: TrackedFile, stat: FileStat, rule: Rule?, defersInsert: Bool, candidates: [String],
-        folder: WatchedFolder
+        file: TrackedFile, stat: FileStat, rule: Rule?, candidates: [String], folder: WatchedFolder
     ) {
+        let deferred = defersInsert(rule: rule)
         let fs = env.fs
         let path = file.path
         let folderPath = folder.path
         let task = Task.detached(priority: .utility) { [weak self] in
             let name = DuplicateFinder.firstMatch(path: path, candidates: candidates, folderPath: folderPath, fs: fs)
             await self?.finishDuplicateCheck(
-                file: file, stat: stat, rule: rule, defersInsert: defersInsert, duplicate: name)
+                file: file, stat: stat, rule: rule, defersInsert: deferred, duplicate: name)
         }
-        duplicateChecks[path] = DuplicateCheck(task: task, file: file, awaitsInsert: defersInsert)
+        duplicateChecks[path] = DuplicateCheck(task: task, file: file, awaitsInsert: deferred)
     }
 
     func finishDuplicateCheck(
@@ -187,6 +188,11 @@ extension DropKeeperEngine {
             update(current)
             return
         }
+        insertDeferred(file, stat: stat, rule: rule, duplicate: duplicate)
+    }
+
+    /// Inserts a file whose insert waited for its duplicate check, resolved by what the check found.
+    private func insertDeferred(_ file: TrackedFile, stat: FileStat, rule: Rule?, duplicate: String?) {
         let now = env.time.now()
         guard let folder = validatedFolder(for: file, stat: stat, now: now) else { return }
         // The rule may have been disabled or removed meanwhile: then the file is a plain pending item.
