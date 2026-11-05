@@ -3,23 +3,42 @@ import Foundation
 enum TimeLabels {
     /// Exact deletion time: "Today 16:40", "Tomorrow 09:15", "Tue 2 Oct 09:15" (locale-dependent).
     static func deletion(at date: Date, now: Date, calendar: Calendar = .current) -> String {
-        let locale = calendar.locale ?? .current
-        let time = date.formatted(
-            Date.FormatStyle(locale: locale, calendar: calendar, timeZone: calendar.timeZone)
-                .hour(uses12HourClock(locale) ? .defaultDigits(amPM: .abbreviated) : .twoDigits(amPM: .omitted))
-                .minute(.twoDigits))
+        let time = timeText(date, calendar: calendar)
         if calendar.isDate(date, inSameDayAs: now) {
             return String(localized: "Today \(time)", comment: "Deletion time today, e.g. Today 16:40")
         }
-        if let tomorrow = calendar.date(byAdding: .day, value: 1, to: now),
-            calendar.isDate(date, inSameDayAs: tomorrow)
-        {
+        if isTomorrow(date, now: now, calendar: calendar) {
             return String(localized: "Tomorrow \(time)", comment: "Deletion time tomorrow, e.g. Tomorrow 09:15")
         }
         let day = date.formatted(
-            Date.FormatStyle(locale: locale, calendar: calendar, timeZone: calendar.timeZone)
+            Date.FormatStyle(locale: calendar.locale ?? .current, calendar: calendar, timeZone: calendar.timeZone)
                 .weekday(.abbreviated).day(.defaultDigits).month(.abbreviated))
         return "\(day) \(time)"
+    }
+
+    /// Short deletion time for list rows: "10:42" today, "Tomorrow 9:58", "Nov 13" later.
+    static func absolute(at date: Date, now: Date, calendar: Calendar = .current) -> String {
+        if calendar.isDate(date, inSameDayAs: now) { return timeText(date, calendar: calendar) }
+        if isTomorrow(date, now: now, calendar: calendar) {
+            let time = timeText(date, calendar: calendar)
+            return String(localized: "Tomorrow \(time)", comment: "Deletion time tomorrow, e.g. Tomorrow 09:15")
+        }
+        return date.formatted(
+            Date.FormatStyle(locale: calendar.locale ?? .current, calendar: calendar, timeZone: calendar.timeZone)
+                .day(.defaultDigits).month(.abbreviated))
+    }
+
+    private static func timeText(_ date: Date, calendar: Calendar) -> String {
+        let locale = calendar.locale ?? .current
+        return date.formatted(
+            Date.FormatStyle(locale: locale, calendar: calendar, timeZone: calendar.timeZone)
+                .hour(uses12HourClock(locale) ? .defaultDigits(amPM: .abbreviated) : .twoDigits(amPM: .omitted))
+                .minute(.twoDigits))
+    }
+
+    private static func isTomorrow(_ date: Date, now: Date, calendar: Calendar) -> Bool {
+        guard let tomorrow = calendar.date(byAdding: .day, value: 1, to: now) else { return false }
+        return calendar.isDate(date, inSameDayAs: tomorrow)
     }
 
     /// Time left, for list rows: "in 42 min", "in 3 h", "in 2 days".

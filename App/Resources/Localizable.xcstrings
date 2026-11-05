@@ -1,6 +1,105 @@
 {
   "sourceLanguage" : "en",
   "strings" : {
+    "Upcoming" : {
+      "comment" : "Menu bar list tab: files waiting or scheduled",
+      "localizations" : {
+        "cs" : { "stringUnit" : { "state" : "translated", "value" : "Nadcházející" } },
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Anstehend" } },
+        "es" : { "stringUnit" : { "state" : "translated", "value" : "Próximos" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "À venir" } }
+      }
+    },
+    "History" : {
+      "comment" : "Menu bar list tab: files DropKeeper has dealt with",
+      "localizations" : {
+        "cs" : { "stringUnit" : { "state" : "translated", "value" : "Historie" } },
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Verlauf" } },
+        "es" : { "stringUnit" : { "state" : "translated", "value" : "Historial" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Historique" } }
+      }
+    },
+    "Waiting for you" : {
+      "comment" : "List section: files that need a decision",
+      "localizations" : {
+        "cs" : { "stringUnit" : { "state" : "translated", "value" : "Čeká na vás" } },
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Warten auf dich" } },
+        "es" : { "stringUnit" : { "state" : "translated", "value" : "Esperando tu decisión" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "En attente de vous" } }
+      }
+    },
+    "Deleting soon" : {
+      "comment" : "List section: scheduled files",
+      "localizations" : {
+        "cs" : { "stringUnit" : { "state" : "translated", "value" : "Brzy se smažou" } },
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Bald gelöscht" } },
+        "es" : { "stringUnit" : { "state" : "translated", "value" : "Se eliminarán pronto" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Suppression imminente" } }
+      }
+    },
+    "Couldn't delete" : {
+      "comment" : "List section: files that failed to move",
+      "localizations" : {
+        "cs" : { "stringUnit" : { "state" : "translated", "value" : "Nelze smazat" } },
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Löschen nicht möglich" } },
+        "es" : { "stringUnit" : { "state" : "translated", "value" : "No se pudo eliminar" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Suppression impossible" } }
+      }
+    },
+    "Decide" : {
+      "comment" : "List button: open the prompt for a waiting file",
+      "localizations" : {
+        "cs" : { "stringUnit" : { "state" : "translated", "value" : "Rozhodnout" } },
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Entscheiden" } },
+        "es" : { "stringUnit" : { "state" : "translated", "value" : "Decidir" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Décider" } }
+      }
+    },
+    "Decide for %@" : {
+      "comment" : "VoiceOver label of the Decide button; the file name follows",
+      "localizations" : {
+        "cs" : { "stringUnit" : { "state" : "translated", "value" : "Rozhodnout o souboru %@" } },
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Über %@ entscheiden" } },
+        "es" : { "stringUnit" : { "state" : "translated", "value" : "Decidir sobre %@" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Décider pour %@" } }
+      }
+    },
+    "Retry %@" : {
+      "comment" : "VoiceOver label of the Retry button; the file name follows",
+      "localizations" : {
+        "cs" : { "stringUnit" : { "state" : "translated", "value" : "Zkusit znovu: %@" } },
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "%@ erneut versuchen" } },
+        "es" : { "stringUnit" : { "state" : "translated", "value" : "Reintentar %@" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Réessayer %@" } }
+      }
+    },
+    "Next deletion in %@" : {
+      "comment" : "List footer: time until the soonest deletion, e.g. Next deletion in 6 min",
+      "localizations" : {
+        "cs" : { "stringUnit" : { "state" : "translated", "value" : "Další smazání za %@" } },
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Nächstes Löschen in %@" } },
+        "es" : { "stringUnit" : { "state" : "translated", "value" : "Próxima eliminación en %@" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Prochaine suppression dans %@" } }
+      }
+    },
+    "Settings…" : {
+      "comment" : "List menu item: open Settings",
+      "localizations" : {
+        "cs" : { "stringUnit" : { "state" : "translated", "value" : "Nastavení…" } },
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Einstellungen…" } },
+        "es" : { "stringUnit" : { "state" : "translated", "value" : "Ajustes…" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Réglages…" } }
+      }
+    },
+    "Settings and Quit" : {
+      "comment" : "VoiceOver label of the list footer menu",
+      "localizations" : {
+        "cs" : { "stringUnit" : { "state" : "translated", "value" : "Nastavení a ukončení" } },
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Einstellungen und Beenden" } },
+        "es" : { "stringUnit" : { "state" : "translated", "value" : "Ajustes y salir" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Réglages et quitter" } }
+      }
+    },
     "Same as %@" : {
       "comment" : "Prompt hint: the new file is identical to this existing file",
       "localizations" : {
@@ -658,24 +757,6 @@
         "de" : { "stringUnit" : { "state" : "translated", "value" : "DropKeeper beenden" } },
         "es" : { "stringUnit" : { "state" : "translated", "value" : "Salir de DropKeeper" } },
         "fr" : { "stringUnit" : { "state" : "translated", "value" : "Quitter DropKeeper" } }
-      }
-    },
-    "Waiting" : {
-      "comment" : "Pending list status of a file waiting for a decision",
-      "localizations" : {
-        "cs" : { "stringUnit" : { "state" : "translated", "value" : "Čeká" } },
-        "de" : { "stringUnit" : { "state" : "translated", "value" : "Wartet" } },
-        "es" : { "stringUnit" : { "state" : "translated", "value" : "En espera" } },
-        "fr" : { "stringUnit" : { "state" : "translated", "value" : "En attente" } }
-      }
-    },
-    "Couldn't move" : {
-      "comment" : "Pending list status of a file that could not be moved to the Trash",
-      "localizations" : {
-        "cs" : { "stringUnit" : { "state" : "translated", "value" : "Nelze přesunout" } },
-        "de" : { "stringUnit" : { "state" : "translated", "value" : "Verschieben fehlgeschlagen" } },
-        "es" : { "stringUnit" : { "state" : "translated", "value" : "No se pudo mover" } },
-        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Échec du déplacement" } }
       }
     },
     "Actions" : {

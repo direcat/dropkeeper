@@ -49,31 +49,28 @@ enum StatusPulse {
     }
 }
 
-/// The menu bar anchor: icon, count or countdown, and a popover with the pending list.
+/// The menu bar anchor: icon, count or countdown, and the pending list under it.
 @MainActor
-final class StatusItemController: NSObject, NSPopoverDelegate {
+final class StatusItemController: NSObject {
     private let model: AppModel
-    private let actions: AppActions
     private let item = NSStatusBar.system.statusItem(withLength: NSStatusItem.variableLength)
-    private let popover = NSPopover()
-    /// Called after the popover opened or closed, so the floating panel can stop or start showing errors.
-    var onPopoverChange: (@MainActor () -> Void)?
+    private let list: ListPanelController
+    /// Called after the list opened or closed, so the floating panel can step aside or come back.
+    var onListChange: (@MainActor () -> Void)? {
+        get { list.onChange }
+        set { list.onChange = newValue }
+    }
 
     init(model: AppModel, actions: AppActions) {
         self.model = model
-        self.actions = actions
+        let item = item
+        list = ListPanelController(
+            model: model, actions: actions, anchorFrame: { item.button?.window?.frame },
+            anchorWindow: { item.button?.window })
         super.init()
-        popover.behavior = .transient
-        popover.delegate = self
-        popover.animates = true
-        let hosting = NSHostingController(rootView: PendingListView(model: model, actions: actions))
-        // Without this the popover is laid out at NSPopover's default 320×320 and then shrinks,
-        // leaving it hanging far below the menu bar icon.
-        hosting.sizingOptions = [.preferredContentSize]
-        popover.contentViewController = hosting
         if let button = item.button {
             button.target = self
-            button.action = #selector(togglePopover(_:))
+            button.action = #selector(toggleList(_:))
             button.imagePosition = .imageLeading
             button.setAccessibilityLabel(String(localized: "DropKeeper"))
         }
@@ -82,12 +79,9 @@ final class StatusItemController: NSObject, NSPopoverDelegate {
     }
 
     var anchorFrame: CGRect? { item.button?.window?.frame }
-    var isPopoverShown: Bool { popover.isShown }
 
     /// Closes the pending list before another window (Settings, the prompt) takes over.
-    func closePopover() {
-        if popover.isShown { popover.performClose(nil) }
-    }
+    func closeList() { list.close() }
 
     private func readState() {
         _ = model.hasProblems
@@ -130,25 +124,7 @@ final class StatusItemController: NSObject, NSPopoverDelegate {
         }
     }
 
-    @objc private func togglePopover(_ sender: Any?) {
-        guard let button = item.button else { return }
-        if popover.isShown {
-            popover.performClose(sender)
-        } else {
-            // Activating the app makes ⌘, and ⌘Q from the main menu work inside the popover.
-            NSApp.activate()
-            // The status bar button lives in a window the app doesn't own, so the popover would not follow
-            // a forced Light or Dark appearance by itself (nil in Auto inherits the system's).
-            popover.appearance = NSApp.appearance
-            popover.show(relativeTo: button.bounds, of: button, preferredEdge: .minY)
-            popover.contentViewController?.view.window?.makeKey()
-            onPopoverChange?()
-        }
-    }
-
-    func popoverDidClose(_ notification: Notification) {
-        onPopoverChange?()
-    }
+    @objc private func toggleList(_ sender: Any?) { list.toggle() }
 }
 
 extension NSFont {

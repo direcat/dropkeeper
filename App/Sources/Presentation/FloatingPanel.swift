@@ -32,7 +32,15 @@ final class FirstMouseHostingView<Content: View>: NSHostingView<Content> {
     /// Called when the pointer enters (true) or leaves (false) the view, whichever app is active.
     var onPointerChange: ((Bool) -> Void)?
 
+    /// Called when SwiftUI's content changed size, so the owner can resize the panel around it.
+    var onIntrinsicSizeChange: (() -> Void)?
+
     override func acceptsFirstMouse(for event: NSEvent?) -> Bool { true }
+
+    override func invalidateIntrinsicContentSize() {
+        super.invalidateIntrinsicContentSize()
+        onIntrinsicSizeChange?()
+    }
 
     /// Our own area only: the hosting view's other areas drive SwiftUI's `.onHover`.
     private var pointerArea: NSTrackingArea?

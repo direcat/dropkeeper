@@ -7,8 +7,6 @@ import SwiftUI
 final class PanelCoordinator {
     private let model: AppModel
     private let statusAnchor: @MainActor () -> CGRect?
-    /// The open popover shows errors in its list; the panel then doesn't show them a second time.
-    private let isPopoverShown: @MainActor () -> Bool
     private let panel = FloatingPanel()
     private var hosting: FirstMouseHostingView<PanelRootView>?
     /// True from the start of a hide's fade until the panel is ordered out; a show in between clears it and keeps
@@ -21,13 +19,14 @@ final class PanelCoordinator {
     private var lockedAnchor: CGRect?
     private var keyMonitor: Any?
 
-    init(
-        model: AppModel, statusAnchor: @escaping @MainActor () -> CGRect?,
-        isPopoverShown: @escaping @MainActor () -> Bool
-    ) {
+    init(model: AppModel, statusAnchor: @escaping @MainActor () -> CGRect?) {
         self.model = model
         self.statusAnchor = statusAnchor
-        self.isPopoverShown = isPopoverShown
+    }
+
+    isolated deinit {
+        if let keyMonitor { NSEvent.removeMonitor(keyMonitor) }
+        if let screenObserver { NotificationCenter.default.removeObserver(screenObserver) }
     }
 
     func start() {
@@ -66,12 +65,16 @@ final class PanelCoordinator {
         _ = model.reminders.due.count
         _ = model.panelError.message
         _ = model.settings.quietMode
+        _ = model.isListOpen
     }
 
     func render() {
+        // One card at a time: while the menu bar list is open it is the only card (it shows errors itself), and
+        // `isPromptAvailable` is already false then.
+        let listOpen = model.isListOpen
         let content = PanelDecision.content(
-            promptAvailable: model.isPromptAvailable, noticeVisible: model.isNoticeVisible,
-            errorVisible: model.panelError.isVisible && !isPopoverShown())
+            promptAvailable: model.isPromptAvailable, noticeVisible: model.isNoticeVisible && !listOpen,
+            errorVisible: model.panelError.isVisible && !listOpen)
         let previousContent = lastContent
         lastContent = content
         guard content != .hidden else {

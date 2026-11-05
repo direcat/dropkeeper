@@ -66,10 +66,6 @@ struct PromptView: View {
             withAnimation(TimelineView.selectionAnimation(reduceMotion: reduceMotion)) { timeline.moveRight() }
             return .handled
         }
-        // Tab, Space and the like: not handled here, but they show the user is still at the prompt.
-        .onKeyPress(phases: .down) { _ in
-            return .ignored
-        }
     }
 
     private var header: some View {
@@ -121,12 +117,7 @@ struct PromptView: View {
     /// "49 KB · Downloads": the size and the name of the folder the file lies in.
     static func metadata(for file: TrackedFile) -> String {
         let size = file.sizeBytes.map { ByteCountFormatter.string(fromByteCount: $0, countStyle: .file) }
-        let directory = URL(fileURLWithPath: file.path).deletingLastPathComponent()
-        // A file directly under the root has "/" as its folder: show the volume's display name instead.
-        let folder =
-            directory.path == "/"
-            ? FileManager.default.displayName(atPath: "/") : directory.lastPathComponent
-        return [size, folder.isEmpty ? nil : folder].compactMap(\.self).joined(separator: " · ")
+        return [size, FileLocation.folderName(of: file)].compactMap(\.self).joined(separator: " · ")
     }
 
     static func hideCaption(seconds: Int?) -> String? {

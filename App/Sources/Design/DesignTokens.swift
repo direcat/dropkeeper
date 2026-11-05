@@ -42,6 +42,8 @@ enum TK {
         static let cardEdge = dynamic(light: Color.white.opacity(0.5), dark: Color.white.opacity(0.12))
         static let cardTint = dynamic(
             light: Color(hex: 0xF4F1EF).opacity(0.80), dark: Color(hex: 0x26262A).opacity(0.78))
+        /// The selected segment of a segmented control.
+        static let segmentOn = dynamic(light: Color.white, dark: Color.white.opacity(0.18))
         static let accent = dynamic(light: Petrol.p500, dark: Petrol.p400)
         static let accentText = dynamic(light: Petrol.p700, dark: Petrol.p300)
         /// The timeline knob stays white in both appearances.
@@ -77,6 +79,8 @@ enum TK {
         static let compactCard: CGFloat = 18
         static let group: CGFloat = 14
         static let segment: CGFloat = 12
+        /// The selected segment inside the track's inner padding.
+        static let segmentInner: CGFloat = 9
         static let control: CGFloat = 10
         static let button: CGFloat = 11
         static let fileGlyph: CGFloat = 8
@@ -102,7 +106,15 @@ enum TK {
         /// The inner stroke of a glass card.
         static let cardStroke: CGFloat = 0.5
         static let fileGlyph: CGFloat = 40
-        static let listRow: CGFloat = 48
+        /// Vertical padding of a list row, and the inner padding of a segmented control's track.
+        static let listRowInset: CGFloat = 6
+        static let segmentPadding: CGFloat = 3
+        /// The small icon inside a list row's progress ring and in a muted row.
+        static let listIcon: CGFloat = 22
+        /// The tallest the list's scrolling part grows before it scrolls.
+        static let listMaxHeight: CGFloat = 340
+        /// The round "•••" button in the list footer.
+        static let moreButton: CGFloat = 30
         static let timelineDot: CGFloat = 10
         static let timelineKnob: CGFloat = 22
         /// The translucent accent ring around the knob.

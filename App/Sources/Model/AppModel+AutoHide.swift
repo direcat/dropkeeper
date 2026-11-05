@@ -6,7 +6,8 @@ struct AutoHideState {
     /// Unset until the first sync brings in the model's settings.
     var prompt = AutoHideTimer(duration: Settings.notificationTimeoutNever)
     var reminder = AutoHideTimer(duration: Settings.notificationTimeoutNever)
-    /// What the running prompt countdown belongs to (current file and stack size); a change restarts it.
+    /// What the running prompt countdown belongs to (the current file and the ids on the stack); a new current
+    /// file or a joining id restarts it.
     struct PromptKey: Equatable {
         let current: FileID
         var ids: Set<FileID>
@@ -72,7 +73,7 @@ extension AppModel {
             state.reminderIds = []
         }
         let due = Set(reminders.due.map(\.id))
-        if hidesByItself, !due.isEmpty {
+        if hidesByItself, !isListOpen, !due.isEmpty {
             if !due.isSubset(of: state.reminderIds) || state.reminder.remaining(now: now) == nil {
                 state.reminder.start(now: now)
                 if state.isPanelHovered { state.reminder.pause(now: now) }

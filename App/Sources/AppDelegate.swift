@@ -20,12 +20,12 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     private lazy var settingsWindow = SettingsWindowController(model: model, defaults: AppDelegate.appDefaults)
     private lazy var actions = AppActions(
         openSettings: { [weak self] in
-            self?.statusItem?.closePopover()
+            self?.statusItem?.closeList()
             self?.openSettings()
         },
         quit: { NSApp.terminate(nil) },
         review: { [weak self] id in
-            self?.statusItem?.closePopover()
+            self?.statusItem?.closeList()
             self?.model.review(id)
         })
     private let log = Logger(subsystem: "net.direcat.dropkeeper", category: "app")
@@ -81,10 +81,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     private func didLaunch() {
         let status = StatusItemController(model: model, actions: actions)
         statusItem = status
-        let panels = PanelCoordinator(
-            model: model, statusAnchor: { [weak status] in status?.anchorFrame },
-            isPopoverShown: { [weak status] in status?.isPopoverShown ?? false })
-        status.onPopoverChange = { [weak panels] in panels?.render() }
+        let panels = PanelCoordinator(model: model, statusAnchor: { [weak status] in status?.anchorFrame })
+        status.onListChange = { [weak panels] in panels?.render() }
         panels.start()
         self.panels = panels
         if model.needsOnboarding { onboarding.show() }

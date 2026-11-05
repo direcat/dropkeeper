@@ -5,15 +5,51 @@ import Testing
 
 @testable import DropKeeper
 
-@Test func rowsShowFailedThenPendingThenSoonestScheduled() {
-    let later = scheduledFile(expiresIn: 600, id: "later")
-    let sooner = scheduledFile(expiresIn: 60, id: "sooner")
-    var failedFile = scheduledFile(expiresIn: 0, id: "failed")
-    failedFile.state = .failed
-    var pendingFile = scheduledFile(expiresIn: 0, id: "pending")
-    pendingFile.state = .pending
-    let rows = PendingRows.ordered(pending: [pendingFile], scheduled: [later, sooner], failed: [failedFile])
-    #expect(rows.map(\.id) == ["failed", "pending", "sooner", "later"])
+private func file(_ id: String, state: FileState, expiresIn: TimeInterval = 0) -> TrackedFile {
+    var file = scheduledFile(expiresIn: expiresIn, id: id)
+    file.state = state
+    if state != .scheduled { file.expiresAt = nil }
+    return file
+}
+
+@Test func sectionsOrderAndOmitEmpty() {
+    let waiting = file("p", state: .pending)
+    let late = file("late", state: .scheduled, expiresIn: 600)
+    let soon = file("soon", state: .scheduled, expiresIn: 60)
+    let sections = ListSections.make(pending: [waiting], scheduled: [late, soon], failed: [])
+    #expect(sections.map(\.0) == [.waiting, .deletingSoon])
+    #expect(sections[1].1.map(\.id) == ["soon", "late"])
+    let all = ListSections.make(pending: [waiting], scheduled: [late], failed: [file("f", state: .failed)])
+    #expect(all.map(\.0) == [.waiting, .deletingSoon, .couldNotDelete])
+    #expect(ListSections.make(pending: [], scheduled: [], failed: []).isEmpty)
+}
+
+@Test func listTabsAreUpcomingThenHistory() {
+    #expect(ListTab.allCases == [.upcoming, .history])
+}
+
+@Test func absoluteDeletionTimeIsShortInTheListRows() {
+    let calendar = {
+        var calendar = Calendar(identifier: .gregorian)
+        calendar.timeZone = TimeZone(identifier: "Europe/Prague")!
+        calendar.locale = Locale(identifier: "en_GB")
+        return calendar
+    }()
+    let now = Date(timeIntervalSince1970: 1_800_000_000)  // 09:00 in Prague
+    #expect(TimeLabels.absolute(at: now.addingTimeInterval(3600), now: now, calendar: calendar) == "10:00")
+    #expect(
+        TimeLabels.absolute(at: now.addingTimeInterval(86_400), now: now, calendar: calendar) == "Tomorrow 09:00")
+    let later = TimeLabels.absolute(at: now.addingTimeInterval(864_000), now: now, calendar: calendar)
+    #expect(later.contains("25") && later.contains("Jan") && !later.contains(":"))
+}
+
+@MainActor
+@Test func footerCaptionNamesTheSoonestDeletion() {
+    let now = Date(timeIntervalSince1970: 1_800_000_000)
+    #expect(ListFooter.caption(scheduled: [], now: now) == "No files scheduled")
+    let soon = file("soon", state: .scheduled, expiresIn: 360)
+    let late = file("late", state: .scheduled, expiresIn: 7200)
+    #expect(ListFooter.caption(scheduled: [late, soon], now: now) == "Next deletion in 6 min")
 }
 
 @Test func statusIconStates() {
@@ -64,6 +100,6 @@ import Testing
     var failedFile = scheduledFile(expiresIn: 0, id: "failed")
     failedFile.state = .failed
     model.apply([scheduledFile(expiresIn: 60, id: "sooner"), failedFile])
-    let view = PendingListView(model: model, actions: actions, showsFooter: false)
+    let view = PendingListView(model: model, actions: actions)
     #expect(ImageRenderer(content: view).cgImage != nil)
 }

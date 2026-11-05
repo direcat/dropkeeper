@@ -27,6 +27,12 @@ final class AppModel {
     /// The file the user opened from the list: its prompt shows in Quiet mode and never hides by itself. Covers that
     /// one file only; the next file in the stack is treated normally.
     private(set) var requestedFileId: FileID?
+    /// The menu bar list is open (set by the status item). One card at a time: the prompt and the notices step
+    /// aside, the countdowns stop, and new notices are dropped; nothing is dismissed, so on close a still-pending
+    /// prompt and due reminders show again with fresh countdowns.
+    var isListOpen = false {
+        didSet { if isListOpen != oldValue { syncAutoHide() } }
+    }
     /// Injectable so tests can move time; only the auto-hide timers use it.
     @ObservationIgnored var clock: () -> Date = { Date() }
     @ObservationIgnored var isVoiceOverRunning: () -> Bool = { NSWorkspace.shared.isVoiceOverEnabled }
@@ -62,7 +68,8 @@ final class AppModel {
     var isNoticeVisible: Bool { notice.isVisible || ruleNotice.isVisible || !reminders.due.isEmpty }
     /// A revisit comes from the user's click on a notice, so Quiet mode doesn't hold it back.
     var isPromptAvailable: Bool {
-        queue.current != nil && (!settings.quietMode || requestedFileId == queue.current?.id || queue.isRevisiting)
+        guard !isListOpen, let current = queue.current else { return false }
+        return !settings.quietMode || requestedFileId == current.id || queue.isRevisiting
     }
 
     // MARK: Lifecycle
@@ -161,6 +168,7 @@ final class AppModel {
     func handle(_ note: EngineNotification) async {
         switch note {
         case .trashed(let files):
+            guard !isListOpen else { break }  // the list shows the result itself
             notice.add(files, now: Date())
             scheduleNoticeExpiry()
         case .failed:
@@ -168,6 +176,7 @@ final class AppModel {
         case .foldersChanged:
             await refreshState()
         case .ruleApplied(let applications):
+            guard !isListOpen else { break }
             ruleNotice.add(applications, now: Date())
             scheduleRuleNoticeExpiry()
         }
