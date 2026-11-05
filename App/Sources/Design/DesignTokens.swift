@@ -185,10 +185,12 @@ enum TK {
         static let ringStepPoints: CGFloat = 0.5
         static let ringFastestTick: Double = 1.0 / 30
         static let ringSlowestTick: Double = 10
+        /// The panel's measured height is not trusted below this (an empty view's stale measurement).
+        static let panelMinMeasuredHeight: CGFloat = 40
         /// A panel slides down this far into place when it appears, over `panelSlideDuration`, while it fades in.
         static let panelSlideOffset: CGFloat = 18
         static let panelSlideDuration: Double = 0.28
-        static let panelFadeInDuration: Double = 0.15
+        static let panelReducedFadeDuration: Double = 0.15
         static let panelFadeOutDuration: Double = 0.22
         /// A visible panel that changes size follows its new frame over this long.
         static let panelResizeDuration: Double = 0.3

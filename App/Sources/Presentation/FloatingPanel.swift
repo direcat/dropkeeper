@@ -22,6 +22,13 @@ final class FloatingPanel: NSPanel {
         isReleasedWhenClosed = false
     }
 
+    /// The frame a running slide or resize is heading for; nil when no frame animation is in flight. Decisions about
+    /// the panel's frame are made against `settledFrame`, never the interpolated mid-animation `frame`.
+    private(set) var frameTarget: CGRect?
+    private var frameAnimation = 0
+
+    var settledFrame: CGRect { frameTarget ?? frame }
+
     override var canBecomeKey: Bool { true }
     override var canBecomeMain: Bool { false }
 }
@@ -33,11 +40,37 @@ extension FloatingPanel {
         alphaValue = 0
         setFrame(reduceMotion ? frame : PanelGeometry.slideStartFrame(for: frame), display: true)
         if makeKey { makeKeyAndOrderFront(nil) } else { orderFrontRegardless() }
+        animate(
+            to: frame, moves: !reduceMotion,
+            duration: reduceMotion ? TK.Motion.panelReducedFadeDuration : TK.Motion.panelSlideDuration)
+    }
+
+    /// Moves a visible panel to `frame` (same left and top edge: a resize in place) and back to full opacity. A
+    /// running slide or resize is re-targeted through the animator, never overridden by a direct `setFrame`.
+    func retarget(to frame: CGRect, reduceMotion: Bool) {
+        if reduceMotion, frameTarget == nil { setFrame(frame, display: true) }
+        animate(to: frame, moves: !reduceMotion || frameTarget != nil, duration: TK.Motion.panelResizeDuration)
+    }
+
+    /// Sets the frame without animation, unless a frame animation is in flight (then it is re-targeted).
+    func place(_ frame: CGRect) {
+        if frameTarget == nil { setFrame(frame, display: true) } else { animate(to: frame, moves: true, duration: 0.1) }
+    }
+
+    private func animate(to frame: CGRect, moves: Bool, duration: Double) {
+        frameAnimation += 1
+        let animation = frameAnimation
+        if moves { frameTarget = frame }
         NSAnimationContext.runAnimationGroup { context in
-            context.duration = reduceMotion ? TK.Motion.panelFadeInDuration : TK.Motion.panelSlideDuration
+            context.duration = duration
             context.timingFunction = CAMediaTimingFunction(name: .easeOut)
             animator().alphaValue = 1
-            if !reduceMotion { animator().setFrame(frame, display: true) }
+            if moves { animator().setFrame(frame, display: true) }
+        } completionHandler: { [weak self] in
+            MainActor.assumeIsolated {
+                guard let self, self.frameAnimation == animation else { return }
+                self.frameTarget = nil
+            }
         }
     }
 }

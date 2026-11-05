@@ -87,17 +87,23 @@ enum RingProgress {
 }
 
 /// A progress ring of a file's timer that runs down continuously. Only this small view re-renders on the fast
-/// tick, not the list around it. It only exists while its card is on screen, so the timeline never runs hidden.
+/// tick, not the list around it. The panels drop their content when hidden, so the timeline stops with it.
 struct LiveRing<Center: View>: View {
     let file: TrackedFile
     @ViewBuilder let center: Center
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
+    /// Without a timer length the share is constantly 0, so the slowest tick will do.
+    private var interval: TimeInterval {
+        guard let length = file.timerLength, length > 0 else { return TK.Motion.ringSlowestTick }
+        return RingProgress.tickInterval(timerLength: length)
+    }
+
     var body: some View {
         if reduceMotion {
-            SwiftUI.TimelineView(.periodic(from: .now, by: TK.Motion.ringReducedTick)) { ring(at: $0.date) }
+            let reduced = max(interval, TK.Motion.ringReducedTick)
+            SwiftUI.TimelineView(.periodic(from: .now, by: reduced)) { ring(at: $0.date) }
         } else {
-            let interval = RingProgress.tickInterval(timerLength: file.timerLength ?? 0)
             SwiftUI.TimelineView(.animation(minimumInterval: interval)) { ring(at: $0.date) }
         }
     }

@@ -82,8 +82,8 @@ final class ListPanelController {
         guard let screen else { return }
         let size = CGSize(width: TK.Size.panelWidth, height: max(hosting.fittingSize.height, 1))
         let frame = PanelGeometry.menuBarPanelFrame(anchor: anchor, visibleFrame: screen.visibleFrame, size: size)
-        guard frame != panel.frame else { return }
-        panel.setFrame(frame, display: true)
+        guard frame != panel.settledFrame else { return }
+        panel.place(frame)
         panel.invalidateShadow()
     }
 

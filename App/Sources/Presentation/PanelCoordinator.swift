@@ -68,7 +68,7 @@ final class PanelCoordinator {
         _ = model.isListOpen
     }
 
-    func render() {
+    func render(retryTinyMeasurement: Bool = true) {
         // One card at a time: while the menu bar list is open it is the only card (it shows errors itself), and
         // `isPromptAvailable` is already false then.
         let listOpen = model.isListOpen
@@ -96,16 +96,38 @@ final class PanelCoordinator {
             // The coordinator sizes the panel itself. Keep the intrinsic size (fittingSize needs it) but
             // drop SwiftUI's window min/max constraints.
             hostingView.sizingOptions = [.intrinsicContentSize]
+            // A measurement taken before the content laid out heals when its real size arrives.
+            hostingView.onIntrinsicSizeChange = { [weak self] in
+                DispatchQueue.main.async { MainActor.assumeIsolated { self?.reframe() } }
+            }
             panel.contentView = hostingView
             hosting = hostingView
         }
-        guard let frame = frame(for: content, previous: previousContent, fitting: hostingView.fittingSize) else {
+        hostingView.layoutSubtreeIfNeeded()
+        let fitting = hostingView.fittingSize
+        if fitting.height < TK.Motion.panelMinMeasuredHeight, retryTinyMeasurement {
+            // The new content has not laid out yet: measure again on the next turn rather than show a sliver.
+            DispatchQueue.main.async { MainActor.assumeIsolated { self.render(retryTinyMeasurement: false) } }
+            return
+        }
+        guard let frame = frame(for: content, previous: previousContent, fitting: fitting) else {
             lastContent = .hidden
             lockedAnchor = nil
             model.resumePanelTimers()
             hide()
             return
         }
+        show(frame: frame)
+    }
+
+    /// Places the open panel again after its content changed size, without touching the content.
+    private func reframe() {
+        guard lastContent != .hidden, let hosting, panel.isVisible, !isFadingOut else { return }
+        hosting.layoutSubtreeIfNeeded()
+        let fitting = hosting.fittingSize
+        guard fitting.height >= TK.Motion.panelMinMeasuredHeight,
+            let frame = frame(for: lastContent, previous: lastContent, fitting: fitting)
+        else { return }
         show(frame: frame)
     }
 
@@ -128,31 +150,24 @@ final class PanelCoordinator {
 
     private func show(frame: CGRect) {
         let reduceMotion = NSWorkspace.shared.accessibilityDisplayShouldReduceMotion
-        let step = PanelDecision.showStep(
-            isOnScreen: panel.isVisible, isFadingOut: isFadingOut, frameChanged: frame != panel.frame)
-        isFadingOut = false
-        switch step {
-        case .none:
-            return
-        case .restore:
-            // A visible panel resizes in place; any other move (new anchor) jumps instead of travelling.
-            let animated = !reduceMotion && PanelGeometry.resizesInPlace(from: panel.frame, to: frame)
-            NSAnimationContext.runAnimationGroup { context in
-                context.duration = animated ? TK.Motion.panelResizeDuration : 0
-                context.allowsImplicitAnimation = animated
-                if animated {
-                    panel.animator().setFrame(frame, display: true)
-                } else {
-                    panel.setFrame(frame, display: true)
-                }
-                // Undoes a fade-out that is still running.
-                panel.animator().alphaValue = 1
-            }
-            syncPointer(frame: frame)
-        case .fadeIn:
+        guard panel.isVisible else {
+            isFadingOut = false
             panel.slideIn(to: frame, reduceMotion: reduceMotion)
             syncPointer(frame: frame)
+            return
         }
+        let wasFadingOut = isFadingOut
+        isFadingOut = false
+        switch PanelDecision.frameStep(settled: panel.settledFrame, new: frame) {
+        case .keep:
+            guard wasFadingOut else { return }
+            panel.retarget(to: frame, reduceMotion: reduceMotion)  // undoes the running fade-out
+        case .resize:
+            panel.retarget(to: frame, reduceMotion: reduceMotion)
+        case .slideIn:
+            panel.slideIn(to: frame, reduceMotion: reduceMotion)
+        }
+        syncPointer(frame: frame)
     }
 
     /// A panel that appears, grows or shrinks under a resting pointer gets no enter or exit event, so the
@@ -177,5 +192,8 @@ final class PanelCoordinator {
         guard isFadingOut else { return }
         isFadingOut = false
         panel.orderOut(nil)
+        // No hidden view graph keeps running (ring timelines), and the next show measures a fresh one.
+        hosting = nil
+        panel.contentView = nil
     }
 }

@@ -76,3 +76,14 @@ private func dueFile(_ id: String) -> TrackedFile {
     #expect(!PanelGeometry.resizesInPlace(from: final, to: otherAnchor))
     #expect(!PanelGeometry.resizesInPlace(from: final, to: otherTop))
 }
+
+/// The collapsed prompt after Decide: the panel slides in at its full frame, then a second render arrives mid-slide
+/// (the panel's own frame is interpolated by then). It must be judged against the slide's target.
+@Test func secondRenderDuringTheSlideKeepsTheTargetFrame() {
+    let full = CGRect(x: 100, y: 300, width: 380, height: 231)
+    #expect(PanelDecision.frameStep(settled: full, new: full) == .keep)
+    // A first stale measurement (a sliver) that is corrected under the same anchor resizes in place.
+    let sliver = CGRect(x: 100, y: 499, width: 380, height: 32)
+    #expect(PanelDecision.frameStep(settled: sliver, new: full) == .resize)
+    #expect(PanelDecision.frameStep(settled: full, new: full.offsetBy(dx: 300, dy: 0)) == .slideIn)
+}

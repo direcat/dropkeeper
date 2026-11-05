@@ -14,7 +14,19 @@ enum PanelShowStep: Equatable {
     case none
 }
 
+/// What happens to a visible panel's frame when a render wants another one.
+enum PanelFrameStep: Equatable {
+    case keep, resize, slideIn
+}
+
 enum PanelDecision {
+    /// Against the frame the panel is settling at (not its mid-animation frame): the same frame is kept, a pure
+    /// height change under the same anchor resizes in place, anything else slides in again.
+    static func frameStep(settled: CGRect, new: CGRect) -> PanelFrameStep {
+        if new == settled { return .keep }
+        return PanelGeometry.resizesInPlace(from: settled, to: new) ? .resize : .slideIn
+    }
+
     /// Prompt beats notice. An error never hides the prompt or the notice (they show it as a banner); on its own
     /// it replaces a hidden panel.
     static func content(promptAvailable: Bool, noticeVisible: Bool, errorVisible: Bool) -> PanelContent {
