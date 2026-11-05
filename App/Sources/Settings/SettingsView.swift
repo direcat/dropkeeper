@@ -210,7 +210,7 @@ private struct GeneralTab: View {
                 }
             }
             .labelsHidden()
-            .frame(width: TK.Size.settingsPicker)
+            .fixedSize()
         }
     }
 
@@ -317,7 +317,7 @@ private struct ExpiryTab: View {
                             Text(verbatim: "#\(index + 1)")
                         }
                         .labelsHidden()
-                        .frame(width: TK.Size.settingsPicker)
+                        .fixedSize()
                         Button {
                             store.draft.timelineStops.remove(at: index)
                         } label: {
@@ -361,7 +361,7 @@ private struct ExpiryTab: View {
                     }
                 }
                 .labelsHidden()
-                .frame(width: TK.Size.settingsPicker)
+                .fixedSize()
             }
             StepSlider(
                 "Apply default action after", values: Settings.gracePeriodOptions, selection: $store.draft.gracePeriod,
@@ -389,7 +389,7 @@ private struct ExpiryTab: View {
                     Text("Delete permanently").tag(DeleteMode.permanent)
                 }
                 .labelsHidden()
-                .frame(width: TK.Size.settingsPicker)
+                .fixedSize()
             }
             SettingsToggleRow(
                 "Mark scheduled files with the “Temporary” Finder tag", isOn: $store.draft.finderTagEnabled)

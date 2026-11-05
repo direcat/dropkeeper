@@ -67,7 +67,7 @@ struct RuleEditor: View {
                             Text("File name pattern").tag(MatchKind.pattern)
                         }
                         .labelsHidden()
-                        .frame(width: TK.Size.settingsPicker)
+                        .fixedSize()
                     }
                     matchRow
                     SettingsRow("Where") {
@@ -78,7 +78,7 @@ struct RuleEditor: View {
                             }
                         }
                         .labelsHidden()
-                        .frame(width: TK.Size.settingsPicker)
+                        .fixedSize()
                     }
                     StepSlider(
                         "When", values: StopPresets.all, selection: $rule.duration, label: { DurationLabel.long($0) })
@@ -107,7 +107,7 @@ struct RuleEditor: View {
                     ForEach(RuleCategory.allCases, id: \.self) { Text(RuleSummary.categoryName($0)).tag($0) }
                 }
                 .labelsHidden()
-                .frame(width: TK.Size.settingsPicker)
+                .fixedSize()
             }
         } else {
             SettingsRow {
