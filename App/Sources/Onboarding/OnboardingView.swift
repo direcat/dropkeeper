@@ -30,7 +30,9 @@ struct OnboardingView: View {
         let step = OnboardingStep.state(folders: model.folders, downloads: downloads)
         VStack(spacing: TK.Space.xl) {
             Image("Lockup").resizable().scaledToFit().frame(height: TK.Size.onboardingLockup)
-            Image("Onboarding").resizable().scaledToFit()
+                .accessibilityLabel("DropKeeper")
+                .accessibilityAddTraits(.isHeader)
+            Image(decorative: "Onboarding").resizable().scaledToFit()
                 .frame(width: TK.Size.onboardingArt.width, height: TK.Size.onboardingArt.height)
             Text(
                 """
@@ -59,7 +61,7 @@ struct OnboardingView: View {
                     onDone()
                 }
             }
-            .buttonStyle(PromptButtonStyle(primary: true))
+            .buttonStyle(PromptButtonStyle(primary: step == .granted))
             .keyboardShortcut(.defaultAction)
         }
         .padding(TK.Space.xl)
@@ -81,7 +83,12 @@ struct OnboardingView: View {
     private func accessRows(_ step: OnboardingStep) -> some View {
         switch step {
         case .needsAccess:
-            SettingsButtonRow("Allow access to Downloads") { Task { await allowAccess() } }
+            SettingsRow(
+                title: {
+                    Button("Allow access to Downloads") { Task { await allowAccess() } }
+                        .buttonStyle(PromptButtonStyle(primary: true))
+                },
+                control: { EmptyView() })
         case .granted:
             SettingsRow(
                 title: {

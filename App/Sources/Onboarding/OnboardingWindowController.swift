@@ -10,6 +10,9 @@ final class OnboardingWindowController {
         self.model = model
     }
 
+    /// The window, once opened (internal for tests).
+    var onboardingWindow: NSWindow? { window }
+
     func show() {
         if let window {
             NSApp.activate()
