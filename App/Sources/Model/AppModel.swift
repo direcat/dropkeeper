@@ -33,7 +33,12 @@ final class AppModel {
     /// aside, the countdowns stop, and new notices are dropped; nothing is dismissed, so on close a still-pending
     /// prompt and due reminders show again with fresh countdowns.
     var isListOpen = false {
-        didSet { if isListOpen != oldValue { syncAutoHide() } }
+        didSet {
+            guard isListOpen != oldValue else { return }
+            // An error shown inside the list was read there; it must not pop up again as a card on close.
+            if !isListOpen { clearPanelError() }
+            syncAutoHide()
+        }
     }
     /// Injectable so tests can move time; only the auto-hide timers use it.
     @ObservationIgnored var clock: () -> Date = { Date() }
@@ -280,6 +285,12 @@ final class AppModel {
             guard !Task.isCancelled, let self else { return }
             self.ruleNotice.expireIfDue(now: Date())
         }
+    }
+
+    private func clearPanelError() {
+        panelErrorTask?.cancel()
+        panelErrorTask = nil
+        panelError.clear()
     }
 
     private func showPanelError(_ failure: PanelFailure) {

@@ -59,6 +59,8 @@ private struct ListSegmentedControl: View {
         }
         .padding(TK.Size.segmentPadding)
         .background(TK.Palette.fillStrong, in: RoundedRectangle(cornerRadius: TK.Radius.segment, style: .continuous))
+        .accessibilityElement(children: .contain)
+        .accessibilityLabel(Text("List sections"))
     }
 
     private func segment(_ tab: ListTab) -> some View {

@@ -1831,6 +1831,15 @@
         "fr" : { "stringUnit" : { "state" : "translated", "value" : "Depuis l’entrée la plus ancienne de l’historique." } }
       }
     },
+    "List sections" : {
+      "comment" : "VoiceOver label of the menu bar list's Upcoming / History switch",
+      "localizations" : {
+        "cs" : { "stringUnit" : { "state" : "translated", "value" : "Sekce seznamu" } },
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Abschnitte der Liste" } },
+        "es" : { "stringUnit" : { "state" : "translated", "value" : "Secciones de la lista" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Sections de la liste" } }
+      }
+    },
     "Settings tabs" : {
       "comment" : "VoiceOver label of the Settings window's tab bar",
       "localizations" : {

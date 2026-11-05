@@ -111,6 +111,53 @@ private final class LoginItemRecorder {
         await model.stop()
     }
 
+    /// A successful Put back keeps the History row; Core marks it restored, shown as Kept.
+    @Test func putBackTurnsTheHistoryRowIntoKept() async throws {
+        let root = try tempDir()
+        defer { try? FileManager.default.removeItem(at: root) }
+        let suite = "DropKeeperAppTests.\(UUID().uuidString)"
+        let defaults = try #require(UserDefaults(suiteName: suite))
+        defer { defaults.removePersistentDomain(forName: suite) }
+        let started = try await startedModel(root: root, defaults: defaults)
+        let (model, folder) = (started.model, started.folder)
+
+        let id = try await drop("back.pdf", in: folder, model: model)
+        await model.deleteNow([id])
+        try await waitUntil { model.history.contains { $0.id == id } }
+
+        await model.putBack(id)
+        #expect(!model.panelError.isVisible)
+        try await waitUntil { model.history.first { $0.id == id }?.historyOutcome == .kept }
+        #expect(model.history.contains { $0.id == id && $0.historyOutcome == .kept })
+        model.autoHide.cancelTasks()
+        await model.stop()
+    }
+
+    /// An error shown inside the list is not repeated as a card once the list closes.
+    @Test func listErrorDoesNotReappearAfterClose() async throws {
+        let root = try tempDir()
+        defer { try? FileManager.default.removeItem(at: root) }
+        let suite = "DropKeeperAppTests.\(UUID().uuidString)"
+        let defaults = try #require(UserDefaults(suiteName: suite))
+        defer { defaults.removePersistentDomain(forName: suite) }
+        let started = try await startedModel(root: root, defaults: defaults)
+        let (model, folder) = (started.model, started.folder)
+
+        let id = try await drop("twice.pdf", in: folder, model: model)
+        await model.deleteNow([id])
+        try await waitUntil { model.history.contains { $0.id == id } }
+        let row = try #require(model.history.first { $0.id == id })
+        try FileManager.default.removeItem(atPath: try #require(row.trashPath))
+
+        model.isListOpen = true
+        await model.putBack(id)
+        #expect(model.panelError.isVisible)
+        model.isListOpen = false
+        #expect(!model.panelError.isVisible)
+        model.autoHide.cancelTasks()
+        await model.stop()
+    }
+
     @Test func promptDecisionRecordsLastChoice() async throws {
         let root = try tempDir()
         defer { try? FileManager.default.removeItem(at: root) }

@@ -69,7 +69,7 @@ The prompt always appears under the menu bar icon, as its own floating card (no 
 - [ ] Menu bar list card: Esc and a click outside close it; clicking the menu bar icon while it is open closes it (the card itself and its menus do not count as outside). Clicks in the gaps between separate cards (list, prompt, notice) do not act on anything.
 - [ ] Settings and Onboarding: the content sits below the titlebar and traffic lights and nothing is clipped at the bottom, in Light and Dark.
 - [ ] Appearance Dark while macOS is Light (and back to Auto): panel, list, Settings and onboarding all switch immediately, without a restart.
-- [ ] History shows the last 10 decisions; Put back restores a trashed file and the row disappears. Put back for a file whose Trash copy was already emptied shows the error in the panel ("couldn't put back"), the row stays and nothing crashes.
+- [ ] History shows the last 10 decisions; Put back restores a trashed file and its row changes to Kept. Put back for a file whose Trash copy was already emptied shows the error in the panel ("couldn't put back"), the row stays and nothing crashes.
 - [ ] A file put back from the Finder Trash by hand (not via Put back) does not appear in History.
 - [ ] Statistics (Settings > Data) show the counts and space freed since the oldest entry in history; removing a watched folder with many files adds nothing to History or to Kept.
 - [ ] Rules reorder by dragging as well as with Move up / Move down.

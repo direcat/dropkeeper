@@ -5,27 +5,12 @@ import SwiftUI
 // swiftlint:disable:next type_name
 enum TK {
     enum Petrol {
-        static let p100 = Color(hex: 0xEAF8F9)
-        static let p200 = Color(hex: 0xD2EEF0)
         static let p300 = Color(hex: 0xA3DDE0)
         static let p400 = Color(hex: 0x6AC2C6)
         static let p500 = Color(hex: 0x39A4A9)
-        static let p600 = Color(hex: 0x188489)
         static let p700 = Color(hex: 0x0C6468)
-        static let p800 = Color(hex: 0x034649)
-        static let p900 = Color(hex: 0x002A2D)
-        static let glow = Color(hex: 0x7FDDDD)
     }
     enum Neutral {
-        static let n100 = Color(hex: 0xF1F6F7)
-        static let n200 = Color(hex: 0xE3E9E9)
-        static let n300 = Color(hex: 0xCDD2D2)
-        static let n400 = Color(hex: 0xADB2B2)
-        static let n500 = Color(hex: 0x8E9393)
-        static let n600 = Color(hex: 0x717676)
-        static let n700 = Color(hex: 0x545959)
-        static let n800 = Color(hex: 0x3A3E3E)
-        static let n900 = Color(hex: 0x212525)
         static let ink = Color(hex: 0x1D1F20)
     }
     /// Appearance-aware colors: each resolves to its light or dark value from the effective appearance of the
@@ -138,7 +123,9 @@ enum TK {
         static let closeButton: CGFloat = 24
         /// The auto-hide progress bar under the prompt buttons.
         static let hideBar: CGFloat = 3
-        /// A hairline divider between panel sections.
+        /// The divider between the prompt and reminder sections. The glass cards are drawn over a translucent
+        /// material where a 0.5 pt line vanishes, so they keep a full point; Settings sits on an opaque window
+        /// background and uses the finer `separator`.
         static let hairline: CGFloat = 1
         /// The divider between Settings rows and under the tab bar.
         static let separator: CGFloat = 0.5
@@ -185,8 +172,6 @@ enum TK {
         static let knobOffset: CGFloat = 1
     }
     enum Motion {
-        static let open = Animation.spring(response: 0.35, dampingFraction: 0.82)
-        static let close = Animation.easeIn(duration: 0.22)
         static let select = Animation.spring(response: 0.25, dampingFraction: 0.85)
         static let reduced = Animation.easeInOut(duration: 0.15)
         static let deletedNoticeSeconds: Double = 2.5

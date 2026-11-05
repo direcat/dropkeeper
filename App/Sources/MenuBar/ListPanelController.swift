@@ -46,9 +46,6 @@ final class ListPanelController {
         anchor = frame
         // Activating the app makes ⌘, and ⌘Q from the main menu work while the card is key.
         NSApp.activate()
-        // The status bar button lives in a window the app doesn't own, so the card would not follow a forced
-        // Light or Dark appearance by itself (nil in Auto inherits the system's).
-        panel.appearance = NSApp.appearance
         model.isListOpen = true
         // A fresh view each time, so the card opens on Upcoming.
         let root = PendingListView(model: model, actions: actions)

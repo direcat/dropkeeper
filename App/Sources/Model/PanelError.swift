@@ -15,6 +15,11 @@ struct PanelError: Equatable {
         expiresAt = now.addingTimeInterval(Self.window)
     }
 
+    mutating func clear() {
+        message = nil
+        expiresAt = nil
+    }
+
     mutating func expireIfDue(now: Date) {
         guard let expiresAt, now >= expiresAt else { return }
         message = nil

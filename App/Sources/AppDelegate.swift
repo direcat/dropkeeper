@@ -25,8 +25,9 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         },
         quit: { NSApp.terminate(nil) },
         review: { [weak self] id in
-            self?.statusItem?.closeList()
+            // Review first: with the list still open it only picks the file, so the close renders it directly.
             self?.model.review(id)
+            self?.statusItem?.closeList()
         })
     private let log = Logger(subsystem: "net.direcat.dropkeeper", category: "app")
 

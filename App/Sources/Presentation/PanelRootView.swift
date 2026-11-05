@@ -32,10 +32,9 @@ struct PanelRootView: View {
         }
     }
 
-    /// The list shows the error itself, so it also has it in the menu bar popover.
     @ViewBuilder
     private var banner: some View {
-        if let message = model.panelError.message, content == .prompt || content == .notice || content == .error {
+        if let message = model.panelError.message {
             PanelErrorBanner(message: message, standalone: content != .prompt)
         }
     }
