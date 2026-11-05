@@ -20,8 +20,9 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     private lazy var settingsWindow = SettingsWindowController(model: model, defaults: AppDelegate.appDefaults)
     private lazy var actions = AppActions(
         openSettings: { [weak self] in
-            self?.statusItem?.closeList()
+            // Settings first: the accessory app never has zero visible windows, which is when AppKit yields activation.
             self?.openSettings()
+            self?.statusItem?.closeList()
         },
         quit: { NSApp.terminate(nil) },
         review: { [weak self] id in

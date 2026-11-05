@@ -56,10 +56,38 @@ private func scheduled(expiresIn seconds: TimeInterval, length: TimeInterval, no
     #expect(NSApp.appearance == nil)
 }
 
+@Test func ringShareIsZeroWithoutExpiryOrLength() {
+    let now = Date()
+    var noExpiry = scheduled(expiresIn: 30, length: 120, now: now)
+    noExpiry.expiresAt = nil
+    #expect(RingProgress.share(for: noExpiry, now: now) == 0)
+    #expect(RingProgress.share(for: scheduled(expiresIn: 30, length: 0, now: now), now: now) == 0)
+}
+
+/// A window the test owns must not release itself on close: ARC already does, and a double release crashes the
+/// test host later (xcodebuild then blames whichever test runs next).
 @MainActor
-@Test func frontWindowActivatesNowAndAgainAfterTheCloseSettles() {
+private func makeTestWindow() -> NSWindow {
     let window = NSWindow(
         contentRect: .init(x: 0, y: 0, width: 100, height: 100), styleMask: [.titled], backing: .buffered, defer: true)
+    window.isReleasedWhenClosed = false
+    return window
+}
+
+@MainActor
+@Test func frontWindowLeavesAWindowClosedInTheMeantimeAlone() {
+    let window = makeTestWindow()
+    var activations = 0
+    var pending: [@MainActor () -> Void] = []
+    FrontWindow.present(window, activate: { activations += 1 }, later: { pending.append($0) })
+    window.close()
+    for work in pending { work() }
+    #expect(activations == 1)
+}
+
+@MainActor
+@Test func frontWindowActivatesNowAndAgainAfterTheCloseSettles() {
+    let window = makeTestWindow()
     var activations = 0
     var pending: [@MainActor () -> Void] = []
     FrontWindow.present(window, activate: { activations += 1 }, later: { pending.append($0) })
