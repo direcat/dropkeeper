@@ -38,6 +38,15 @@ enum RingProgress {
         return min(max(expiresAt.timeIntervalSince(now) / length, 0), 1)
     }
 
+    /// How often a ring needs a redraw to run down smoothly: one step of `TK.Motion.ringStepPoints` of arc, within
+    /// the tick limits, so a 30-day timer does not redraw at 30 fps.
+    static func tickInterval(timerLength: TimeInterval) -> TimeInterval {
+        let radius = (TK.Size.ring - TK.Size.ringLine) / 2
+        let circumference = 2 * Double.pi * Double(radius)
+        let interval = max(timerLength, 0) * Double(TK.Motion.ringStepPoints) / circumference
+        return min(max(interval, TK.Motion.ringFastestTick), TK.Motion.ringSlowestTick)
+    }
+
     /// The ring's color blend for a remaining share: green from half the time left, amber at a quarter, red from
     /// a twentieth, linear in between. `amount` is how far the blend has moved from `from` to `to`.
     struct Blend: Equatable {
@@ -74,5 +83,27 @@ enum RingProgress {
         case .amber: TK.Palette.warning
         case .red: TK.Palette.destructive
         }
+    }
+}
+
+/// A progress ring of a file's timer that runs down continuously. Only this small view re-renders on the fast
+/// tick, not the list around it. It only exists while its card is on screen, so the timeline never runs hidden.
+struct LiveRing<Center: View>: View {
+    let file: TrackedFile
+    @ViewBuilder let center: Center
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
+
+    var body: some View {
+        if reduceMotion {
+            SwiftUI.TimelineView(.periodic(from: .now, by: TK.Motion.ringReducedTick)) { ring(at: $0.date) }
+        } else {
+            let interval = RingProgress.tickInterval(timerLength: file.timerLength ?? 0)
+            SwiftUI.TimelineView(.animation(minimumInterval: interval)) { ring(at: $0.date) }
+        }
+    }
+
+    private func ring(at date: Date) -> some View {
+        let share = RingProgress.share(for: file, now: date)
+        return ProgressRing(progress: share, tint: RingProgress.tint(share: share)) { center }
     }
 }

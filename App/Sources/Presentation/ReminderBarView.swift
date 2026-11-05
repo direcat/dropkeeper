@@ -48,9 +48,10 @@ struct ReminderBarView: View {
         // Counts down while the bar is open (the soonest expiry decides).
         SwiftUI.TimelineView(.periodic(from: .now, by: 1)) { context in
             HStack(spacing: TK.Space.m) {
-                let share = share(at: context.date)
-                ProgressRing(progress: share, tint: RingProgress.tint(share: share)) {
-                    FinderIcon(path: files.first?.path ?? "", kind: files.first?.kind ?? .other, size: TK.Size.ringIcon)
+                if let file = files.first {
+                    LiveRing(file: file) {
+                        FinderIcon(path: file.path, kind: file.kind, size: TK.Size.ringIcon)
+                    }
                 }
                 VStack(alignment: .leading, spacing: 2) {
                     Text(NoticeView.title(for: files))
@@ -96,10 +97,6 @@ struct ReminderBarView: View {
         let lengths = Set(files.compactMap(\.timerLength))
         guard lengths.count == 1, let length = lengths.first else { return Text(Action.extend.title) }
         return Text("Extend by \(DurationLabel.short(length))")
-    }
-
-    private func share(at date: Date) -> Double {
-        files.first.map { RingProgress.share(for: $0, now: date) } ?? 0
     }
 
     private func remaining(at date: Date) -> String {

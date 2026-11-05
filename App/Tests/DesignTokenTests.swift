@@ -97,3 +97,15 @@ private func makeTestWindow() -> NSWindow {
     #expect(activations == 2)
     window.close()
 }
+
+@Test func ringTickFollowsTimerLengthWithinLimits() {
+    #expect(RingProgress.tickInterval(timerLength: 1) == TK.Motion.ringFastestTick)
+    #expect(RingProgress.tickInterval(timerLength: 30 * 86_400) == TK.Motion.ringSlowestTick)
+    #expect(RingProgress.tickInterval(timerLength: 0) == TK.Motion.ringFastestTick)
+    let hour = RingProgress.tickInterval(timerLength: 600)
+    let day = RingProgress.tickInterval(timerLength: 1200)
+    #expect(hour > TK.Motion.ringFastestTick && hour < day && day < TK.Motion.ringSlowestTick)
+    // A tick moves the arc by about the step, never more (except where clamped).
+    let circumference = 2 * Double.pi * Double((TK.Size.ring - TK.Size.ringLine) / 2)
+    #expect(abs(hour / 600 * circumference - Double(TK.Motion.ringStepPoints)) < 1e-9)
+}

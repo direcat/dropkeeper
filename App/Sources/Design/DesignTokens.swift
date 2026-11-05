@@ -180,6 +180,13 @@ enum TK {
         static let ruleNoticeSeconds: Double = 6
         /// How often the prompt's hide bar and caption refresh.
         static let hideTick: Double = 1
+        /// The ring runs down in steps of at most this many points of arc, but redraws no faster than
+        /// `ringFastestTick` (short timers) and no slower than `ringSlowestTick` (long timers).
+        static let ringStepPoints: CGFloat = 0.5
+        static let ringFastestTick: Double = 1.0 / 30
+        static let ringSlowestTick: Double = 10
+        /// With Reduce Motion the ring only updates this often.
+        static let ringReducedTick: Double = 1
     }
 }
 
