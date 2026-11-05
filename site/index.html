@@ -60,7 +60,7 @@
     </div>
 
     <figure class="screen">
-      <video id="demo" autoplay muted loop playsinline preload="metadata" poster="assets/demo-poster.jpg" width="920" height="540" aria-label="Demo: a downloaded file appears, the prompt opens under the menu bar icon, a slider picks one day, and the file is later moved to the Trash with an Undo button.">
+      <video id="demo" autoplay muted loop playsinline preload="metadata" poster="assets/demo-poster.jpg" width="920" height="540" aria-label="Demo: a downloaded file appears, the prompt slides down under the menu bar icon, you pick one day and click Delete in 1 day, then the list shows the file among the others with progress rings.">
         <source src="assets/dropkeeper-demo.mp4" type="video/mp4">
       </video>
       <button type="button" class="pp" id="pp" aria-label="Pause the demo video" hidden>Pause</button>
@@ -163,16 +163,20 @@
       <h2 id="shots-h">What you will see.</h2>
       <div class="stage">
         <figure class="s-prompt">
-          <img src="assets/prompt.png" width="840" height="502" loading="lazy" alt="The prompt for a new file named Mountain trip.jpg with a slider set to one day, showing the deletion time Tomorrow 21:16, a Keep button and a Delete in 1 day button.">
+          <img src="assets/prompt.png" width="840" height="520" loading="lazy" alt="The prompt for a new file named Beach day.jpg with a slider set to one day, showing the deletion time Tomorrow 4:21 PM, a Keep button and a Delete in 1 day button.">
           <figcaption>Pick when a new download goes.</figcaption>
         </figure>
         <figure class="s-list">
-          <img src="assets/list.png" width="840" height="268" loading="lazy" alt="A list of tracked files, Iridescence.jpg expiring in 1 hour and Valley at dawn.jpg in 23 hours.">
+          <img src="assets/list.png" width="840" height="844" loading="lazy" alt="The menu bar list with an Upcoming and History switch. Under Deleting soon, Iridescence.jpg leaves in 3 minutes and Mountain trip.jpg in 17 minutes, each with a progress ring, followed by Invoice 2026-10.pdf, Setup-v2.4.zip and Valley at dawn.jpg. The footer reads Next deletion in 3 min.">
           <figcaption>See what is tracked and when it leaves.</figcaption>
         </figure>
-        <figure class="s-notice">
-          <img src="assets/notice.png" width="840" height="240" loading="lazy" alt="A notice saying Setup-v2.4.zip was moved to the Trash, with an Undo button.">
-          <figcaption>Changed your mind? Undo.</figcaption>
+        <figure class="s-reminder">
+          <img src="assets/reminder.png" width="840" height="288" loading="lazy" alt="A reminder that Iridescence.jpg is deleting in 3 minutes, with Delete now, Keep and Extend by 30 min buttons.">
+          <figcaption>A reminder before it goes, with a way out.</figcaption>
+        </figure>
+        <figure class="s-settings">
+          <img src="assets/settings.png" width="1480" height="1200" loading="lazy" alt="Settings, General tab: Launch at login, Appearance set to Auto, Light or Dark, Language, Quiet mode with Apply the default action automatically, and Hide notifications after 30 seconds.">
+          <figcaption>Light or dark, and notifications that hide on their own.</figcaption>
         </figure>
       </div>
     </div>

@@ -81,17 +81,13 @@ h1, h2, h3 { font-family: var(--cond); font-weight: 600; line-height: 1.05; lett
 .copy:hover { background: rgba(163,221,224,.32); }
 .small { margin: 22px 0 0; font-size: .92rem; color: var(--p300); }
 
-/* MacBook-top frame around the demo video. The ::before shape mimics the old notch demo; remove it together with the new demo media. */
+/* Frame around the demo video. */
 .screen {
   position: relative; margin: 0 auto; max-width: 940px;
-  background: #000; padding: 16px 10px 0; border-radius: 22px 22px 0 0;
+  background: #000; padding: 12px; border-radius: 22px;
   box-shadow: 0 0 0 1.5px #1c2a2b, 0 -30px 90px rgba(127,221,221,.14);
 }
-.screen::before {
-  content: ""; position: absolute; top: 0; left: 50%; transform: translateX(-50%);
-  width: clamp(80px, 14%, 132px); height: 26px; background: #000; border-radius: 0 0 14px 14px; z-index: 2;
-}
-.screen video { width: 100%; border-radius: 6px 6px 0 0; background: var(--p800); aspect-ratio: 920 / 540; }
+.screen video { display: block; width: 100%; border-radius: 12px; background: var(--p800); aspect-ratio: 920 / 540; }
 .pp {
   position: absolute; right: 18px; bottom: 12px; z-index: 3; font: 600 .8rem var(--sans); color: #fff;
   background: rgba(0,0,0,.6); border: 1px solid rgba(255,255,255,.3); border-radius: 999px; padding: 6px 14px; cursor: pointer;
@@ -130,13 +126,13 @@ h1, h2, h3 { font-family: var(--cond); font-weight: 600; line-height: 1.05; lett
 /* screenshots */
 .stage {
   margin-top: 56px; background: #0C3436; border-radius: 28px; padding: clamp(24px, 5vw, 64px);
-  display: grid; grid-template-columns: 1.15fr 1fr; grid-template-areas: "p l" "p n"; gap: clamp(20px, 3vw, 40px) clamp(24px, 4vw, 56px);
+  display: grid; grid-template-columns: 1.15fr 1fr; grid-template-areas: "p l" "r l" "s s"; gap: clamp(20px, 3vw, 40px) clamp(24px, 4vw, 56px);
   align-items: center; box-shadow: inset 0 0 0 1px rgba(127,221,221,.12);
 }
 .stage figure { margin: 0; }
 .stage img { border-radius: 14px; box-shadow: 0 20px 50px rgba(0,0,0,.45); }
 .stage figcaption { margin-top: 12px; color: var(--p200); font-size: .95rem; }
-.s-prompt { grid-area: p; } .s-list { grid-area: l; } .s-notice { grid-area: n; }
+.s-prompt { grid-area: p; } .s-list { grid-area: l; } .s-reminder { grid-area: r; } .s-settings { grid-area: s; }
 
 /* privacy */
 .sec.dark { background: var(--p900); color: #fff; }
@@ -180,7 +176,7 @@ h1, h2, h3 { font-family: var(--cond); font-weight: 600; line-height: 1.05; lett
   .track li:last-child::before { display: none; }
   .track li::after { top: 3px; }
   .feats { grid-template-columns: 1fr; }
-  .stage { grid-template-columns: 1fr; grid-template-areas: "p" "l" "n"; border-radius: 20px; }
+  .stage { grid-template-columns: 1fr; grid-template-areas: "p" "l" "r" "s"; border-radius: 20px; }
   .two { grid-template-columns: 1fr; }
 }
 @media (max-width: 520px) {
@@ -188,9 +184,8 @@ h1, h2, h3 { font-family: var(--cond); font-weight: 600; line-height: 1.05; lett
   .btn { width: 100%; text-align: center; }
   .brew { width: 100%; }
   .brew code { font-size: .78rem; }
-  .screen { padding: 12px 6px 0; border-radius: 16px 16px 0 0; }
-  .screen::before { height: 18px; }
-}
+  .screen { padding: 6px; border-radius: 16px; }
+  }
 
 .brew code { min-width: 0; flex: 1 1 auto; }
 .copy { flex: none; }

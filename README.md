@@ -23,15 +23,18 @@ Keep what matters. Let the rest disappear. When a file lands in a watched folder
 - **Speaks your language** — English, Czech, German, Spanish and French, switchable in Settings.
 - Apple Silicon, macOS 15 Sequoia or later.
 
-![DropKeeper demo: a downloaded file appears, the prompt opens under the menu bar icon, a slider picks one day, and the file is later moved to the Trash with an Undo button](assets/demo/dropkeeper-demo.gif)
+![DropKeeper demo: a downloaded file appears, the prompt slides down under the menu bar icon, you pick one day, and the list shows the file with a progress ring](assets/demo/dropkeeper-demo.gif)
 
 ### Screenshots
 
 <table>
   <tr>
-    <td align="center" width="40%"><img src="assets/demo/prompt.png" alt="The prompt with the expiry slider set to one day" width="300"><br><sub>Pick when a new download goes.</sub></td>
-    <td align="center" width="30%"><img src="assets/demo/list.png" alt="The list of tracked files with their remaining time" width="240"><br><sub>See what is tracked and when it leaves.</sub></td>
-    <td align="center" width="30%"><img src="assets/demo/notice.png" alt="The notice that a file was moved to the Trash, with an Undo button" width="240"><br><sub>Changed your mind? Undo.</sub></td>
+    <td align="center" width="50%"><img src="assets/demo/prompt.png" alt="The prompt for Beach day.jpg with the slider set to one day and a Delete in 1 day button" width="360"><br><sub>Pick when a new download goes.</sub></td>
+    <td align="center" width="50%"><img src="assets/demo/list.png" alt="The menu bar list of tracked files with progress rings and the time each one has left" width="300"><br><sub>See what is tracked and when it leaves.</sub></td>
+  </tr>
+  <tr>
+    <td align="center"><img src="assets/demo/reminder.png" alt="The reminder that Iridescence.jpg is deleting in 3 minutes, with Delete now, Keep and Extend buttons" width="360"><br><sub>A reminder before it goes, with a way out.</sub></td>
+    <td align="center"><img src="assets/demo/settings.png" alt="Settings, General tab, with Light, Dark and Auto appearance and the option to hide notifications automatically" width="360"><br><sub>Light or dark, and notifications that hide on their own.</sub></td>
   </tr>
 </table>
 
