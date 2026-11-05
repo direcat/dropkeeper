@@ -29,47 +29,27 @@ struct OnboardingView: View {
     var body: some View {
         let step = OnboardingStep.state(folders: model.folders, downloads: downloads)
         VStack(spacing: TK.Space.xl) {
-            Image("Lockup").resizable().scaledToFit().frame(height: 32)
-            Image("Onboarding").resizable().scaledToFit().frame(width: 320, height: 160)
+            Image("Lockup").resizable().scaledToFit().frame(height: TK.Size.onboardingLockup)
+            Image("Onboarding").resizable().scaledToFit()
+                .frame(width: TK.Size.onboardingArt.width, height: TK.Size.onboardingArt.height)
             Text(
                 """
                 Every new download gets an expiry. Pick 30 minutes, a day, or keep it. \
                 When time is up, DropKeeper moves the file to the Trash.
                 """
             )
+            .foregroundStyle(TK.Palette.textPrimary)
             .multilineTextAlignment(.center)
             .fixedSize(horizontal: false, vertical: true)
             Label("100 % offline, no analytics, no tracking, nothing leaves your computer.", systemImage: "lock")
                 .font(.system(size: TK.TextSize.formCallout))
-                .foregroundStyle(.secondary)
+                .foregroundStyle(TK.Palette.textSecondary)
                 .multilineTextAlignment(.center)
                 .fixedSize(horizontal: false, vertical: true)
-            switch step {
-            case .needsAccess:
-                Button("Allow access to Downloads") { Task { await allowAccess() } }
-                    .buttonStyle(.borderedProminent)
-            case .granted:
-                Label("Downloads is watched", systemImage: "checkmark.circle").foregroundStyle(Color.green)
-            case .denied:
-                VStack(spacing: TK.Space.s) {
-                    Image("Permission").resizable().scaledToFit().frame(width: 64, height: 64)
-                    Text(
-                        """
-                        DropKeeper has no access to Downloads. \
-                        Allow it in System Settings → Privacy & Security → Files and Folders.
-                        """
-                    )
-                    .multilineTextAlignment(.center)
-                    .fixedSize(horizontal: false, vertical: true)
-                    HStack {
-                        Button("Open System Settings") {
-                            NSWorkspace.shared.open(Self.filesAndFoldersSettings)
-                        }
-                        Button("Check again") { Task { await model.refreshFolders() } }
-                    }
-                }
+            SettingsGroup {
+                accessRows(step)
+                SettingsToggleRow("Launch at login", isOn: $launchAtLogin)
             }
-            Toggle("Launch at login", isOn: $launchAtLogin)
             Button("Done") {
                 Task {
                     var settings = model.settings
@@ -79,12 +59,13 @@ struct OnboardingView: View {
                     onDone()
                 }
             }
+            .buttonStyle(PromptButtonStyle(primary: true))
             .keyboardShortcut(.defaultAction)
         }
         .padding(TK.Space.xl)
         .font(.system(size: TK.TextSize.formBody))
-        .controlSize(.large)
-        .frame(width: 560)
+        .frame(width: TK.Size.onboardingWidth)
+        .background { GlassSurface().ignoresSafeArea() }
         .onAppear { launchAtLogin = model.settings.launchAtLogin }
         .alert(
             "Couldn't watch Downloads",
@@ -93,6 +74,40 @@ struct OnboardingView: View {
             Button("OK") {}
         } message: {
             Text(accessError ?? "")
+        }
+    }
+
+    @ViewBuilder
+    private func accessRows(_ step: OnboardingStep) -> some View {
+        switch step {
+        case .needsAccess:
+            SettingsButtonRow("Allow access to Downloads") { Task { await allowAccess() } }
+        case .granted:
+            SettingsRow(
+                title: {
+                    Label("Downloads is watched", systemImage: "checkmark.circle")
+                        .foregroundStyle(TK.Palette.accentText)
+                },
+                control: { EmptyView() })
+        case .denied:
+            SettingsRow(
+                title: {
+                    HStack(spacing: TK.Space.m) {
+                        Image("Permission").resizable().scaledToFit()
+                            .frame(width: TK.Size.onboardingPermission, height: TK.Size.onboardingPermission)
+                            .accessibilityHidden(true)
+                        Text(
+                            """
+                            DropKeeper has no access to Downloads. \
+                            Allow it in System Settings → Privacy & Security → Files and Folders.
+                            """
+                        )
+                        .fixedSize(horizontal: false, vertical: true)
+                    }
+                },
+                control: { EmptyView() })
+            SettingsButtonRow("Open System Settings") { NSWorkspace.shared.open(Self.filesAndFoldersSettings) }
+            SettingsButtonRow("Check again") { Task { await model.refreshFolders() } }
         }
     }
 

@@ -166,6 +166,11 @@ enum TK {
         static let lockup: CGFloat = 28
         /// The Statistics values' column.
         static let statisticsValue: CGFloat = 120
+        /// The onboarding window's width, its wordmark, illustration and permission glyph.
+        static let onboardingWidth: CGFloat = 560
+        static let onboardingLockup: CGFloat = 32
+        static let onboardingArt = CGSize(width: 320, height: 160)
+        static let onboardingPermission: CGFloat = 64
     }
     /// Opacities of decorations that are not colors of their own.
     enum Opacity {

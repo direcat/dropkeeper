@@ -26,7 +26,12 @@ final class OnboardingWindowController {
         }
         let window = NSWindow(contentViewController: NSHostingController(rootView: view))
         window.title = String(localized: "Welcome to DropKeeper")
-        window.styleMask = [.titled, .closable]
+        // Same glass window as Settings: content under a transparent titlebar.
+        window.styleMask = [.titled, .closable, .fullSizeContentView]
+        window.titlebarAppearsTransparent = true
+        window.titleVisibility = .hidden
+        window.isOpaque = false
+        window.backgroundColor = .clear
         window.isReleasedWhenClosed = false
         window.center()
         self.window = window
