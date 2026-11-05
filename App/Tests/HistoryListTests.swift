@@ -1,5 +1,6 @@
 import DropKeeperCore
 import Foundation
+import SwiftUI
 import Testing
 
 @testable import DropKeeper
@@ -56,26 +57,24 @@ private func historyFile(_ id: String, state: FileState = .kept, trashPath: Stri
 }
 
 @MainActor
-@Suite(.serialized) struct HistoryModelTests {
-    @Test func putBackFailureShowsPanelError() async {
-        let suite = "HistoryModelTests.\(UUID().uuidString)"
-        defer { UserDefaults(suiteName: suite)?.removePersistentDomain(forName: suite) }
-        let model = AppModel(defaults: UserDefaults(suiteName: suite)!, applyLoginItem: { _ in })
-        model.isVoiceOverRunning = { false }
-        // No engine: the action fails like a broken engine would.
-        await model.putBack("x")
-        #expect(model.panelError.isVisible)
-        model.autoHide.cancelTasks()
+@Suite(.serialized) struct HistoryViewTests {
+    private func height(of model: AppModel) throws -> Int {
+        let renderer = ImageRenderer(content: HistoryListView(model: model).frame(width: TK.Size.panelWidth))
+        return try #require(renderer.cgImage).height
     }
 
-    @Test func historyTabRenders() {
-        let suite = "HistoryModelTests.\(UUID().uuidString)"
+    @Test func rowsRenderTallerThanTheEmptyState() throws {
+        let suite = "HistoryViewTests.\(UUID().uuidString)"
         defer { UserDefaults(suiteName: suite)?.removePersistentDomain(forName: suite) }
         let model = AppModel(defaults: UserDefaults(suiteName: suite)!, applyLoginItem: { _ in })
-        model.history = [
+        let empty = try height(of: model)
+        let files = [
             historyFile("t", state: .trashed, trashPath: "/tmp/t", at: Date()),
             historyFile("p", state: .trashed, at: Date()), historyFile("k", at: Date()),
         ]
+        #expect(files.map(\.historyOutcome) == [.movedToTrash(canPutBack: true), .deletedPermanently, .kept])
+        model.applyHistory(files)
         #expect(model.history.count == 3)
+        #expect(try height(of: model) > empty)
     }
 }

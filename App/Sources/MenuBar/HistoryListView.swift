@@ -66,7 +66,7 @@ struct HistoryListView: View {
 
     private func content(_ groups: [(title: String, files: [TrackedFile])]) -> some View {
         VStack(alignment: .leading, spacing: 0) {
-            ForEach(groups, id: \.title) { group in
+            ForEach(Array(groups.enumerated()), id: \.offset) { _, group in
                 Text(group.title)
                     .font(.system(size: TK.TextSize.formCaption, weight: .semibold))
                     .foregroundStyle(TK.Palette.textSecondary)

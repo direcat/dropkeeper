@@ -10,7 +10,7 @@ final class AppModel {
     private(set) var pending: [TrackedFile] = []
     private(set) var scheduled: [TrackedFile] = []
     /// The last decisions, newest first (the History tab).
-    var history: [TrackedFile] = []
+    private(set) var history: [TrackedFile] = []
     private(set) var failed: [TrackedFile] = []
     private(set) var settings = Settings()
     private(set) var folders: [WatchedFolder] = []
@@ -138,20 +138,6 @@ final class AppModel {
                 do {
                     for try await files in updates {
                         self?.apply(files)
-                    }
-                } catch {
-                    self?.report(error)
-                }
-            })
-    }
-
-    private func observeHistory(_ engine: DropKeeperEngine) {
-        let updates = engine.historyUpdates()
-        tasks.append(
-            Task { [weak self] in
-                do {
-                    for try await files in updates {
-                        self?.history = files
                     }
                 } catch {
                     self?.report(error)
@@ -405,9 +391,6 @@ final class AppModel {
         }
     }
 
-    /// Takes a file back out of the Trash; it re-enters the history as kept.
-    func putBack(_ id: FileID) async { await perform(.undo) { try await $0.undoTrash(ids: [id]) } }
-
     func retry(_ ids: [FileID]) async { await perform(.retry) { try await $0.retry(ids: ids) } }
 
     /// Disposes of the files now, like an expiry (Trash or permanent, per Settings); the notice offers Undo.
@@ -509,6 +492,29 @@ final class AppModel {
         log.error("Engine action failed: \(String(describing: error), privacy: .private)")
         lastError = ErrorText.message(for: error)
     }
+}
+
+// MARK: History
+
+extension AppModel {
+    private func observeHistory(_ engine: DropKeeperEngine) {
+        let updates = engine.historyUpdates()
+        tasks.append(
+            Task { [weak self] in
+                do {
+                    for try await files in updates {
+                        self?.applyHistory(files)
+                    }
+                } catch {
+                    self?.report(error)
+                }
+            })
+    }
+
+    func applyHistory(_ files: [TrackedFile]) { history = files }
+
+    /// Takes a file back out of the Trash; it re-enters the history as kept.
+    func putBack(_ id: FileID) async { await perform(.undo) { try await $0.undoTrash(ids: [id]) } }
 }
 
 /// An action before the engine started (or after it failed to start).

@@ -87,6 +87,30 @@ private final class LoginItemRecorder {
         return try #require(model.queue.current?.id)
     }
 
+    /// Put back after the Trash was emptied: the error shows and the history row stays.
+    @Test func putBackWithEmptiedTrashShowsErrorAndKeepsRow() async throws {
+        let root = try tempDir()
+        defer { try? FileManager.default.removeItem(at: root) }
+        let suite = "DropKeeperAppTests.\(UUID().uuidString)"
+        let defaults = try #require(UserDefaults(suiteName: suite))
+        defer { defaults.removePersistentDomain(forName: suite) }
+        let started = try await startedModel(root: root, defaults: defaults)
+        let (model, folder) = (started.model, started.folder)
+
+        let id = try await drop("gone.pdf", in: folder, model: model)
+        await model.deleteNow([id])
+        try await waitUntil { model.history.contains { $0.id == id } }
+        let row = try #require(model.history.first { $0.id == id })
+        #expect(row.historyOutcome == .movedToTrash(canPutBack: true))
+        try FileManager.default.removeItem(atPath: try #require(row.trashPath))
+
+        await model.putBack(id)
+        #expect(model.panelError.isVisible)
+        #expect(model.history.contains { $0.id == id && $0.historyOutcome == .movedToTrash(canPutBack: true) })
+        model.autoHide.cancelTasks()
+        await model.stop()
+    }
+
     @Test func promptDecisionRecordsLastChoice() async throws {
         let root = try tempDir()
         defer { try? FileManager.default.removeItem(at: root) }
