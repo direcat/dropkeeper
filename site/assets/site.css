@@ -167,7 +167,7 @@ h1, h2, h3 { font-family: var(--cond); font-weight: 600; line-height: 1.05; lett
 .foot img { height: 22px; width: auto; }
 .foot ul { display: flex; flex-wrap: wrap; gap: 8px 24px; list-style: none; margin: 0; padding: 0; }
 .foot .badge { margin-left: auto; line-height: 0; }
-.foot .badge img { height: 58px; }
+.foot .badge img { width: 320px; height: auto; max-width: 100%; }
 .foot a { color: var(--text); }
 .foot p { margin: 0; flex-basis: 100%; }
 
