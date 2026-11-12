@@ -15,6 +15,8 @@ concurrency:
 
 jobs:
   deploy:
+    # Only master is deployed, even when dispatched manually from another branch.
+    if: github.ref == 'refs/heads/master'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v7
@@ -28,7 +30,9 @@ jobs:
           # site.js contain no URLs). Only relative assets/... references are
           # rewritten; absolute URLs (canonical, og:image, ...) stay untouched.
           sed -E -i "s@\b(src|href|poster|srcset)=\"(assets/[^\"?]+)\"@\1=\"\2?v=${v}\"@g" build/index.html
-          echo "Rewritten references: $(grep -c "?v=${v}" build/index.html) lines"
+          n=$(grep -c "?v=${v}" build/index.html || true)
+          echo "Rewritten references: ${n} lines"
+          if [ "${n}" -eq 0 ]; then echo "::error::No asset references were rewritten"; exit 1; fi
 
       - name: Deploy via rsync over SSH
         env:
