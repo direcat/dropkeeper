@@ -1,9 +1,6 @@
 name: Pages
 
 on:
-  push:
-    branches: [master]
-    paths: ['site/**']
   workflow_dispatch:
 
 permissions:
