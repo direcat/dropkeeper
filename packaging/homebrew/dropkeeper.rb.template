@@ -5,7 +5,7 @@ cask "dropkeeper" do
   url "https://github.com/direcat/dropkeeper/releases/download/v#{version}/DropKeeper-#{version}.zip"
   name "DropKeeper"
   desc "Gives every download an expiry and moves expired files to the Trash"
-  homepage "https://github.com/direcat/dropkeeper"
+  homepage "https://direcat.net/dropkeeper/"
 
   depends_on arch: :arm64
   depends_on macos: :sequoia

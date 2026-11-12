@@ -1,2 +1,2 @@
 # URL literals allowed in app code (opened in the user's browser, never fetched by the app)
-https://direcat.github.io/dropkeeper/
+https://direcat.net/dropkeeper/

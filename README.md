@@ -5,7 +5,7 @@
 
 # DropKeeper
 
-**Website: <https://direcat.github.io/dropkeeper/>**
+**Website: <https://direcat.net/dropkeeper/>**
 
 Keep what matters. Let the rest disappear. When a file lands in a watched folder, DropKeeper asks how long it should stay — half an hour, a day, ten days, or for good. Expired files go to the Trash, so you can still bring them back.
 

@@ -490,8 +490,8 @@ private struct AboutTab: View {
                 }
                 SettingsRow {
                     Link(
-                        "direcat.github.io/dropkeeper",
-                        destination: URL(string: "https://direcat.github.io/dropkeeper/")!)
+                        "direcat.net/dropkeeper",
+                        destination: URL(string: "https://direcat.net/dropkeeper/")!)
                 } control: {
                     EmptyView()
                 }

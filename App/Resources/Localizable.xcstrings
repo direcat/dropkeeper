@@ -1296,7 +1296,7 @@
         "fr" : { "stringUnit" : { "state" : "translated", "value" : "Gratuit et open source (MIT). 100 % hors ligne, aucune analyse, aucun suivi, rien ne quitte votre ordinateur." } }
       }
     },
-    "direcat.github.io/dropkeeper" : {
+    "direcat.net/dropkeeper" : {
       "comment" : "Settings: link to the project website",
       "shouldTranslate" : false
     },
