@@ -4,6 +4,8 @@ All notable changes to DropKeeper are documented here. The format follows [Keep 
 
 ## [Unreleased]
 
+## [1.2.1] - 2026-11-12
+
 ### Changed
 - The website moved to https://direcat.net/dropkeeper/; the link in Settings and the Homebrew cask homepage point there.
 
