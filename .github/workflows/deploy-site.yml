@@ -46,8 +46,8 @@ jobs:
           printf '%s\n' "$DEPLOY_SSH_KEY" > "$key"
           chmod 600 "$key"
           printf '%s\n' "$DEPLOY_KNOWN_HOSTS" > "$known_hosts"
-          # The key is forced to `rrsync -wo -munge <webroot>/dropkeeper` on the
-          # server, so the destination is relative to that directory.
+          # The key is forced to `rrsync -wo -munge <site root>/microsites/dropkeeper`
+          # on the server, so the destination is relative to that directory.
           rsync -rltvz --delete --chmod=D755,F644 \
             -e "ssh -i $key -o UserKnownHostsFile=$known_hosts -o StrictHostKeyChecking=yes -o IdentitiesOnly=yes" \
             build/ "$DEPLOY_TARGET:./"
