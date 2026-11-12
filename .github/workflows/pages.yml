@@ -1,5 +1,7 @@
 name: Pages
 
+# The site now lives at https://direcat.net/dropkeeper/ (see deploy-site.yml).
+# Run this workflow manually once to serve a redirect from the old GitHub Pages URL.
 on:
   workflow_dispatch:
 
@@ -23,6 +25,6 @@ jobs:
       - uses: actions/configure-pages@v6
       - uses: actions/upload-pages-artifact@v5
         with:
-          path: site
+          path: pages-redirect
       - id: deployment
         uses: actions/deploy-pages@v5
